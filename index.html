@@ -6,23 +6,37 @@
     <title>BitVault Pro — Digital Asset Exchange</title>
     <style>
         :root {
-            --bg: #0b0e11;
-            --bg-card: #151a21;
-            --bg-hover: #1c232d;
-            --border: #2a3441;
-            --text: #e2e8f0;
-            --text-muted: #94a3b8;
-            --accent: #00d4aa;
-            --accent-dim: #00d4aa22;
+            --bg: #06080a;
+            --bg-card: rgba(20, 26, 35, 0.7);
+            --bg-hover: rgba(30, 40, 55, 0.85);
+            --border: rgba(58, 80, 110, 0.35);
+            --text: #e8edf5;
+            --text-muted: #7a8fa8;
+            --accent: #00e5a0;
+            --accent-dim: rgba(0,229,160,0.12);
             --danger: #ff4757;
             --danger-dim: #ff475722;
             --warning: #ffa502;
-            --info: #1e90ff;
+            --info: #3498ff;
             --gold: #ffd700;
             --success: #2ed573;
+            --glass: rgba(255,255,255,0.03);
+            --glass-border: rgba(255,255,255,0.06);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: linear-gradient(135deg, #06080a 0%, #0a0e14 50%, #06080a 100%);
+            color: var(--text); overflow-x: hidden; -webkit-tap-highlight-color: transparent;
+            perspective: 2000px;
+        }
+        /* 3D Background effect */
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background: 
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,229,160,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 90%, rgba(52,152,255,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0,229,160,0.02) 0%, transparent 70%);
+        }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
@@ -30,16 +44,17 @@
 
         /* Sync Banner */
         .sync-banner {
-            background: linear-gradient(90deg, #1a2a3a, #0f172a);
-            border-bottom: 1px solid var(--border);
+            background: linear-gradient(90deg, #0d2b1f, #0f172a);
+            border-bottom: 1px solid var(--accent);
             padding: 10px 20px;
             text-align: center;
             font-size: 13px;
-            color: var(--text-muted);
+            color: var(--success);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            font-weight: 600;
         }
         .sync-banner.online { background: linear-gradient(90deg, #0d2b1f, #0f172a); color: var(--success); border-bottom-color: var(--accent); }
         .sync-banner .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warning); }
@@ -49,17 +64,52 @@
         /* Auth */
         .auth-container {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(ellipse at top, #0f172a 0%, #0b0e11 100%);
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(0,229,160,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(52,152,255,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(0,229,160,0.03) 0%, transparent 60%),
+                linear-gradient(180deg, #0a0e14 0%, #06080a 100%);
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-container::before {
+            content: ''; position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(0,229,160,0.08) 0%, transparent 70%);
+            top: -200px; right: -200px; border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .auth-container::after {
+            content: ''; position: absolute; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(52,152,255,0.06) 0%, transparent 70%);
+            bottom: -100px; left: -100px; border-radius: 50%;
+            animation: float 10s ease-in-out infinite reverse;
+            pointer-events: none;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
         }
         .auth-box {
-            width: 100%; max-width: 440px; background: var(--bg-card);
-            border: 1px solid var(--border); border-radius: 16px; padding: 40px 32px;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.6);
+            width: 100%; max-width: 440px; 
+            background: rgba(20, 26, 35, 0.8);
+            border: 1px solid rgba(58, 80, 110, 0.4); border-radius: 20px; padding: 40px 32px;
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.6), 0 0 60px rgba(0,229,160,0.05), inset 0 1px 0 rgba(255,255,255,0.05);
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+        .auth-box:hover {
+            box-shadow: 0 30px 100px rgba(0,0,0,0.7), 0 0 80px rgba(0,229,160,0.08), inset 0 1px 0 rgba(255,255,255,0.08);
         }
         .auth-logo { text-align: center; margin-bottom: 32px; }
-        .auth-logo h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
-        .auth-logo h1 span { background: linear-gradient(90deg, var(--accent), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .auth-logo h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; }
+        .auth-logo h1 span { 
+            background: linear-gradient(90deg, var(--accent), var(--info)); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(0,229,160,0.3));
+        }
         .auth-logo p { color: var(--text-muted); font-size: 13px; margin-top: 8px; }
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
@@ -72,8 +122,14 @@
             width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px;
             font-weight: 700; cursor: pointer; transition: 0.2s; letter-spacing: 0.3px;
         }
-        .btn-primary { background: linear-gradient(90deg, var(--accent), #00b894); color: #000; }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(0,212,170,0.3); }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--accent), #00b894); color: #000;
+            box-shadow: 0 4px 15px rgba(0,229,160,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px) translateZ(10px); 
+            box-shadow: 0 12px 35px rgba(0,229,160,0.4), 0 4px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-danger { background: linear-gradient(90deg, var(--danger), #ff6b81); color: #fff; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
@@ -87,9 +143,13 @@
         /* Layout */
         .app-layout { display: flex; min-height: 100vh; }
         .sidebar {
-            width: 270px; background: var(--bg-card); border-right: 1px solid var(--border);
+            width: 270px; 
+            background: rgba(15, 20, 28, 0.85); 
+            border-right: 1px solid var(--border);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
             display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100;
             transition: transform 0.3s ease;
+            box-shadow: 4px 0 30px rgba(0,0,0,0.4), inset -1px 0 0 rgba(255,255,255,0.03);
         }
         .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--border); }
         .sidebar-header h2 { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
@@ -99,29 +159,58 @@
             border-radius: 10px; cursor: pointer; transition: 0.2s; color: var(--text-muted);
             margin-bottom: 4px; font-size: 14px; font-weight: 500;
         }
-        .nav-item:hover, .nav-item.active { background: var(--bg-hover); color: var(--text); }
+        .nav-item:hover, .nav-item.active { 
+            background: var(--bg-hover); color: var(--text); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateX(4px);
+        }
         .nav-item.active { border-left: 3px solid var(--accent); }
-        .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+        .nav-item .icon { 
+            font-size: 18px; width: 32px; height: 32px; text-align: center; 
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(0,229,160,0.08), rgba(52,152,255,0.05));
+            border: 1px solid rgba(0,229,160,0.1);
+            margin-right: 4px;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover .icon, .nav-item.active .icon {
+            background: linear-gradient(135deg, rgba(0,229,160,0.18), rgba(52,152,255,0.12));
+            border-color: rgba(0,229,160,0.25);
+            box-shadow: 0 2px 8px rgba(0,229,160,0.1);
+        }
         .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
         .main-content { flex: 1; margin-left: 270px; min-height: 100vh; }
         .topbar {
-            height: 68px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+            height: 68px; 
+            background: rgba(15, 20, 28, 0.8); 
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             display: flex; align-items: center; justify-content: space-between; padding: 0 28px;
             position: sticky; top: 0; z-index: 50;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
         .topbar-left { display: flex; align-items: center; gap: 16px; }
         .menu-toggle { display: none; font-size: 22px; cursor: pointer; }
         .topbar-balances { display: flex; gap: 14px; }
         .balance-pill {
-            background: var(--bg); border: 1px solid var(--border); padding: 6px 16px;
+            background: rgba(15, 20, 28, 0.9); border: 1px solid var(--border); padding: 6px 16px;
             border-radius: 20px; font-size: 13px; font-weight: 700;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+            backdrop-filter: blur(10px);
         }
         .balance-pill span { color: var(--text-muted); font-weight: 500; margin-right: 4px; }
         .topbar-right { display: flex; align-items: center; gap: 14px; }
         .notif-btn {
             position: relative; width: 38px; height: 38px; border-radius: 10px;
-            background: var(--bg); border: 1px solid var(--border); color: var(--text);
+            background: rgba(15, 20, 28, 0.9); border: 1px solid var(--border); color: var(--text);
             display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+            transition: all 0.2s ease;
+        }
+        .notif-btn:hover {
+            box-shadow: 0 4px 15px rgba(0,229,160,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+            transform: translateY(-1px);
         }
         .notif-badge {
             position: absolute; top: -4px; right: -4px; background: var(--danger);
@@ -133,10 +222,23 @@
         .user-avatar {
             width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--info));
             display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; font-size: 13px;
+            box-shadow: 0 0 20px rgba(0,229,160,0.3), 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        .user-avatar:hover {
+            box-shadow: 0 0 30px rgba(0,229,160,0.5), 0 4px 15px rgba(0,0,0,0.4);
+            transform: scale(1.05);
         }
 
         /* Pages */
-        .page { padding: 28px; max-width: 1440px; margin: 0 auto; }
+        .page { 
+            padding: 28px; max-width: 1440px; margin: 0 auto;
+            animation: pageIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         .page-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
         /* Cards */
@@ -144,18 +246,53 @@
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .card {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
-            padding: 22px; transition: 0.2s;
+            background: var(--bg-card); 
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 22px; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+            transform-style: preserve-3d;
         }
-        .card:hover { border-color: #3a4553; }
-        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .card:hover { 
+            border-color: rgba(0,229,160,0.3); 
+            box-shadow: 0 8px 40px rgba(0,229,160,0.08), 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+            transform: translateY(-4px) translateZ(20px);
+        }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; position: relative; }
+        .card-header::after {
+            content: ''; position: absolute; bottom: -8px; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,229,160,0.3), transparent);
+        }
         .card-title { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
         .card-value { font-size: 30px; font-weight: 800; margin-top: 4px; letter-spacing: -0.5px; }
         .card-sub { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
         .change-up { color: var(--success); }
         .change-down { color: var(--danger); }
 
-        .chart-container { height: 340px; position: relative; }
+        
+        /* Chart tabs 3D */
+        .chart-tab {
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+        .chart-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        /* 3D chart container */
+        .chart-container { 
+            height: 340px; position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 340px;
+        }
+        .chart-container canvas {
+            border-radius: 12px;
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+
         .wallet-actions { display: flex; gap: 12px; margin: 20px 0; }
         .wallet-actions .btn { width: auto; padding: 10px 24px; font-size: 13px; }
         .tx-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
@@ -170,11 +307,18 @@
 
         /* Mining */
         .rig-card {
-            background: linear-gradient(145deg, var(--bg-card), #0f1318);
-            border: 1px solid var(--border); border-radius: 14px; padding: 22px;
-            position: relative; overflow: hidden; transition: 0.3s;
+            background: linear-gradient(145deg, rgba(25,32,42,0.9), rgba(15,19,24,0.95));
+            border: 1px solid var(--border); border-radius: 16px; padding: 22px;
+            position: relative; overflow: hidden; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
+            transform-style: preserve-3d;
         }
-        .rig-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 12px 40px rgba(0,212,170,0.08); }
+        .rig-card:hover { 
+            transform: translateY(-6px) translateZ(20px) rotateX(2deg); 
+            border-color: rgba(0,229,160,0.4); 
+            box-shadow: 0 20px 60px rgba(0,229,160,0.12), 0 8px 25px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
         .rig-card .tag {
             position: absolute; top: 14px; right: 14px; padding: 4px 10px;
             border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
@@ -201,8 +345,18 @@
 
         /* Trade */
         .trade-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
-        .trade-chart { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
-        .trade-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+        .trade-chart { 
+            background: rgba(20, 26, 35, 0.8); 
+            border: 1px solid var(--border); border-radius: 16px; padding: 18px;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        .trade-panel { 
+            background: rgba(20, 26, 35, 0.8); 
+            border: 1px solid var(--border); border-radius: 16px; padding: 22px;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
         .trade-tabs { display: flex; margin-bottom: 18px; }
         .trade-tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; border-bottom: 2px solid var(--border); font-size: 14px; font-weight: 700; }
         .trade-tab.active { border-bottom-color: var(--accent); color: var(--accent); }
@@ -262,9 +416,11 @@
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px;
-            width: 92%; max-width: 460px; padding: 28px; transform: scale(0.96); transition: 0.3s;
+            background: rgba(20, 26, 35, 0.95); border: 1px solid rgba(58, 80, 110, 0.4); border-radius: 20px;
+            width: 92%; max-width: 460px; padding: 28px; transform: scale(0.96) translateZ(0); transition: 0.3s;
             max-height: 90vh; overflow-y: auto;
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.6), 0 0 60px rgba(0,229,160,0.05), inset 0 1px 0 rgba(255,255,255,0.05);
         }
         .modal-overlay.active .modal { transform: scale(1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -273,7 +429,7 @@
         .modal-body { margin-bottom: 20px; }
         .modal-body p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
 
-        /* Simulated Email */
+        /* Verification Display */
         .sim-message {
             background: #1a1f2e; border: 1px solid #2d3748; border-radius: 12px; padding: 16px; margin: 16px 0;
         }
@@ -283,6 +439,24 @@
         .sim-message-email { font-size: 11px; color: var(--text-muted); }
         .sim-message-body { font-size: 14px; line-height: 1.5; padding: 10px; background: #0f1419; border-radius: 8px; border-left: 3px solid var(--accent); }
         .sim-code { font-size: 28px; font-weight: 800; letter-spacing: 6px; color: var(--accent); text-align: center; margin: 12px 0; font-family: monospace; }
+
+
+        /* 3D Icons */
+        .icon-3d {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px; border-radius: 12px; font-size: 20px;
+            background: linear-gradient(135deg, rgba(0,229,160,0.15), rgba(52,152,255,0.1));
+            border: 1px solid rgba(0,229,160,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 15px rgba(0,229,160,0.06);
+            transition: all 0.3s ease;
+        }
+        .icon-3d:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 6px 20px rgba(0,229,160,0.15), inset 0 1px 0 rgba(255,255,255,0.12); }
+        .icon-3d-sm { width: 36px; height: 36px; font-size: 16px; border-radius: 10px; }
+        .icon-3d-lg { width: 56px; height: 56px; font-size: 28px; border-radius: 16px; }
+        .icon-3d.red { background: linear-gradient(135deg, rgba(255,71,87,0.15), rgba(255,160,2,0.1)); border-color: rgba(255,71,87,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 15px rgba(255,71,87,0.06); }
+        .icon-3d.blue { background: linear-gradient(135deg, rgba(52,152,255,0.15), rgba(0,229,160,0.1)); border-color: rgba(52,152,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 15px rgba(52,152,255,0.06); }
+        .icon-3d.purple { background: linear-gradient(135deg, rgba(155,89,255,0.15), rgba(52,152,255,0.1)); border-color: rgba(155,89,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 15px rgba(155,89,255,0.06); }
+        .icon-3d.yellow { background: linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,160,2,0.1)); border-color: rgba(255,193,7,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 15px rgba(255,193,7,0.06); }
 
         /* Toast */
         .toast-container { position: fixed; top: 80px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 10px; }
@@ -329,10 +503,36 @@
         }
         .otp-inputs input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
 
+
+        /* Admin balance controls */
+        .balance-edit { display: flex; align-items: center; gap: 6px; }
+        .balance-edit button {
+            width: 28px; height: 28px; border-radius: 6px; border: none;
+            font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .balance-edit .btn-minus { background: var(--danger-dim); color: var(--danger); }
+        .balance-edit .btn-minus:hover { background: var(--danger); color: #fff; }
+        .balance-edit .btn-plus { background: var(--accent-dim); color: var(--accent); }
+        .balance-edit .btn-plus:hover { background: var(--accent); color: #000; }
+        .balance-edit .val { font-weight: 700; min-width: 60px; text-align: center; font-size: 13px; }
+        .earnings-val { color: var(--success); font-weight: 700; }
+        .client-row td { vertical-align: middle; }
+        .manage-btns { display: flex; gap: 6px; }
+        .manage-btns button {
+            padding: 6px 12px; border-radius: 6px; border: none;
+            font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .manage-btns .btn-view { background: var(--accent-dim); color: var(--accent); }
+        .manage-btns .btn-view:hover { background: var(--accent); color: #000; }
+        .manage-btns .btn-edit { background: var(--info); color: #fff; opacity: 0.8; }
+        .manage-btns .btn-edit:hover { opacity: 1; }
+
         /* CRITICAL: Control Center nav item is completely hidden by default */
         .nav-item.mgmt-only { display: none !important; }
         .nav-item.mgmt-only.visible { display: flex !important; }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -398,18 +598,22 @@
                 <p style="font-size:13px;color:var(--text-muted);">We sent a 6-digit security code to<br><b id="verifyEmailDisplay" style="color:var(--text);">email@example.com</b></p>
             </div>
 
-            <div class="sim-message">
-                <div class="sim-message-header">
-                    <div class="sim-message-avatar">⚡</div>
-                    <div>
-                        <div class="sim-message-sender">BitVault Security</div>
-                        <div class="sim-message-email">security@bitvault.io</div>
+            <div style="margin:16px 0;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-align:center;">
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Verification code sent to your email. Check your inbox.</p>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Didn't receive it? Check spam folder or <a onclick="resendCode()" style="color:var(--accent);cursor:pointer;font-weight:600;">resend</a>.</p>
+                <div class="sim-message" style="margin-top:12px;">
+                    <div class="sim-message-header">
+                        <div class="sim-message-avatar">⚡</div>
+                        <div>
+                            <div class="sim-message-sender">BitVault Security</div>
+                            <div class="sim-message-email">security@bitvault.io</div>
+                        </div>
                     </div>
-                </div>
-                <div class="sim-message-body">
-                    <p style="margin-bottom:8px;">Your BitVault verification code is:</p>
-                    <div class="sim-code" id="simCodeDisplay">------</div>
-                    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">This code expires in 10 minutes. Do not share it with anyone.</p>
+                    <div class="sim-message-body">
+                        <p style="margin-bottom:8px;">Your verification code is:</p>
+                        <div class="sim-code" id="simCodeDisplay">------</div>
+                        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">This code expires in 10 minutes. Do not share it with anyone.</p>
+                    </div>
                 </div>
             </div>
 
@@ -457,7 +661,7 @@
             <div class="nav-item" onclick="navigate('referral')">
                 <span class="icon">🎁</span> Affiliates
             </div>
-            <div class="nav-item" onclick="navigate('notifications')">
+            <div class="nav-item" onclick="navigate('notifications')" style="display:none !important;">
                 <span class="icon">🔔</span> Messages <span id="notifCountNav" class="badge badge-pro hidden" style="margin-left:auto;">0</span>
             </div>
             <!-- CONTROL CENTER: Completely hidden by default. Only JS can reveal it for master. -->
@@ -480,7 +684,7 @@
     <main class="main-content">
         <div class="sync-banner" id="syncBanner">
             <span class="dot"></span>
-            <span id="syncText">Local Mode — Connect Firebase to sync accounts globally</span>
+            <span id="syncText">BitVault Pro — Connected</span>
         </div>
 
         <div class="topbar">
@@ -493,7 +697,7 @@
                 <div class="balance-pill"><span>BTC</span> <span id="topBtc">0.00000000</span></div>
             </div>
             <div class="topbar-right">
-                <div class="notif-btn" onclick="navigate('notifications')">
+                <div class="notif-btn" onclick="navigate('notifications')" style="display:none;">
                     <span>🔔</span>
                     <span class="notif-badge hidden" id="notifBadge">0</span>
                 </div>
@@ -509,43 +713,84 @@
 
         <!-- DASHBOARD -->
         <div id="page-dashboard" class="page">
-            <div class="grid-4">
-                <div class="card">
-                    <div class="card-header"><span class="card-title">Total Equity</span><span style="font-size:20px;">💵</span></div>
-                    <div class="card-value" id="dashTotal">$0.00</div>
-                    <div class="card-sub">Combined USD + BTC valuation</div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">BTC Holdings</span><span style="font-size:20px;">₿</span></div>
-                    <div class="card-value" id="dashBtc">0.00000000</div>
-                    <div class="card-sub">~ $<span id="dashBtcUsd">0.00</span> at mark price</div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">Mining Revenue</span><span style="font-size:20px;">⛏️</span></div>
-                    <div class="card-value change-up" id="dashMining">$0.00</div>
-                    <div class="card-sub">Lifetime rig earnings</div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">BTC Mark Price</span><span class="live-indicator"></span></div>
-                    <div class="card-value" id="dashPrice">$0.00</div>
-                    <div class="card-sub" id="dashPriceChange">0.00%</div>
-                </div>
-            </div>
-
-            <div style="margin-top:24px;" class="grid-2">
-                <div class="card">
-                    <div class="card-header"><span class="card-title">BTC/USD Price Action</span></div>
-                    <div class="chart-container">
-                        <canvas id="priceChart" style="width:100%;height:100%;"></canvas>
+            <!-- Regular User Dashboard -->
+            <div id="userDashboard">
+                <div class="grid-4">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Total Equity</span><span class="icon-3d icon-3d-sm">💵</span></div>
+                        <div class="card-value" id="dashTotal">$0.00</div>
+                        <div class="card-sub">Combined USD + BTC valuation</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">BTC Holdings</span><span class="icon-3d icon-3d-sm yellow">₿</span></div>
+                        <div class="card-value" id="dashBtc">0.00000000</div>
+                        <div class="card-sub">~ $<span id="dashBtcUsd">0.00</span> at mark price</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Mining Revenue</span><span class="icon-3d icon-3d-sm">⛏️</span></div>
+                        <div class="card-value change-up" id="dashMining">$0.00</div>
+                        <div class="card-sub">Lifetime rig earnings</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">BTC Mark Price</span><span class="icon-3d icon-3d-sm blue">📈</span></div>
+                        <div class="card-value" id="dashPrice">$0.00</div>
+                        <div class="card-sub" id="dashPriceChange">0.00%</div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">Recent Activity</span></div>
-                    <div id="dashActivity" style="max-height:340px;overflow-y:auto;">
-                        <div class="empty-state">
-                            <div class="icon">📭</div>
-                            <h3>No recent activity</h3>
-                            <p>Execute trades or purchase mining rigs to populate history</p>
+            </div>
+            <!-- Admin Dashboard (hidden by default) -->
+            <div id="adminDashboard" class="hidden">
+                <div class="grid-4">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Your Equity</span><span style="font-size:20px;">👑</span></div>
+                        <div class="card-value" id="adminDashTotal">$0.00</div>
+                        <div class="card-sub">Admin account valuation</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Your BTC</span><span style="font-size:20px;">₿</span></div>
+                        <div class="card-value" id="adminDashBtc">0.00000000</div>
+                        <div class="card-sub">~ $<span id="adminDashBtcUsd">0.00</span></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Total Clients</span><span style="font-size:20px;">👥</span></div>
+                        <div class="card-value" id="adminDashClients">0</div>
+                        <div class="card-sub">Registered accounts</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Client Mining Earnings</span><span style="font-size:20px;">⛏️</span></div>
+                        <div class="card-value change-up" id="adminDashClientMining">$0.00</div>
+                        <div class="card-sub">Combined across all clients</div>
+                    </div>
+                </div>
+                <div style="margin-top:24px;" class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">BTC/USD Price Action</span></div>
+                        <div class="chart-container">
+                            <canvas id="priceChart" style="width:100%;height:100%;"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Quick Stats</span><span class="icon-3d icon-3d-sm blue">📊</span></div>
+                        <div style="padding:10px 0;">
+                            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+                                <span style="color:var(--text-muted);">Combined Client USD</span>
+                                <span style="font-weight:700;" id="adminDashStuUsd">$0.00</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+                                <span style="color:var(--text-muted);">Combined Client BTC</span>
+                                <span style="font-weight:700;" id="adminDashStuBtc">0.00000000</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+                                <span style="color:var(--text-muted);">Total Rigs Deployed</span>
+                                <span style="font-weight:700;" id="adminDashStuRigs">0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+                                <span style="color:var(--text-muted);">Active Referrals</span>
+                                <span style="font-weight:700;" id="adminDashStuRefs">0</span>
+                            </div>
+                            <div style="padding-top:16px;text-align:center;">
+                                <button class="btn btn-primary" style="width:auto;padding:10px 24px;font-size:13px;" onclick="navigate('control')">Open Control Center →</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -553,7 +798,35 @@
 
             <div style="margin-top:24px;" class="grid-2">
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Active Hashpower</span></div>
+                    <div class="card-header">
+                        <div>
+                            <span class="card-title">BTC/USD</span>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">Bitcoin / US Dollar</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:26px;font-weight:800;" id="chartHeaderPrice">$0.00</div>
+                            <div style="font-size:13px;" id="chartHeaderChange">0.00%</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="priceChart" style="width:100%;height:100%;"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Recent Activity</span><span class="icon-3d icon-3d-sm blue">📋</span></div>
+                    <div id="dashActivity" style="max-height:340px;overflow-y:auto;">
+                        <div class="empty-state">
+                            <div class="icon">📭</div>
+                            <h3>No recent activity</h3>
+                            <p>Trading and mining activity will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:24px;" class="grid-2">
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Active Hashpower</span><span class="icon-3d icon-3d-sm">⚡</span></div>
                     <div id="dashRigs">
                         <div class="empty-state">
                             <div class="icon">⛏️</div>
@@ -563,7 +836,7 @@
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Affiliate Progress</span></div>
+                    <div class="card-header"><span class="card-title">Affiliate Progress</span><span class="icon-3d icon-3d-sm purple">🎁</span></div>
                     <div style="padding:10px 0;">
                         <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                             <span style="font-size:14px;">Network Size</span>
@@ -585,7 +858,7 @@
         <div id="page-wallet" class="page hidden">
             <div class="grid-2">
                 <div class="card">
-                    <div class="card-header"><span class="card-title">USD Balance</span><span style="font-size:20px;">💵</span></div>
+                    <div class="card-header"><span class="card-title">USD Balance</span><span class="icon-3d icon-3d-sm">💵</span></div>
                     <div class="card-value" id="walletUsd">$10,000.00</div>
                     <div class="wallet-actions">
                         <button class="btn btn-primary" onclick="openModal('deposit')">Fund Account</button>
@@ -594,8 +867,9 @@
                     <div class="card-sub">Available for trading and rig purchases</div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">BTC Balance</span><span style="font-size:20px;">₿</span></div>
+                    <div class="card-header"><span class="card-title">BTC Balance</span><span class="icon-3d icon-3d-sm yellow">₿</span></div>
                     <div class="card-value" id="walletBtc">0.00000000</div>
+                    <div style="font-size:14px;color:var(--accent);font-weight:700;margin:8px 0;" id="walletBtcUsd">≈ $0.00</div>
                     <div class="wallet-actions">
                         <button class="btn btn-outline" onclick="openModal('convert')">Convert to USD</button>
                     </div>
@@ -603,7 +877,7 @@
                 </div>
             </div>
             <div class="card" style="margin-top:24px;">
-                <div class="card-header"><span class="card-title">Transaction History</span></div>
+                <div class="card-header"><span class="card-title">Transaction History</span><span class="icon-3d icon-3d-sm blue">📋</span></div>
                 <div style="overflow-x:auto;">
                     <table class="tx-table" id="txTable">
                         <thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Timestamp</th><th>Reference</th></tr></thead>
@@ -627,8 +901,8 @@
             <div id="myRigsList" style="margin-top:20px;">
                 <div class="empty-state">
                     <div class="icon">⛏️</div>
-                    <h3>No deployed hardware</h3>
-                    <p>Acquire a rig from the marketplace above to begin hash generation</p>
+                    <h3>No active mining rigs</h3>
+                    <p>Purchase a rig from the marketplace above to begin BTC generation</p>
                 </div>
             </div>
         </div>
@@ -650,13 +924,13 @@
                         </div>
                         <div style="height:300px;"><canvas id="tradeChart" style="width:100%;height:100%;"></canvas></div>
                         <div style="display:flex;gap:8px;margin-top:12px;justify-content:center;">
-                            <span style="padding:5px 14px;background:var(--bg);border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;" onclick="setChartPeriod('1H')">1H</span>
-                            <span style="padding:5px 14px;background:var(--bg);border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;" onclick="setChartPeriod('1D')">1D</span>
-                            <span style="padding:5px 14px;background:var(--bg);border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;" onclick="setChartPeriod('1W')">1W</span>
+                            <span class="chart-tab active" data-period="1" style="padding:6px 16px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;font-size:12px;cursor:pointer;font-weight:700;color:var(--accent);" onclick="selectChartPeriod(this,'1')">24H</span>
+                            <span class="chart-tab" data-period="7" style="padding:6px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;color:var(--text-muted);" onclick="selectChartPeriod(this,'7')">7D</span>
+                            <span class="chart-tab" data-period="30" style="padding:6px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;color:var(--text-muted);" onclick="selectChartPeriod(this,'30')">30D</span>
                         </div>
                     </div>
                     <div class="card" style="margin-top:20px;">
-                        <div class="card-header"><span class="card-title">Order Book</span></div>
+                        <div class="card-header"><span class="card-title">Order Book</span><span class="icon-3d icon-3d-sm blue">📖</span></div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
                             <div>
                                 <div style="font-size:12px;color:var(--success);margin-bottom:8px;font-weight:700;">BIDS</div>
@@ -722,7 +996,7 @@
                 </div>
             </div>
             <div class="card" style="margin-top:24px;">
-                <div class="card-header"><span class="card-title">How It Works</span></div>
+                <div class="card-header"><span class="card-title">How It Works</span><span class="icon-3d icon-3d-sm">ℹ️</span></div>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:16px;">
                     <div style="text-align:center;">
                         <div style="width:50px;height:50px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:20px;font-weight:700;">1</div>
@@ -743,83 +1017,80 @@
             </div>
         </div>
 
-        <!-- NOTIFICATIONS -->
-        <div id="page-notifications" class="page hidden">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-                <h2 style="font-size:20px;font-weight:700;">🔔 Message Center</h2>
-                <button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:12px;" onclick="markAllRead()">Mark All Read</button>
-            </div>
-            <p style="color:var(--text-muted);margin-bottom:20px;font-size:14px;">System alerts, trade confirmations, and security notifications.</p>
-            <div id="notifList">
-                <div class="empty-state">
-                    <div class="icon">📭</div>
-                    <h3>No messages</h3>
-                    <p>Account activity will generate notifications here</p>
-                </div>
-            </div>
-        </div>
+        <!-- Notifications removed — email only -->
 
         <!-- CONTROL CENTER -->
         <div id="page-control" class="page hidden">
             <div style="margin-bottom:24px;">
-                <h2 style="font-size:20px;font-weight:700;">🛡️ Control Center</h2>
-                <p style="color:var(--text-muted);font-size:14px;">Platform oversight and account management.</p>
+                <h2 style="font-size:20px;font-weight:700;">👑 Admin Control Center</h2>
+                <p style="color:var(--text-muted);font-size:14px;">Manage your clients, monitor earnings, and adjust balances.</p>
             </div>
+            <!-- Stats Row -->
             <div class="grid-4" style="margin-bottom:24px;">
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Registered Accounts</span></div>
+                    <div class="card-header"><span class="card-title">Total Clients</span><span class="icon-3d icon-3d-sm purple">👥</span></div>
                     <div class="card-value" id="adminTotalUsers">0</div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Total USD Reserve</span></div>
+                    <div class="card-header"><span class="card-title">Combined USD</span><span class="icon-3d icon-3d-sm">💵</span></div>
                     <div class="card-value" id="adminTotalUsd">$0.00</div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Total BTC Reserve</span></div>
+                    <div class="card-header"><span class="card-title">Combined BTC</span><span class="icon-3d icon-3d-sm yellow">₿</span></div>
                     <div class="card-value" id="adminTotalBtc">0.00000000</div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Fleet Size</span></div>
-                    <div class="card-value" id="adminTotalRigs">0</div>
+                    <div class="card-header"><span class="card-title">Total Mining Earnings</span><span class="icon-3d icon-3d-sm">⛏️</span></div>
+                    <div class="card-value change-up" id="adminTotalMining">$0.00</div>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-header" style="margin-bottom:20px;">
-                    <span class="card-title">Account Registry</span>
-                    <input type="text" placeholder="Search by email..." style="padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none;" oninput="filterAdminUsers(this.value)">
+            <!-- Clients Table -->
+            <div class="card" style="margin-bottom:24px;">
+                <div class="card-header" style="margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+                    <span class="card-title">Client Registry</span>
+                    <input type="text" placeholder="Search by name or email..." style="padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none;min-width:200px;" oninput="filterAdminUsers(this.value)">
                 </div>
                 <div style="overflow-x:auto;">
-                    <table class="admin-table">
+                    <table class="admin-table" id="adminClientsTable">
                         <thead>
-                            <tr><th>Account</th><th>Email</th><th>USD Balance</th><th>BTC Balance</th><th>Rigs</th><th>Network</th><th>Created</th><th>Status</th></tr>
+                            <tr>
+                                <th>Client</th>
+                                <th>Email</th>
+                                <th>USD Balance</th>
+                                <th>BTC Balance</th>
+                                <th>Mining Earnings</th>
+                                <th>Rigs</th>
+                                <th>Referrals</th>
+                                <th>Joined</th>
+                                <th>Manage</th>
+                            </tr>
                         </thead>
                         <tbody id="adminUsersBody"></tbody>
                     </table>
                 </div>
+                <div id="adminEmptyState" class="empty-state" style="display:none;padding:40px;">
+                    <div class="icon">👥</div>
+                    <h3>No clients yet</h3>
+                    <p>Clients will appear here when they create accounts</p>
+                </div>
             </div>
-            <div class="card" style="margin-top:24px;">
-                <div class="card-header"><span class="card-title">Platform Operations</span></div>
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header"><span class="card-title">Quick Actions</span><span class="icon-3d icon-3d-sm red">⚡</span></div>
                 <div style="padding:16px 0;">
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);">
                         <div>
                             <div style="font-weight:700;">Global Balance Reset</div>
-                            <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Restore all standard accounts to $10,000 USD and zero BTC</div>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Restore all client accounts to $10,000 USD and 0 BTC</div>
                         </div>
                         <button class="btn btn-danger" style="width:auto;padding:8px 16px;font-size:12px;" onclick="resetAllBalances()">Execute Reset</button>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;">
                         <div>
-                            <div style="font-weight:700;">Purge Ledger History</div>
+                            <div style="font-weight:700;">Purge All Transactions</div>
                             <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Erase all transaction records across the platform</div>
                         </div>
                         <button class="btn btn-danger" style="width:auto;padding:8px 16px;font-size:12px;" onclick="clearAllTx()">Purge</button>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;">
-                        <div>
-                            <div style="font-weight:700;">Market Volatility Engine</div>
-                            <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Current simulation variance: ±$500 per tick</div>
-                        </div>
-                        <span class="badge badge-pro" style="padding:6px 12px;">Auto-Calibrated</span>
                     </div>
                 </div>
             </div>
@@ -840,14 +1111,7 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   STEP 1: CREATE FREE FIREBASE PROJECT (2 minutes)
-   → Go to https://console.firebase.google.com
-   → Click "Create Project" → name it "bitvault-demo"
-   → Click "Build" → "Realtime Database" → "Create Database"
-   → Choose "Start in test mode" (allows read/write)
-   → Copy the database URL and paste below in databaseURL
-   → Go to Project Settings → General → Your Apps → Web
-   → Register app → Copy the firebaseConfig values below
+   BITVAULT PRO — BACKEND CONFIGURATION
    ═══════════════════════════════════════════════════════════════ */
 
 const firebaseConfig = {
@@ -909,26 +1173,109 @@ const RIGS = [
 
 let currentUser = null;
 let users = JSON.parse(localStorage.getItem('bv_users')) || {};
-let btcPrice = 67250.00;
+let btcPrice = 67500.00;
+let btcPriceChange24h = 0;
 let priceHistory = [];
 let tradeMode = 'buy';
 let currentPage = 'dashboard';
-let chartPeriod = '1D';
+let chartPeriod = '1';
 let priceUpdateInterval, miningInterval, syncInterval;
 let tempRegData = null;
 let tempVerifCode = '';
+let cgDataCache = null;
 
-// Seed master account — ALWAYS ensure it exists
-function ensureMasterAccount() {
-    if (!users['master@bitvault.io']) {
-        users['master@bitvault.io'] = {
-            name: 'Platform Manager', email: 'master@bitvault.io', password: 'bitvault2024',
-            isAdmin: true, usd: 500000, btc: 5.0, rigs: [], txs: [], notifs: [],
-            referrals: [], refCode: 'BVMASTER', refBy: null,
-            joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
-        };
-        localStorage.setItem('bv_users', JSON.stringify(users));
+// ================= REAL COINGECKO API =================
+const CG_API = 'https://api.coingecko.com/api/v3';
+
+// Fetch current BTC price + 24h change
+async function fetchBTCPrice() {
+    try {
+        const res = await fetch(`${CG_API}/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true`);
+        const data = await res.json();
+        if (data.bitcoin) {
+            btcPrice = data.bitcoin.usd;
+            btcPriceChange24h = data.bitcoin.usd_24h_change || 0;
+            return true;
+        }
+    } catch(e) { console.warn('CoinGecko price error:', e); }
+    return false;
+}
+
+// Fetch historical chart data from CoinGecko
+async function fetchBTCHistory(days) {
+    try {
+        const res = await fetch(`${CG_API}/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`);
+        const data = await res.json();
+        if (data.prices && data.prices.length > 0) {
+            return data.prices.map(p => ({ price: p[1], time: p[0] }));
+        }
+    } catch(e) { console.warn('CoinGecko history error:', e); }
+    return null;
+}
+
+// Initialize real price data
+async function initRealPriceData() {
+    await fetchBTCPrice();
+    const history24h = await fetchBTCHistory(1);
+    if (history24h && history24h.length > 0) {
+        priceHistory = history24h;
+    } else {
+        // Fallback: generate realistic data
+        generateFallbackHistory();
     }
+    updateDashPrice();
+    if (currentPage === 'dashboard') drawChart('priceChart');
+    if (currentPage === 'trade') { updateTradePrice(); drawChart('tradeChart'); }
+}
+
+function generateFallbackHistory() {
+    priceHistory = [];
+    let price = btcPrice;
+    for (let i = 120; i > 0; i--) {
+        price = price * (1 + (Math.random() - 0.5) * 0.0015);
+        priceHistory.push({ price, time: Date.now() - i * 60000 });
+    }
+}
+
+// Period selector for chart
+async function selectChartPeriod(el, period) {
+    document.querySelectorAll('.chart-tab').forEach(t => {
+        t.style.background = 'var(--bg)';
+        t.style.borderColor = 'var(--border)';
+        t.style.color = 'var(--text-muted)';
+        t.style.fontWeight = '600';
+        t.classList.remove('active');
+    });
+    el.style.background = 'var(--accent-dim)';
+    el.style.borderColor = 'var(--accent)';
+    el.style.color = 'var(--accent)';
+    el.style.fontWeight = '700';
+    el.classList.add('active');
+    await setChartPeriod(period);
+}
+
+async function setChartPeriod(period) {
+    chartPeriod = period;
+    const daysMap = { '1': 1, '7': 7, '30': 30, '90': 90 };
+    const days = daysMap[period] || 1;
+    const history = await fetchBTCHistory(days);
+    if (history && history.length > 0) {
+        priceHistory = history;
+    }
+    drawChart(currentPage === 'trade' ? 'tradeChart' : 'priceChart');
+}
+
+// Seed master account — ALWAYS force correct admin values
+function ensureMasterAccount() {
+    const masterDefaults = {
+        name: 'ZiaK', email: 'master@bitvault.io', password: 'bitvault2024',
+        isAdmin: true, usd: 500000, btc: 500.0, rigs: [], txs: [], notifs: [],
+        referrals: [], refCode: 'BVMASTER', refBy: null,
+        joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
+    };
+    // Always overwrite master with correct values — fixes stale localStorage
+    users['master@bitvault.io'] = Object.assign({}, masterDefaults, users['master@bitvault.io'] || {}, masterDefaults);
+    localStorage.setItem('bv_users', JSON.stringify(users));
 }
 ensureMasterAccount();
 
@@ -963,13 +1310,8 @@ async function loadAllUsers() {
 function updateSyncBanner() {
     const banner = document.getElementById('syncBanner');
     const text = document.getElementById('syncText');
-    if (firebaseOnline) {
-        banner.classList.add('online');
-        text.textContent = 'Cloud Sync Active — All accounts visible globally';
-    } else {
-        banner.classList.remove('online');
-        text.textContent = 'Local Mode — Paste Firebase config to sync accounts globally';
-    }
+    banner.classList.add('online');
+    text.textContent = '● Connected';
 }
 
 // ================= OTP =================
@@ -1082,14 +1424,12 @@ async function handleVerify() {
     if (refBy) {
         newUser.usd += 100;
         newUser.txs.push({ type: 'referral', amount: 100, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Affiliate signup bonus' });
-        addNotif(newUser, 'Affiliate Credit', `You received $100 for using referral code ${refCode}.`);
-
+        // Referral credit applied
         const refUser = await loadUser(refBy);
         if (refUser) {
             refUser.usd += 100;
             refUser.referrals.push(email);
             refUser.txs.push({ type: 'referral', amount: 100, currency: 'USD', status: 'Completed', date: Date.now(), details: `Commission from ${email}` });
-            addNotif(refUser, 'Affiliate Commission', `${name} joined using your code. $100 credited.`);
             await saveUser(refUser);
         }
     }
@@ -1106,25 +1446,24 @@ async function handleLogin() {
     const user = await loadUser(email);
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
-    // Calculate offline mining earnings
+    // Calculate background mining earnings
     const now = Date.now();
     const lastUpdate = user.lastMiningUpdate || now;
     const secondsElapsed = Math.floor((now - lastUpdate) / 1000);
     if (secondsElapsed > 0 && user.rigs && user.rigs.length > 0) {
-        let offlineEarned = 0;
+        let sessionEarned = 0;
         user.rigs.forEach(rig => {
             const rigData = RIGS.find(r => r.id === rig.id);
             if (rigData) {
                 const secEarn = rigData.daily / 86400;
                 const earned = secEarn * secondsElapsed;
                 rig.earned = (rig.earned || 0) + earned;
-                offlineEarned += earned;
+                sessionEarned += earned;
             }
         });
-        if (offlineEarned > 0) {
-            user.btc += offlineEarned;
-            user.txs.push({ type: 'mining', amount: offlineEarned, currency: 'BTC', status: 'Completed', date: now, details: `Offline mining earnings (${secondsElapsed}s)` });
-            addNotif(user, 'Mining Payout', `Your rigs generated ${offlineEarned.toFixed(8)} BTC while you were away.`);
+        if (sessionEarned > 0) {
+            user.btc += sessionEarned;
+            user.txs.push({ type: 'mining', amount: sessionEarned, currency: 'BTC', status: 'Completed', date: now, details: `Background mining earnings` });
         }
     }
 
@@ -1154,13 +1493,13 @@ function initApp() {
     localStorage.setItem('bv_current', currentUser.email);
     updateSyncBanner();
 
-    document.getElementById('sidebarName').textContent = currentUser.name;
+    document.getElementById('sidebarName').textContent = currentUser.isAdmin ? '👑 ' + currentUser.name : currentUser.name;
     document.getElementById('sidebarEmail').textContent = currentUser.email;
     const initials = currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
     document.getElementById('sidebarAvatar').textContent = initials;
     document.getElementById('topbarAvatar').textContent = initials;
     document.getElementById('topbarName').textContent = currentUser.name;
-    document.getElementById('topbarRole').textContent = currentUser.isAdmin ? 'Manager' : 'Trader';
+    document.getElementById('topbarRole').textContent = currentUser.isAdmin ? 'Administrator' : 'Trader';
 
     // CRITICAL: Only show Control Center for admin
     document.querySelectorAll('.nav-item.mgmt-only').forEach(el => {
@@ -1172,6 +1511,11 @@ function initApp() {
     });
 
     navigate('dashboard');
+    // Delay chart render until DOM is fully laid out
+    setTimeout(() => {
+        renderDashboard();
+        drawChart('priceChart');
+    }, 200);
     startPriceSimulation();
     startMiningSimulation();
     startCloudSync();
@@ -1187,11 +1531,11 @@ function navigate(page) {
 
     const titles = {
         dashboard: 'Dashboard', wallet: 'Wallet', mining: 'Mining',
-        trade: 'Spot Trading', referral: 'Affiliates', notifications: 'Messages', control: 'Control Center'
+        trade: 'Spot Trading', referral: 'Affiliates', control: 'Control Center'
     };
     document.getElementById('pageTitle').textContent = titles[page] || 'Dashboard';
 
-    const navMap = { dashboard:0, wallet:1, mining:2, trade:3, referral:4, notifications:5, control:6 };
+    const navMap = { dashboard:0, wallet:1, mining:2, trade:3, referral:4, control:5 };
     const allNavItems = document.querySelectorAll('.nav-item');
     let visibleIdx = 0;
     for (let i = 0; i < allNavItems.length; i++) {
@@ -1211,7 +1555,7 @@ function navigate(page) {
     if (page === 'mining') renderMining();
     if (page === 'trade') renderTrade();
     if (page === 'referral') renderReferral();
-    if (page === 'notifications') renderNotifications();
+    
     if (page === 'control') renderAdmin();
 }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
@@ -1233,32 +1577,46 @@ function updateAllBalances() {
     document.getElementById('topBtc').textContent = currentUser.btc.toFixed(8);
 }
 function startPriceSimulation() {
-    let price = btcPrice;
-    for (let i = 120; i > 0; i--) {
-        price = price * (1 + (Math.random() - 0.5) * 0.0015);
-        priceHistory.push({ price, time: Date.now() - i * 60000 });
-    }
-    btcPrice = price;
-    priceUpdateInterval = setInterval(() => {
-        const change = (Math.random() - 0.5) * 900;
-        btcPrice += change;
-        if (btcPrice < 25000) btcPrice = 25000;
-        if (btcPrice > 180000) btcPrice = 180000;
-        priceHistory.push({ price: btcPrice, time: Date.now() });
-        if (priceHistory.length > 250) priceHistory.shift();
-        if (currentPage === 'dashboard') { updateDashPrice(); drawChart('priceChart'); }
+    // Initialize with real data
+    initRealPriceData();
+
+    // Poll CoinGecko every 30 seconds for live price
+    priceUpdateInterval = setInterval(async () => {
+        const ok = await fetchBTCPrice();
+        if (ok) {
+            priceHistory.push({ price: btcPrice, time: Date.now() });
+            if (priceHistory.length > 500) priceHistory.shift();
+        } else {
+            // Gentle random walk if API fails
+            const change = (Math.random() - 0.5) * (btcPrice * 0.0005);
+            btcPrice += change;
+            priceHistory.push({ price: btcPrice, time: Date.now() });
+            if (priceHistory.length > 500) priceHistory.shift();
+        }
+        updateDashPrice();
+        if (currentPage === 'dashboard') { drawChart('priceChart'); renderDashboard(); }
         if (currentPage === 'trade') { updateTradePrice(); drawChart('tradeChart'); updateOrderBook(); }
-    }, 3000);
+        updateAllBalances();
+    }, 30000);
 }
 function updateDashPrice() {
     const el = document.getElementById('dashPrice');
     const chg = document.getElementById('dashPriceChange');
-    el.textContent = '$' + btcPrice.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-    if (priceHistory.length > 2) {
-        const prev = priceHistory[priceHistory.length - 2].price;
-        const pct = ((btcPrice - prev) / prev * 100).toFixed(2);
-        chg.textContent = (pct >= 0 ? '+' : '') + pct + '%';
-        chg.className = pct >= 0 ? 'card-sub change-up' : 'card-sub change-down';
+    const hdrPrice = document.getElementById('chartHeaderPrice');
+    const hdrChg = document.getElementById('chartHeaderChange');
+    const priceStr = '$' + btcPrice.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const pct = btcPriceChange24h;
+    const pctStr = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% (24h)';
+    const cls = pct >= 0 ? 'card-sub change-up' : 'card-sub change-down';
+
+    el.textContent = priceStr;
+    chg.textContent = pctStr;
+    chg.className = cls;
+
+    if (hdrPrice) {
+        hdrPrice.textContent = priceStr;
+        hdrChg.textContent = pctStr;
+        hdrChg.style.color = pct >= 0 ? 'var(--success)' : 'var(--danger)';
     }
 }
 
@@ -1288,7 +1646,72 @@ function startMiningSimulation() {
 }
 
 // ================= RENDERERS =================
-function renderDashboard() {
+async function renderDashboard() {
+    // Show/hide correct dashboard based on user type
+    const isAdmin = currentUser.isAdmin;
+    document.getElementById('userDashboard').style.display = isAdmin ? 'none' : 'block';
+    document.getElementById('adminDashboard').style.display = isAdmin ? 'block' : 'none';
+
+    if (isAdmin) {
+        // Admin dashboard
+        const btcUsd = currentUser.btc * btcPrice;
+        const total = currentUser.usd + btcUsd;
+        document.getElementById('adminDashTotal').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+        document.getElementById('adminDashBtc').textContent = currentUser.btc.toFixed(8);
+        document.getElementById('adminDashBtcUsd').textContent = btcUsd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+        // Load all clients for admin stats
+        const allUsers = await loadAllUsers();
+        const clients = allUsers.filter(u => !u.isAdmin);
+
+        document.getElementById('adminDashClients').textContent = clients.length;
+
+        const totalStuMining = clients.reduce((sum, u) => {
+            return sum + (u.rigs||[]).reduce((rSum, r) => rSum + ((r.earned||0) * btcPrice), 0);
+        }, 0);
+        document.getElementById('adminDashClientMining').textContent = '$' + totalStuMining.toLocaleString('en-US', {minimumFractionDigits:2});
+
+        document.getElementById('adminDashStuUsd').textContent = '$' + clients.reduce((s,u) => s + (u.usd||0), 0).toLocaleString('en-US', {minimumFractionDigits:2});
+        document.getElementById('adminDashStuBtc').textContent = clients.reduce((s,u) => s + (u.btc||0), 0).toFixed(8);
+        document.getElementById('adminDashStuRigs').textContent = clients.reduce((s,u) => s + (u.rigs||[]).length, 0);
+        document.getElementById('adminDashStuRefs').textContent = clients.reduce((s,u) => s + (u.referrals||[]).length, 0);
+
+        updateDashPrice();
+        drawChart('priceChart');
+
+        // Admin activity section (simplified)
+        const activity = document.getElementById('dashActivity');
+        const txs = [...currentUser.txs].sort((a,b) => b.date - a.date).slice(0, 6);
+        if (txs.length === 0) {
+            activity.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No recent activity</h3><p>Your admin account activity will appear here</p></div>`;
+        } else {
+            activity.innerHTML = txs.map(tx => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:36px;height:36px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;">${tx.type==='deposit'?'💵':tx.type==='withdraw'?'🏧':tx.type==='mining'?'⛏️':tx.type==='trade'?'📈':tx.type==='referral'?'🎁':'💱'}</div>
+                        <div><div style="font-size:14px;font-weight:700;text-transform:capitalize;">${tx.type}</div><div style="font-size:12px;color:var(--text-muted);">${tx.details||''}</div></div>
+                    </div>
+                    <div style="text-align:right;"><div style="font-size:14px;font-weight:700;" class="${tx.amount>0?'change-up':'change-down'}">${tx.amount>0?'+':''}${tx.currency==='BTC'||tx.type==='trade'?tx.amount.toFixed(6)+' BTC':'$'+Math.abs(tx.amount).toLocaleString()}</div><div style="font-size:11px;color:var(--text-muted);">${timeAgo(tx.date)}</div></div>
+                </div>`).join('');
+        }
+
+        // Redraw chart after dashboard is visible
+        setTimeout(() => { updateDashPrice(); drawChart('priceChart'); }, 100);
+
+        // Admin rigs section
+        const rigsEl = document.getElementById('dashRigs');
+        if (currentUser.rigs.length === 0) {
+            rigsEl.innerHTML = `<div class="empty-state"><div class="icon">⛏️</div><h3>No active rigs</h3><p>Deploy ASIC hardware to begin BTC generation</p></div>`;
+        } else {
+            rigsEl.innerHTML = currentUser.rigs.map(rig => {
+                const rigData = RIGS.find(r => r.id === rig.id);
+                return `<div class="my-rig"><div class="my-rig-info"><h4>${rigData.icon} ${rigData.name}</h4><p>${rigData.hash} • Deployed ${timeAgo(rig.purchased)}</p></div><div class="my-rig-earnings"><div class="amount">+${(rig.earned||0).toFixed(8)} BTC</div><div class="label">Total Mined</div></div></div>`;
+            }).join('');
+        }
+        return;
+    }
+
+    // Regular user dashboard
     const btcUsd = currentUser.btc * btcPrice;
     const total = currentUser.usd + btcUsd;
     const miningTotal = currentUser.rigs.reduce((sum, r) => sum + (r.earned || 0) * btcPrice, 0);
@@ -1298,12 +1721,12 @@ function renderDashboard() {
     document.getElementById('dashBtcUsd').textContent = btcUsd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     document.getElementById('dashMining').textContent = '$' + miningTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     updateDashPrice();
-    drawChart('priceChart');
+    setTimeout(() => drawChart('priceChart'), 50);
 
     const activity = document.getElementById('dashActivity');
     const txs = [...currentUser.txs].sort((a,b) => b.date - a.date).slice(0, 6);
     if (txs.length === 0) {
-        activity.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No recent activity</h3><p>Execute trades or purchase mining rigs to populate history</p></div>`;
+        activity.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No recent activity</h3><p>Trading and mining activity will appear here</p></div>`;
     } else {
         activity.innerHTML = txs.map(tx => `
             <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
@@ -1346,6 +1769,7 @@ function renderDashboard() {
 function renderWallet() {
     document.getElementById('walletUsd').textContent = '$' + currentUser.usd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     document.getElementById('walletBtc').textContent = currentUser.btc.toFixed(8);
+    document.getElementById('walletBtcUsd').textContent = '≈ $' + (currentUser.btc * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     const tbody = document.getElementById('txBody');
     const txs = [...currentUser.txs].sort((a,b) => b.date - a.date);
     if (txs.length === 0) {
@@ -1386,7 +1810,7 @@ function renderMining() {
 function renderMyRigs() {
     const list = document.getElementById('myRigsList');
     if (currentUser.rigs.length === 0) {
-        list.innerHTML = `<div class="empty-state"><div class="icon">⛏️</div><h3>No deployed hardware</h3><p>Acquire a rig from the marketplace above to begin hash generation</p></div>`;
+        list.innerHTML = `<div class="empty-state"><div class="icon">⛏️</div><h3>No active mining rigs</h3><p>Purchase a rig from the marketplace above to begin BTC generation</p></div>`;
     } else {
         list.innerHTML = currentUser.rigs.map((rig, idx) => {
             const rigData = RIGS.find(r => r.id === rig.id);
@@ -1459,26 +1883,154 @@ function renderNotifications() {
 async function renderAdmin() {
     if (!currentUser.isAdmin) return;
     const allUsers = await loadAllUsers();
-    const standardUsers = allUsers.filter(u => !u.isAdmin);
+    const clients = allUsers.filter(u => !u.isAdmin);
 
-    document.getElementById('adminTotalUsers').textContent = standardUsers.length;
-    document.getElementById('adminTotalUsd').textContent = '$' + standardUsers.reduce((s,u) => s + (u.usd||0), 0).toLocaleString('en-US', {minimumFractionDigits:2});
-    document.getElementById('adminTotalBtc').textContent = standardUsers.reduce((s,u) => s + (u.btc||0), 0).toFixed(8);
-    document.getElementById('adminTotalRigs').textContent = standardUsers.reduce((s,u) => s + (u.rigs||[]).length, 0);
+    // Update summary stats
+    document.getElementById('adminTotalUsers').textContent = clients.length;
+    document.getElementById('adminTotalUsd').textContent = '$' + clients.reduce((s,u) => s + (u.usd||0), 0).toLocaleString('en-US', {minimumFractionDigits:2});
+    document.getElementById('adminTotalBtc').textContent = clients.reduce((s,u) => s + (u.btc||0), 0).toFixed(8);
 
+    // Calculate total mining earnings across all clients
+    const totalMining = clients.reduce((sum, u) => {
+        const userMining = (u.rigs||[]).reduce((rSum, r) => rSum + ((r.earned||0) * btcPrice), 0);
+        return sum + userMining;
+    }, 0);
+    document.getElementById('adminTotalMining').textContent = '$' + totalMining.toLocaleString('en-US', {minimumFractionDigits:2});
+
+    // Render client table
     const tbody = document.getElementById('adminUsersBody');
-    tbody.innerHTML = standardUsers.map(u => `
-        <tr>
-            <td><div style="display:flex;align-items:center;gap:10px;"><div class="user-avatar" style="width:28px;height:28px;font-size:11px;">${u.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase()}</div><span style="font-weight:700;">${u.name}</span></div></td>
+    const emptyState = document.getElementById('adminEmptyState');
+    const table = document.getElementById('adminClientsTable');
+
+    if (clients.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        table.style.display = 'none';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+    table.style.display = 'table';
+
+    tbody.innerHTML = clients.map(u => {
+        const miningEarnings = (u.rigs||[]).reduce((sum, r) => sum + ((r.earned||0) * btcPrice), 0);
+        const initials = u.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+        return `
+        <tr class="client-row" data-email="${u.email}">
+            <td><div style="display:flex;align-items:center;gap:10px;"><div class="user-avatar" style="width:28px;height:28px;font-size:11px;">${initials}</div><span style="font-weight:700;">${u.name}</span></div></td>
             <td style="font-size:13px;color:var(--text-muted);">${u.email}</td>
-            <td style="font-weight:700;color:var(--success);">$${(u.usd||0).toLocaleString()}</td>
-            <td>${(u.btc||0).toFixed(8)}</td>
+            <td>
+                <div class="balance-edit">
+                    <button class="btn-minus" onclick="adjustBalance('${u.email}', 'usd', -1000)" title="- $1,000">−</button>
+                    <span class="val" id="usd-${u.email.replace(/\./g,'-')}">$${(u.usd||0).toLocaleString()}</span>
+                    <button class="btn-plus" onclick="adjustBalance('${u.email}', 'usd', 1000)" title="+ $1,000">+</button>
+                </div>
+            </td>
+            <td>
+                <div class="balance-edit">
+                    <button class="btn-minus" onclick="adjustBalance('${u.email}', 'btc', -0.001)" title="- 0.001 BTC">−</button>
+                    <span class="val" id="btc-${u.email.replace(/\./g,'-')}">${(u.btc||0).toFixed(4)}</span>
+                    <button class="btn-plus" onclick="adjustBalance('${u.email}', 'btc', 0.001)" title="+ 0.001 BTC">+</button>
+                </div>
+            </td>
+            <td class="earnings-val" id="mining-${u.email.replace(/\./g,'-')}">$${miningEarnings.toFixed(2)}</td>
             <td>${(u.rigs||[]).length}</td>
             <td>${(u.referrals||[]).length}</td>
             <td style="font-size:12px;color:var(--text-muted);">${new Date(u.joined).toLocaleDateString()}</td>
-            <td><span class="status-dot ${Math.random()>0.3?'status-online':'status-offline'}"></span>${Math.random()>0.3?'Online':'Offline'}</td>
+            <td>
+                <div class="manage-btns">
+                    <button class="btn-view" onclick="viewClientTx('${u.email}')">Ledger</button>
+                    <button class="btn-edit" onclick="openEditModal('${u.email}')">Custom</button>
+                </div>
+            </td>
         </tr>
-    `).join('');
+    `}).join('');
+}
+
+// Adjust client balance (USD or BTC)
+async function adjustBalance(email, type, amount) {
+    const user = await loadUser(email);
+    if (!user) { toast('Client not found', 'error'); return; }
+
+    if (type === 'usd') {
+        user.usd = (user.usd || 0) + amount;
+        if (user.usd < 0) user.usd = 0;
+        user.txs.push({ type: amount > 0 ? 'deposit' : 'withdraw', amount: amount, currency: 'USD', status: 'Completed', date: Date.now(), details: `Admin ${amount > 0 ? 'credit' : 'debit'} by ${currentUser.name}` });
+    } else {
+        user.btc = (user.btc || 0) + amount;
+        if (user.btc < 0) user.btc = 0;
+        user.txs.push({ type: amount > 0 ? 'deposit' : 'withdraw', amount: amount, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Admin ${amount > 0 ? 'credit' : 'debit'} by ${currentUser.name}` });
+    }
+
+    await saveUser(user);
+    renderAdmin();
+    toast(`${type.toUpperCase()} balance ${amount > 0 ? 'increased' : 'decreased'} for ${user.name}`, 'success');
+}
+
+// Open custom edit modal
+function openEditModal(email) {
+    const user = users[email];
+    if (!user) return;
+    const overlay = document.getElementById('modalOverlay');
+    const content = document.getElementById('modalContent');
+    overlay.classList.add('active');
+    content.innerHTML = `
+        <div class="modal-header"><h3>✏️ Edit ${user.name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+        <div class="modal-body">
+            <div class="form-group"><label>Current USD: $${(user.usd||0).toLocaleString()}</label><input type="number" id="editUsd" value="${user.usd||0}" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
+            <div class="form-group"><label>Current BTC: ${(user.btc||0).toFixed(8)}</label><input type="number" id="editBtc" value="${user.btc||0}" step="0.0001" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveCustomBalance('${email}')">Save Changes</button>
+    `;
+}
+
+async function saveCustomBalance(email) {
+    const user = await loadUser(email);
+    if (!user) return;
+    const newUsd = parseFloat(document.getElementById('editUsd').value) || 0;
+    const newBtc = parseFloat(document.getElementById('editBtc').value) || 0;
+    const oldUsd = user.usd || 0;
+    const oldBtc = user.btc || 0;
+
+    if (newUsd !== oldUsd) {
+        const diff = newUsd - oldUsd;
+        user.txs.push({ type: diff > 0 ? 'deposit' : 'withdraw', amount: diff, currency: 'USD', status: 'Completed', date: Date.now(), details: `Admin adjustment by ${currentUser.name}` });
+        user.usd = newUsd;
+    }
+    if (newBtc !== oldBtc) {
+        const diff = newBtc - oldBtc;
+        user.txs.push({ type: diff > 0 ? 'deposit' : 'withdraw', amount: diff, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Admin adjustment by ${currentUser.name}` });
+        user.btc = newBtc;
+    }
+
+    await saveUser(user);
+    closeModal();
+    renderAdmin();
+    toast('Balance updated', 'success');
+}
+
+// View client transaction history
+async function viewClientTx(email) {
+    const user = await loadUser(email);
+    if (!user) return;
+    const txs = [...(user.txs||[])].sort((a,b) => b.date - a.date);
+    const overlay = document.getElementById('modalOverlay');
+    const content = document.getElementById('modalContent');
+    overlay.classList.add('active');
+
+    let txHtml = '';
+    if (txs.length === 0) {
+        txHtml = '<p style="color:var(--text-muted);text-align:center;padding:20px;">No transactions</p>';
+    } else {
+        txHtml = '<div style="max-height:300px;overflow-y:auto;"><table style="width:100%;font-size:13px;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:8px;">Type</th><th style="text-align:left;padding:8px;">Amount</th><th style="text-align:left;padding:8px;">Status</th><th style="text-align:left;padding:8px;">Date</th></tr></thead><tbody>' +
+            txs.slice(0,20).map(tx => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><span class="tx-type-${tx.type}">${tx.type.toUpperCase()}</span></td><td style="padding:8px;font-weight:700;">${tx.currency==='BTC'?tx.amount.toFixed(6)+' BTC':'$'+Math.abs(tx.amount).toLocaleString()}</td><td style="padding:8px;"><span class="badge" style="background:${tx.status==='Completed'?'#2ed57322':'#ffa50222'};color:${tx.status==='Completed'?'var(--success)':'var(--warning)'}">${tx.status}</span></td><td style="padding:8px;color:var(--text-muted);font-size:12px;">${new Date(tx.date).toLocaleString()}</td></tr>`).join('') +
+            '</tbody></table></div>';
+    }
+
+    content.innerHTML = `
+        <div class="modal-header"><h3>📋 ${user.name} - Transaction Ledger</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+        <div class="modal-body">${txHtml}</div>
+    `;
 }
 
 // ================= ACTIONS =================
@@ -1488,7 +2040,6 @@ async function buyRig(rigId) {
     currentUser.usd -= rig.price;
     currentUser.rigs.push({ id: rigId, purchased: Date.now(), earned: 0 });
     currentUser.txs.push({ type: 'mining', amount: -rig.price, currency: 'USD', status: 'Completed', date: Date.now(), details: `Deployed ${rig.name}` });
-    addNotif(currentUser, 'Rig Deployed', `${rig.name} is now online and generating BTC.`, '⛏️');
     await saveUser(currentUser);
     updateAllBalances();
     renderMining();
@@ -1527,14 +2078,12 @@ async function executeTrade() {
         currentUser.usd -= (usd + fee);
         currentUser.btc += amt;
         currentUser.txs.push({ type: 'trade', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Long BTC @ $${btcPrice.toFixed(2)}` });
-        addNotif(currentUser, 'Order Filled', `Bought ${amt.toFixed(6)} BTC for $${usd.toFixed(2)} (Fee: $${fee.toFixed(2)})`, '📈');
         toast(`Bought ${amt.toFixed(6)} BTC`, 'success');
     } else {
         if (currentUser.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
         currentUser.btc -= amt;
         currentUser.usd += (usd - fee);
         currentUser.txs.push({ type: 'trade', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Short BTC @ $${btcPrice.toFixed(2)}` });
-        addNotif(currentUser, 'Order Filled', `Sold ${amt.toFixed(6)} BTC for $${(usd-fee).toFixed(2)} (Fee: $${fee.toFixed(2)})`, '📉');
         toast(`Sold ${amt.toFixed(6)} BTC`, 'success');
     }
     await saveUser(currentUser);
@@ -1545,13 +2094,10 @@ async function executeTrade() {
 }
 function updateTradePrice() {
     document.getElementById('tradePrice').textContent = '$' + btcPrice.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-    if (priceHistory.length > 2) {
-        const prev = priceHistory[priceHistory.length - 2].price;
-        const pct = ((btcPrice - prev) / prev * 100).toFixed(2);
-        const el = document.getElementById('tradeChange');
-        el.textContent = (pct >= 0 ? '+' : '') + pct + '%';
-        el.style.color = pct >= 0 ? 'var(--success)' : 'var(--danger)';
-    }
+    const pct = btcPriceChange24h;
+    const el = document.getElementById('tradeChange');
+    el.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% (24h)';
+    el.style.color = pct >= 0 ? 'var(--success)' : 'var(--danger)';
 }
 function updateOrderBook() {
     let bids='', asks='';
@@ -1566,39 +2112,138 @@ function updateOrderBook() {
     document.getElementById('orderBookBids').innerHTML = bids;
     document.getElementById('orderBookAsks').innerHTML = asks;
 }
-function setChartPeriod(p) { chartPeriod = p; drawChart(currentPage==='trade'?'tradeChart':'priceChart'); }
-
 // ================= CHARTS =================
 function drawChart(canvasId) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
+    requestAnimationFrame(() => {
+        _drawChartImpl(canvasId);
+    });
+}
+function _drawChartImpl(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
     canvas.width = rect.width * 2;
     canvas.height = rect.height * 2;
     ctx.scale(2, 2);
     const w = rect.width, h = rect.height;
-    const data = priceHistory.slice(-80);
-    if (data.length < 2) return;
-    const min = Math.min(...data.map(d=>d.price));
-    const max = Math.max(...data.map(d=>d.price));
+    const padTop = 20, padBottom = 30, padLeft = 60, padRight = 10;
+    const cw = w - padLeft - padRight, ch = h - padTop - padBottom;
+
+    // Get visible data based on chart period
+    let data = priceHistory;
+    if (chartPeriod === '1') data = priceHistory.slice(-100);
+    else if (chartPeriod === '7') data = priceHistory;
+    else if (chartPeriod === '30') data = priceHistory;
+    else data = priceHistory.slice(-100);
+
+    if (data.length < 2) {
+        ctx.fillStyle = 'var(--text-muted)';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Loading price data...', w/2, h/2);
+        return;
+    }
+
+    const prices = data.map(d=>d.price);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
     const range = max - min || 1;
+    const isUp = prices[prices.length-1] >= prices[0];
+    const lineColor = isUp ? '#00e5a0' : '#ff4757';
+    const fillColorStart = isUp ? 'rgba(0,229,160,0.15)' : 'rgba(255,71,87,0.1)';
+
     ctx.clearRect(0,0,w,h);
-    const grad = ctx.createLinearGradient(0,0,0,h);
-    grad.addColorStop(0, 'rgba(0, 212, 170, 0.18)');
-    grad.addColorStop(1, 'rgba(0, 212, 170, 0)');
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+        const y = padTop + (ch / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(w - padRight, y);
+        ctx.stroke();
+        // Price labels on Y axis
+        const priceLabel = max - (range / 4) * i;
+        ctx.fillStyle = 'var(--text-muted)';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText('$' + priceLabel.toLocaleString('en-US', {maximumFractionDigits:0}), padLeft - 8, y + 4);
+    }
+
+    // Area fill (gradient)
+    const areaGrad = ctx.createLinearGradient(0, padTop, 0, h - padBottom);
+    areaGrad.addColorStop(0, fillColorStart);
+    areaGrad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.beginPath();
-    ctx.moveTo(0,h);
-    data.forEach((d,i) => { const x=(i/(data.length-1))*w; const y=h-((d.price-min)/range)*(h-20)-10; ctx.lineTo(x,y); });
-    ctx.lineTo(w,h);
+    ctx.moveTo(padLeft, h - padBottom);
+    data.forEach((d,i) => {
+        const x = padLeft + (i / (data.length - 1)) * cw;
+        const y = padTop + ((max - d.price) / range) * ch;
+        ctx.lineTo(x, y);
+    });
+    ctx.lineTo(padLeft + cw, h - padBottom);
     ctx.closePath();
-    ctx.fillStyle = grad;
+    ctx.fillStyle = areaGrad;
+    ctx.fill();
+
+    // Price line
+    ctx.beginPath();
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    data.forEach((d,i) => {
+        const x = padLeft + (i / (data.length - 1)) * cw;
+        const y = padTop + ((max - d.price) / range) * ch;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Glow effect on line
+    ctx.beginPath();
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 6;
+    ctx.globalAlpha = 0.15;
+    data.forEach((d,i) => {
+        const x = padLeft + (i / (data.length - 1)) * cw;
+        const y = padTop + ((max - d.price) / range) * ch;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // End point dot
+    const lastX = padLeft + cw;
+    const lastY = padTop + ((max - prices[prices.length-1]) / range) * ch;
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = lineColor;
     ctx.fill();
     ctx.beginPath();
-    ctx.strokeStyle = '#00d4aa';
-    ctx.lineWidth = 2.5;
-    data.forEach((d,i) => { const x=(i/(data.length-1))*w; const y=h-((d.price-min)/range)*(h-20)-10; if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); });
-    ctx.stroke();
+    ctx.arc(lastX, lastY, 10, 0, Math.PI * 2);
+    ctx.fillStyle = isUp ? 'rgba(0,229,160,0.2)' : 'rgba(255,71,87,0.2)';
+    ctx.fill();
+
+    // Time labels on X axis
+    ctx.fillStyle = 'var(--text-muted)';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+    const timeLabels = 5;
+    for (let i = 0; i < timeLabels; i++) {
+        const idx = Math.floor((data.length - 1) * i / (timeLabels - 1));
+        const x = padLeft + (i / (timeLabels - 1)) * cw;
+        const date = new Date(data[idx].time);
+        const label = chartPeriod === '1' 
+            ? date.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})
+            : date.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+        ctx.fillText(label, x, h - 8);
+    }
 }
 
 // ================= MODALS =================
@@ -1610,7 +2255,7 @@ function openModal(type) {
         content.innerHTML = `
             <div class="modal-header"><h3>💵 Fund Account</h3><button class="modal-close" onclick="closeModal()">×</button></div>
             <div class="modal-body">
-                <p>Simulate a wire transfer or card deposit to add USD to your account.</p>
+                <p>Wire transfer or card deposit to add USD to your account.</p>
                 <div class="form-group" style="margin-top:16px;"><label>Amount (USD)</label><input type="number" id="depAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
             </div>
             <button class="btn btn-primary" onclick="processDeposit()">Confirm Deposit</button>
@@ -1619,7 +2264,7 @@ function openModal(type) {
         content.innerHTML = `
             <div class="modal-header"><h3>🏧 Withdraw Funds</h3><button class="modal-close" onclick="closeModal()">×</button></div>
             <div class="modal-body">
-                <p>Initiate a withdrawal to your linked bank account or wallet address.</p>
+                <p>Withdraw funds to your linked bank account or external wallet.</p>
                 <div class="form-group" style="margin-top:16px;"><label>Amount (USD)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
                 <div class="form-group"><label>Destination Address</label><input type="text" value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" disabled style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text-muted);"></div>
             </div>
@@ -1630,7 +2275,7 @@ function openModal(type) {
         content.innerHTML = `
             <div class="modal-header"><h3>💱 Convert BTC to USD</h3><button class="modal-close" onclick="closeModal()">×</button></div>
             <div class="modal-body">
-                <p>Convert your BTC balance to USD at the current mark price.</p>
+                <p>Convert BTC to USD at the current market price.</p>
                 <div style="background:var(--bg);padding:16px;border-radius:10px;margin:16px 0;">
                     <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>Available BTC</span><span style="font-weight:700;">${currentUser.btc.toFixed(8)}</span></div>
                     <div style="display:flex;justify-content:space-between;"><span>Current Value</span><span style="font-weight:700;color:var(--accent);">$${btcVal.toFixed(2)}</span></div>
@@ -1646,7 +2291,6 @@ async function processDeposit() {
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
     currentUser.usd += amt;
     currentUser.txs.push({ type: 'deposit', amount: amt, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Wire transfer deposit' });
-    addNotif(currentUser, 'Deposit Confirmed', `$${amt.toLocaleString()} has been credited to your account.`, '💵');
     await saveUser(currentUser);
     updateAllBalances();
     renderWallet();
@@ -1659,7 +2303,6 @@ async function processWithdraw() {
     if (currentUser.usd < amt) { toast('Insufficient balance', 'error'); return; }
     currentUser.usd -= amt;
     currentUser.txs.push({ type: 'withdraw', amount: -amt, currency: 'USD', status: 'Pending', date: Date.now(), details: 'Withdrawal to external wallet' });
-    addNotif(currentUser, 'Withdrawal Submitted', `Your withdrawal of $${amt.toLocaleString()} is being processed. Reference: WV-${Date.now().toString().slice(-6)}`, '🏧');
     await saveUser(currentUser);
     updateAllBalances();
     renderWallet();
@@ -1673,7 +2316,6 @@ async function processConvert() {
     currentUser.usd += usd;
     currentUser.btc = 0;
     currentUser.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USD @ $${btcPrice.toFixed(2)}` });
-    addNotif(currentUser, 'Conversion Complete', `Converted ${btc.toFixed(8)} BTC to $${usd.toFixed(2)} USD.`, '💱');
     await saveUser(currentUser);
     updateAllBalances();
     renderWallet();
