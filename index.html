@@ -28,6 +28,24 @@
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
+        /* Sync Banner */
+        .sync-banner {
+            background: linear-gradient(90deg, #1a2a3a, #0f172a);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .sync-banner.online { background: linear-gradient(90deg, #0d2b1f, #0f172a); color: var(--success); border-bottom-color: var(--accent); }
+        .sync-banner .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warning); }
+        .sync-banner.online .dot { background: var(--success); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
         /* Auth */
         .auth-container {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
@@ -64,6 +82,7 @@
         .auth-switch a { color: var(--accent); cursor: pointer; font-weight: 600; text-decoration: none; }
         .badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
         .badge-pro { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); }
+        .badge-security { background: var(--danger-dim); color: var(--danger); border: 1px solid var(--danger); }
 
         /* Layout */
         .app-layout { display: flex; min-height: 100vh; }
@@ -116,9 +135,11 @@
             display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; font-size: 13px;
         }
 
+        /* Pages */
         .page { padding: 28px; max-width: 1440px; margin: 0 auto; }
         .page-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
+        /* Cards */
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
@@ -147,6 +168,7 @@
         .tx-type-trade { color: var(--info); font-weight: 700; }
         .tx-type-ref { color: var(--warning); font-weight: 700; }
 
+        /* Mining */
         .rig-card {
             background: linear-gradient(145deg, var(--bg-card), #0f1318);
             border: 1px solid var(--border); border-radius: 14px; padding: 22px;
@@ -177,6 +199,7 @@
         .my-rig-earnings .amount { font-size: 18px; font-weight: 800; color: var(--success); }
         .my-rig-earnings .label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
+        /* Trade */
         .trade-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
         .trade-chart { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
         .trade-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
@@ -196,6 +219,7 @@
         .trade-info-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
         .trade-info-row:last-child { margin-bottom: 0; padding-top: 8px; border-top: 1px solid var(--border); font-weight: 700; font-size: 14px; }
 
+        /* Referral */
         .ref-box {
             background: linear-gradient(135deg, rgba(0,212,170,0.08), transparent);
             border: 1px dashed var(--accent); border-radius: 14px; padding: 28px; text-align: center; margin-bottom: 24px;
@@ -210,6 +234,7 @@
         .ref-stat .num { font-size: 26px; font-weight: 800; color: var(--accent); }
         .ref-stat .lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
+        /* Notifications */
         .notif-item {
             background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
             padding: 18px; margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; transition: 0.2s;
@@ -221,6 +246,7 @@
         .notif-content p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
         .notif-time { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
 
+        /* Control Center */
         .admin-table { width: 100%; border-collapse: collapse; }
         .admin-table th { text-align: left; padding: 14px 12px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); background: var(--bg); font-weight: 700; }
         .admin-table td { padding: 14px 12px; font-size: 14px; border-bottom: 1px solid var(--border); }
@@ -229,6 +255,7 @@
         .status-online { background: var(--success); }
         .status-offline { background: var(--text-muted); }
 
+        /* Modal */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
             display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: 0.3s;
@@ -246,14 +273,18 @@
         .modal-body { margin-bottom: 20px; }
         .modal-body p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
 
-        .otp-inputs { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
-        .otp-inputs input {
-            width: 44px; height: 52px; text-align: center; font-size: 20px; font-weight: 800;
-            background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
-            color: var(--text); outline: none;
+        /* Simulated Email */
+        .sim-message {
+            background: #1a1f2e; border: 1px solid #2d3748; border-radius: 12px; padding: 16px; margin: 16px 0;
         }
-        .otp-inputs input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+        .sim-message-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .sim-message-avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--info)); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .sim-message-sender { font-size: 13px; font-weight: 700; }
+        .sim-message-email { font-size: 11px; color: var(--text-muted); }
+        .sim-message-body { font-size: 14px; line-height: 1.5; padding: 10px; background: #0f1419; border-radius: 8px; border-left: 3px solid var(--accent); }
+        .sim-code { font-size: 28px; font-weight: 800; letter-spacing: 6px; color: var(--accent); text-align: center; margin: 12px 0; font-family: monospace; }
 
+        /* Toast */
         .toast-container { position: fixed; top: 80px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 10px; }
         .toast {
             background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--accent);
@@ -265,6 +296,7 @@
         .toast.warning { border-left-color: var(--warning); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
+        /* Responsive */
         @media (max-width: 1024px) {
             .grid-4 { grid-template-columns: repeat(2, 1fr); }
             .trade-layout { grid-template-columns: 1fr; }
@@ -289,20 +321,18 @@
         .progress-bar { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; margin-top: 8px; }
         .progress-bar .fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--info)); border-radius: 3px; transition: width 0.5s; }
 
+        .otp-inputs { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
+        .otp-inputs input {
+            width: 44px; height: 52px; text-align: center; font-size: 20px; font-weight: 800;
+            background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+            color: var(--text); outline: none;
+        }
+        .otp-inputs input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+
+        /* CRITICAL: Control Center nav item is completely hidden by default */
         .nav-item.mgmt-only { display: none !important; }
         .nav-item.mgmt-only.visible { display: flex !important; }
-
-        .email-status {
-            text-align: center; padding: 20px; font-size: 14px; color: var(--text-muted);
-        }
-        .email-status .spinner {
-            width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent);
-            border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 12px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
 
@@ -328,7 +358,7 @@
             </div>
             <button class="btn btn-primary" onclick="handleLogin()">Sign In</button>
             <div class="auth-switch">
-                New to BitVault? <a href="javascript:void(0)" onclick="showRegister()" style="cursor:pointer;">Create Account</a>
+                New to BitVault? <a onclick="showRegister()">Create Account</a>
             </div>
         </div>
 
@@ -356,7 +386,7 @@
             </div>
             <button class="btn btn-primary" onclick="startVerification()">Continue</button>
             <div class="auth-switch">
-                Already registered? <a href="javascript:void(0)" onclick="showLogin()" style="cursor:pointer;">Sign In</a>
+                Already registered? <a onclick="showLogin()">Sign In</a>
             </div>
         </div>
 
@@ -368,26 +398,19 @@
                 <p style="font-size:13px;color:var(--text-muted);">We sent a 6-digit security code to<br><b id="verifyEmailDisplay" style="color:var(--text);">email@example.com</b></p>
             </div>
 
-            <!-- EMAIL STATUS -->
-            <div id="emailStatusBox" style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;margin-bottom:20px;">
-                <div id="emailStatusIcon" style="font-size:28px;margin-bottom:6px;">📤</div>
-                <div id="emailStatusText" style="font-size:14px;font-weight:600;color:var(--text);">Sending verification code...</div>
-                <div id="emailStatusSub" style="font-size:12px;color:var(--text-muted);margin-top:4px;">Please check your inbox and spam folder</div>
-            </div>
-
-            <!-- FALLBACK: Hidden by default, revealed if email fails -->
-            <div id="codeFallback" class="hidden" style="background:var(--accent-dim);border:1px dashed var(--accent);border-radius:14px;padding:18px;text-align:center;margin-bottom:20px;">
-                <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Email Delivery Fallback</div>
-                <div id="visibleVerifCode" style="font-size:32px;font-weight:800;color:var(--accent);letter-spacing:8px;font-family:'SF Mono',monospace;">------</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:8px;">Use this code if your email provider blocked the message</div>
-            </div>
-            <div style="text-align:center;margin-bottom:16px;">
-                <a href="javascript:void(0)" id="showCodeLink" onclick="revealCode()" style="color:var(--text-muted);font-size:12px;cursor:pointer;text-decoration:underline;display:none;">Didn't receive the email? Show code</a>
-            </div>
-
-            <div id="emailSendingStatus" class="email-status hidden">
-                <div class="spinner"></div>
-                <p>Sending verification code to your email...</p>
+            <div class="sim-message">
+                <div class="sim-message-header">
+                    <div class="sim-message-avatar">⚡</div>
+                    <div>
+                        <div class="sim-message-sender">BitVault Security</div>
+                        <div class="sim-message-email">security@bitvault.io</div>
+                    </div>
+                </div>
+                <div class="sim-message-body">
+                    <p style="margin-bottom:8px;">Your BitVault verification code is:</p>
+                    <div class="sim-code" id="simCodeDisplay">------</div>
+                    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">This code expires in 10 minutes. Do not share it with anyone.</p>
+                </div>
             </div>
 
             <div class="form-group" style="margin-top:16px;">
@@ -403,9 +426,9 @@
             </div>
             <button class="btn btn-primary" id="verifyBtn" onclick="handleVerify()" disabled>Verify & Create Account</button>
             <div style="text-align:center;margin-top:14px;">
-                <a href="javascript:void(0)" onclick="resendCode()" style="color:var(--accent);font-size:13px;cursor:pointer;font-weight:600;">Resend Code</a>
+                <a onclick="resendCode()" style="color:var(--accent);font-size:13px;cursor:pointer;font-weight:600;">Resend Code</a>
                 <span style="color:var(--text-muted);font-size:13px;margin:0 8px;">•</span>
-                <a href="javascript:void(0)" onclick="cancelVerify()" style="color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</a>
+                <a onclick="cancelVerify()" style="color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</a>
             </div>
         </div>
     </div>
@@ -437,6 +460,7 @@
             <div class="nav-item" onclick="navigate('notifications')">
                 <span class="icon">🔔</span> Messages <span id="notifCountNav" class="badge badge-pro hidden" style="margin-left:auto;">0</span>
             </div>
+            <!-- CONTROL CENTER: Completely hidden by default. Only JS can reveal it for master. -->
             <div class="nav-item mgmt-only" onclick="navigate('control')">
                 <span class="icon">🛡️</span> Control Center
             </div>
@@ -454,6 +478,11 @@
     </aside>
 
     <main class="main-content">
+        <div class="sync-banner" id="syncBanner">
+            <span class="dot"></span>
+            <span id="syncText">Local Mode — Connect Firebase to sync accounts globally</span>
+        </div>
+
         <div class="topbar">
             <div class="topbar-left">
                 <span class="menu-toggle" onclick="toggleSidebar()">☰</span>
@@ -762,7 +791,7 @@
                 <div style="overflow-x:auto;">
                     <table class="admin-table">
                         <thead>
-                            <tr><th>Account</th><th>Email</th><th>USD Balance</th><th>BTC Balance</th><th>Rigs</th><th>Network</th><th>Created</th><th>Status</th><th>Actions</th></tr>
+                            <tr><th>Account</th><th>Email</th><th>USD Balance</th><th>BTC Balance</th><th>Rigs</th><th>Network</th><th>Created</th><th>Status</th></tr>
                         </thead>
                         <tbody id="adminUsersBody"></tbody>
                     </table>
@@ -803,34 +832,71 @@
     <div class="modal" id="modalContent"></div>
 </div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <!-- EmailJS SDK -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   EMAILJS CONFIG — REAL CREDENTIALS
-   Service:    service_ixnhzgj
-   Template:  template_7o0xd77
-   PublicKey: Pxsqo6zPtIvXsO5xF
+   STEP 1: CREATE FREE FIREBASE PROJECT (2 minutes)
+   → Go to https://console.firebase.google.com
+   → Click "Create Project" → name it "bitvault-demo"
+   → Click "Build" → "Realtime Database" → "Create Database"
+   → Choose "Start in test mode" (allows read/write)
+   → Copy the database URL and paste below in databaseURL
+   → Go to Project Settings → General → Your Apps → Web
+   → Register app → Copy the firebaseConfig values below
    ═══════════════════════════════════════════════════════════════ */
 
-const EMAILJS_PUBLIC_KEY = "Pxsqo6zPtIvXsO5xF";
-const EMAILJS_SERVICE_ID = "service_ixnhzgj";
-const EMAILJS_TEMPLATE_ID = "template_7o0xd77";
-let emailjsReady = false;
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
 
-// Safe EmailJS init — if CDN is blocked, app still works
+let db = null;
+let firebaseOnline = false;
+
 try {
-    if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
-        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-        emailjsReady = true;
-        console.log('EmailJS initialized');
-    } else {
-        console.warn('EmailJS SDK not loaded — emails will not send');
+    if (firebaseConfig.apiKey !== "YOUR_API_KEY" && firebaseConfig.databaseURL.includes("firebaseio.com")) {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        firebaseOnline = true;
     }
-} catch (e) {
-    console.error('EmailJS init failed:', e);
-    emailjsReady = false;
+} catch(e) { console.log("Firebase not configured"); }
+
+// ================= EMAILJS =================
+let emailjsReady = false;
+try {
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init({ publicKey: "Pxsqo6zPtIvXsO5xF" });
+        emailjsReady = true;
+        console.log("EmailJS initialized");
+    }
+} catch(e) { console.log("EmailJS init failed:", e); }
+
+async function sendVerificationEmail(name, email, code) {
+    if (!emailjsReady || typeof emailjs === 'undefined') {
+        console.warn("EmailJS not available - code shown on screen as backup");
+        return false;
+    }
+    try {
+        await emailjs.send("service_ixnhzgj", "template_7o0xd77", {
+            email: email,
+            to_name: name,
+            verification_code: code
+        });
+        return true;
+    } catch(err) {
+        console.error("EmailJS send failed:", err);
+        return false;
+    }
 }
 
 // ================= DATA =================
@@ -848,7 +914,7 @@ let priceHistory = [];
 let tradeMode = 'buy';
 let currentPage = 'dashboard';
 let chartPeriod = '1D';
-let priceUpdateInterval, miningInterval;
+let priceUpdateInterval, miningInterval, syncInterval;
 let tempRegData = null;
 let tempVerifCode = '';
 
@@ -870,14 +936,40 @@ function safeKey(email) { return email.replace(/\./g, ','); }
 function unsafeKey(key) { return key.replace(/,/g, '.'); }
 
 async function loadUser(email) {
+    if (firebaseOnline && db) {
+        const snap = await db.ref('users/' + safeKey(email)).once('value');
+        return snap.val();
+    }
     return users[email] || null;
 }
 async function saveUser(user) {
     users[user.email] = user;
     localStorage.setItem('bv_users', JSON.stringify(users));
+    if (firebaseOnline && db) {
+        await db.ref('users/' + safeKey(user.email)).set(user);
+    }
 }
 async function loadAllUsers() {
+    if (firebaseOnline && db) {
+        const snap = await db.ref('users').once('value');
+        const data = snap.val() || {};
+        Object.keys(data).forEach(k => { users[unsafeKey(k)] = data[k]; });
+        localStorage.setItem('bv_users', JSON.stringify(users));
+        return Object.values(data);
+    }
     return Object.values(users);
+}
+
+function updateSyncBanner() {
+    const banner = document.getElementById('syncBanner');
+    const text = document.getElementById('syncText');
+    if (firebaseOnline) {
+        banner.classList.add('online');
+        text.textContent = 'Cloud Sync Active — All accounts visible globally';
+    } else {
+        banner.classList.remove('online');
+        text.textContent = 'Local Mode — Paste Firebase config to sync accounts globally';
+    }
 }
 
 // ================= OTP =================
@@ -914,7 +1006,6 @@ function showRegister() {
     document.getElementById('registerForm').classList.remove('hidden');
     document.getElementById('verifyForm').classList.add('hidden');
 }
-
 async function startVerification() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim().toLowerCase();
@@ -933,112 +1024,43 @@ async function startVerification() {
     tempVerifCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     document.getElementById('verifyEmailDisplay').textContent = email;
-    document.getElementById('visibleVerifCode').textContent = tempVerifCode;
+    document.getElementById('simCodeDisplay').textContent = tempVerifCode;
+
     document.getElementById('registerForm').classList.add('hidden');
     document.getElementById('verifyForm').classList.remove('hidden');
-    document.getElementById('codeFallback').classList.add('hidden');
-    document.getElementById('showCodeLink').style.display = 'none';
-    setEmailStatus('sending');
     clearOtp();
 
     // Send real email via EmailJS
-    if (emailjsReady) {
-        try {
-            const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                to_name: name,
-                to_email: email,
-                verification_code: tempVerifCode,
-                from_name: "BitVault Security",
-                reply_to: "security@bitvault.io"
-            });
-            console.log('EmailJS success:', result);
-            setEmailStatus('sent');
-            toast('Verification code sent to ' + email, 'success');
-        } catch(err) {
-            console.error('EmailJS error:', err);
-            setEmailStatus('failed');
-            document.getElementById('showCodeLink').style.display = 'inline';
-            document.getElementById('codeFallback').classList.remove('hidden');
-            toast('Email delivery failed. Code shown above.', 'error');
+    toast('Sending verification email...', 'info');
+    const sent = await sendVerificationEmail(name, email, tempVerifCode);
+    if (sent) {
+        toast('Security code sent to ' + email, 'success');
+    } else {
+        toast('Email delivery failed. Check your inbox or try again.', 'error');
+    }
+}
+async function resendCode() {
+    tempVerifCode = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById('simCodeDisplay').textContent = tempVerifCode;
+    clearOtp();
+
+    // Resend via EmailJS
+    if (tempRegData && tempRegData.name && tempRegData.email) {
+        toast('Resending verification email...', 'info');
+        const sent = await sendVerificationEmail(tempRegData.name, tempRegData.email, tempVerifCode);
+        if (sent) {
+            toast('New security code sent to ' + tempRegData.email, 'success');
+        } else {
+            toast('Email delivery failed. Check your inbox or try again.', 'error');
         }
     } else {
-        setEmailStatus('failed');
-        document.getElementById('showCodeLink').style.display = 'inline';
-        document.getElementById('codeFallback').classList.remove('hidden');
-        toast('Email service unavailable. Use the code shown above.', 'warning');
+        toast('New security code sent', 'success');
     }
 }
-
-function resendCode() {
-    tempVerifCode = Math.floor(100000 + Math.random() * 900000).toString();
-    document.getElementById('visibleVerifCode').textContent = tempVerifCode;
-    setEmailStatus('sending');
-    document.getElementById('codeFallback').classList.add('hidden');
-
-    if (emailjsReady) {
-        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            to_name: tempRegData.name,
-            to_email: tempRegData.email,
-            verification_code: tempVerifCode,
-            from_name: "BitVault Security",
-            reply_to: "security@bitvault.io"
-        }).then((result) => {
-            console.log('Resend success:', result);
-            setEmailStatus('sent');
-            toast('New code sent to ' + tempRegData.email, 'success');
-        }).catch((err) => {
-            console.error('Resend failed:', err);
-            setEmailStatus('failed');
-            document.getElementById('showCodeLink').style.display = 'inline';
-            document.getElementById('codeFallback').classList.remove('hidden');
-            toast('Email failed again. Code is shown above.', 'error');
-        });
-    } else {
-        setEmailStatus('failed');
-        document.getElementById('showCodeLink').style.display = 'inline';
-        document.getElementById('codeFallback').classList.remove('hidden');
-        toast('Email service unavailable. Code is shown above.', 'warning');
-    }
-}
-
-function setEmailStatus(state) {
-    const icon = document.getElementById('emailStatusIcon');
-    const text = document.getElementById('emailStatusText');
-    const sub = document.getElementById('emailStatusSub');
-    const box = document.getElementById('emailStatusBox');
-    if (!icon || !text) return;
-    if (state === 'sending') {
-        icon.textContent = '📤';
-        text.textContent = 'Sending verification code...';
-        text.style.color = 'var(--text)';
-        sub.textContent = 'Please check your inbox and spam folder';
-        box.style.borderColor = 'var(--border)';
-    } else if (state === 'sent') {
-        icon.textContent = '✅';
-        text.textContent = 'Code sent successfully!';
-        text.style.color = 'var(--success)';
-        sub.textContent = 'If you don't see it, check your spam/junk folder';
-        box.style.borderColor = 'var(--success)';
-    } else if (state === 'failed') {
-        icon.textContent = '⚠️';
-        text.textContent = 'Email delivery failed';
-        text.style.color = 'var(--warning)';
-        sub.textContent = 'Your email provider may have blocked it. Use the fallback below.';
-        box.style.borderColor = 'var(--warning)';
-    }
-}
-function revealCode() {
-    document.getElementById('codeFallback').classList.remove('hidden');
-    document.getElementById('showCodeLink').style.display = 'none';
-}
-
 function cancelVerify() {
     tempRegData = null;
-    const oldFallback = document.getElementById('emailFallback');
-    if (oldFallback) oldFallback.remove();
     showRegister();
 }
-
 async function handleVerify() {
     const entered = getOtpValue();
     if (entered !== tempVerifCode) { toast('Invalid verification code', 'error'); return; }
@@ -1074,8 +1096,6 @@ async function handleVerify() {
 
     await saveUser(newUser);
     tempRegData = null;
-    const oldFallback = document.getElementById('emailFallback');
-    if (oldFallback) oldFallback.remove();
     toast('Account verified. Please sign in.', 'success');
     showLogin();
 }
@@ -1086,6 +1106,7 @@ async function handleLogin() {
     const user = await loadUser(email);
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
+    // Calculate offline mining earnings
     const now = Date.now();
     const lastUpdate = user.lastMiningUpdate || now;
     const secondsElapsed = Math.floor((now - lastUpdate) / 1000);
@@ -1120,6 +1141,7 @@ function logout() {
     document.getElementById('appPage').classList.add('hidden');
     clearInterval(priceUpdateInterval);
     clearInterval(miningInterval);
+    clearInterval(syncInterval);
 }
 function generateRefCode() {
     return 'BV' + Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -1130,6 +1152,7 @@ function initApp() {
     document.getElementById('authPage').classList.add('hidden');
     document.getElementById('appPage').classList.remove('hidden');
     localStorage.setItem('bv_current', currentUser.email);
+    updateSyncBanner();
 
     document.getElementById('sidebarName').textContent = currentUser.name;
     document.getElementById('sidebarEmail').textContent = currentUser.email;
@@ -1139,6 +1162,7 @@ function initApp() {
     document.getElementById('topbarName').textContent = currentUser.name;
     document.getElementById('topbarRole').textContent = currentUser.isAdmin ? 'Manager' : 'Trader';
 
+    // CRITICAL: Only show Control Center for admin
     document.querySelectorAll('.nav-item.mgmt-only').forEach(el => {
         if (currentUser.isAdmin) {
             el.classList.add('visible');
@@ -1150,6 +1174,7 @@ function initApp() {
     navigate('dashboard');
     startPriceSimulation();
     startMiningSimulation();
+    startCloudSync();
     updateAllBalances();
 }
 
@@ -1170,7 +1195,7 @@ function navigate(page) {
     const allNavItems = document.querySelectorAll('.nav-item');
     let visibleIdx = 0;
     for (let i = 0; i < allNavItems.length; i++) {
-        if (allNavItems[i].offsetParent !== null) {
+        if (allNavItems[i].offsetParent !== null) { // visible
             if (visibleIdx === navMap[page]) {
                 allNavItems[i].classList.add('active');
                 break;
@@ -1190,6 +1215,16 @@ function navigate(page) {
     if (page === 'control') renderAdmin();
 }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+// ================= SYNC =================
+function startCloudSync() {
+    if (!firebaseOnline) return;
+    syncInterval = setInterval(async () => {
+        if (!currentUser) return;
+        currentUser.lastMiningUpdate = Date.now();
+        await saveUser(currentUser);
+    }, 10000);
+}
 
 // ================= BALANCES & PRICE =================
 function updateAllBalances() {
@@ -1229,7 +1264,6 @@ function updateDashPrice() {
 
 // ================= MINING =================
 function startMiningSimulation() {
-    if (miningInterval) clearInterval(miningInterval);
     miningInterval = setInterval(async () => {
         if (!currentUser) return;
         let earned = 0;
@@ -1422,41 +1456,6 @@ function renderNotifications() {
         `).join('');
     }
 }
-// ================= ADMIN BALANCE MANAGEMENT =================
-async function addUsdToUser(email) {
-    const amt = parseFloat(prompt(`Add USD to ${email}:`));
-    if (!amt || amt <= 0) return;
-    const u = await loadUser(email);
-    if (!u) { toast('User not found', 'error'); return; }
-    u.usd = (u.usd || 0) + amt;
-    u.txs.push({ type: 'deposit', amount: amt, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Admin credit from master' });
-    addNotif(u, 'Balance Added', `$${amt.toLocaleString()} was added to your account by admin.`);
-    await saveUser(u);
-    renderAdmin();
-    toast(`Added $${amt.toLocaleString()} to ${email}`, 'success');
-}
-async function addBtcToUser(email) {
-    const amt = parseFloat(prompt(`Add BTC to ${email}:`));
-    if (!amt || amt <= 0) return;
-    const u = await loadUser(email);
-    if (!u) { toast('User not found', 'error'); return; }
-    u.btc = (u.btc || 0) + amt;
-    u.txs.push({ type: 'mining', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: 'Admin BTC credit from master' });
-    addNotif(u, 'BTC Credited', `${amt.toFixed(8)} BTC was added to your wallet by admin.`);
-    await saveUser(u);
-    renderAdmin();
-    toast(`Added ${amt.toFixed(8)} BTC to ${email}`, 'success');
-}
-async function resetUser(email) {
-    if (!confirm(`Reset ${email} to $10,000 USD and 0 BTC?`)) return;
-    const u = await loadUser(email);
-    if (!u) return;
-    u.usd = 10000; u.btc = 0; u.rigs = []; u.txs = [];
-    await saveUser(u);
-    renderAdmin();
-    toast(`Reset ${email}`, 'success');
-}
-
 async function renderAdmin() {
     if (!currentUser.isAdmin) return;
     const allUsers = await loadAllUsers();
@@ -1477,18 +1476,7 @@ async function renderAdmin() {
             <td>${(u.rigs||[]).length}</td>
             <td>${(u.referrals||[]).length}</td>
             <td style="font-size:12px;color:var(--text-muted);">${new Date(u.joined).toLocaleDateString()}</td>
-            <td>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                    <span class="status-dot ${Math.random()>0.3?'status-online':'status-offline'}"></span>${Math.random()>0.3?'Online':'Offline'}
-                </div>
-            </td>
-            <td>
-                <div style="display:flex;gap:6px;">
-                    <button class="btn btn-primary" style="width:auto;padding:5px 10px;font-size:11px;" onclick="addUsdToUser('${u.email}')">+USD</button>
-                    <button class="btn btn-outline" style="width:auto;padding:5px 10px;font-size:11px;" onclick="addBtcToUser('${u.email}')">+BTC</button>
-                    <button class="btn btn-danger" style="width:auto;padding:5px 10px;font-size:11px;" onclick="resetUser('${u.email}')">Reset</button>
-                </div>
-            </td>
+            <td><span class="status-dot ${Math.random()>0.3?'status-online':'status-offline'}"></span>${Math.random()>0.3?'Online':'Offline'}</td>
         </tr>
     `).join('');
 }
