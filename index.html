@@ -302,6 +302,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -327,7 +328,7 @@
             </div>
             <button class="btn btn-primary" onclick="handleLogin()">Sign In</button>
             <div class="auth-switch">
-                New to BitVault? <a onclick="showRegister()">Create Account</a>
+                New to BitVault? <a href="javascript:void(0)" onclick="showRegister()" style="cursor:pointer;">Create Account</a>
             </div>
         </div>
 
@@ -355,7 +356,7 @@
             </div>
             <button class="btn btn-primary" onclick="startVerification()">Continue</button>
             <div class="auth-switch">
-                Already registered? <a onclick="showLogin()">Sign In</a>
+                Already registered? <a href="javascript:void(0)" onclick="showLogin()" style="cursor:pointer;">Sign In</a>
             </div>
         </div>
 
@@ -365,6 +366,23 @@
                 <div style="font-size:40px;margin-bottom:10px;">📧</div>
                 <h3 style="font-size:18px;margin-bottom:6px;">Verify Your Email</h3>
                 <p style="font-size:13px;color:var(--text-muted);">We sent a 6-digit security code to<br><b id="verifyEmailDisplay" style="color:var(--text);">email@example.com</b></p>
+            </div>
+
+            <!-- EMAIL STATUS -->
+            <div id="emailStatusBox" style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;margin-bottom:20px;">
+                <div id="emailStatusIcon" style="font-size:28px;margin-bottom:6px;">📤</div>
+                <div id="emailStatusText" style="font-size:14px;font-weight:600;color:var(--text);">Sending verification code...</div>
+                <div id="emailStatusSub" style="font-size:12px;color:var(--text-muted);margin-top:4px;">Please check your inbox and spam folder</div>
+            </div>
+
+            <!-- FALLBACK: Hidden by default, revealed if email fails -->
+            <div id="codeFallback" class="hidden" style="background:var(--accent-dim);border:1px dashed var(--accent);border-radius:14px;padding:18px;text-align:center;margin-bottom:20px;">
+                <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Email Delivery Fallback</div>
+                <div id="visibleVerifCode" style="font-size:32px;font-weight:800;color:var(--accent);letter-spacing:8px;font-family:'SF Mono',monospace;">------</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:8px;">Use this code if your email provider blocked the message</div>
+            </div>
+            <div style="text-align:center;margin-bottom:16px;">
+                <a href="javascript:void(0)" id="showCodeLink" onclick="revealCode()" style="color:var(--text-muted);font-size:12px;cursor:pointer;text-decoration:underline;display:none;">Didn't receive the email? Show code</a>
             </div>
 
             <div id="emailSendingStatus" class="email-status hidden">
@@ -385,9 +403,9 @@
             </div>
             <button class="btn btn-primary" id="verifyBtn" onclick="handleVerify()" disabled>Verify & Create Account</button>
             <div style="text-align:center;margin-top:14px;">
-                <a onclick="resendCode()" style="color:var(--accent);font-size:13px;cursor:pointer;font-weight:600;">Resend Code</a>
+                <a href="javascript:void(0)" onclick="resendCode()" style="color:var(--accent);font-size:13px;cursor:pointer;font-weight:600;">Resend Code</a>
                 <span style="color:var(--text-muted);font-size:13px;margin:0 8px;">•</span>
-                <a onclick="cancelVerify()" style="color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</a>
+                <a href="javascript:void(0)" onclick="cancelVerify()" style="color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</a>
             </div>
         </div>
     </div>
@@ -744,7 +762,7 @@
                 <div style="overflow-x:auto;">
                     <table class="admin-table">
                         <thead>
-                            <tr><th>Account</th><th>Email</th><th>USD Balance</th><th>BTC Balance</th><th>Rigs</th><th>Network</th><th>Created</th><th>Status</th></tr>
+                            <tr><th>Account</th><th>Email</th><th>USD Balance</th><th>BTC Balance</th><th>Rigs</th><th>Network</th><th>Created</th><th>Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody id="adminUsersBody"></tbody>
                     </table>
@@ -801,9 +819,18 @@ const EMAILJS_SERVICE_ID = "service_ixnhzgj";
 const EMAILJS_TEMPLATE_ID = "template_7o0xd77";
 let emailjsReady = false;
 
-if (EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
-    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-    emailjsReady = true;
+// Safe EmailJS init — if CDN is blocked, app still works
+try {
+    if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+        emailjsReady = true;
+        console.log('EmailJS initialized');
+    } else {
+        console.warn('EmailJS SDK not loaded — emails will not send');
+    }
+} catch (e) {
+    console.error('EmailJS init failed:', e);
+    emailjsReady = false;
 }
 
 // ================= DATA =================
@@ -906,59 +933,103 @@ async function startVerification() {
     tempVerifCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     document.getElementById('verifyEmailDisplay').textContent = email;
+    document.getElementById('visibleVerifCode').textContent = tempVerifCode;
     document.getElementById('registerForm').classList.add('hidden');
     document.getElementById('verifyForm').classList.remove('hidden');
+    document.getElementById('codeFallback').classList.add('hidden');
+    document.getElementById('showCodeLink').style.display = 'none';
+    setEmailStatus('sending');
     clearOtp();
 
     // Send real email via EmailJS
     if (emailjsReady) {
-        document.getElementById('emailSendingStatus').classList.remove('hidden');
         try {
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
                 to_name: name,
                 to_email: email,
                 verification_code: tempVerifCode,
                 from_name: "BitVault Security",
                 reply_to: "security@bitvault.io"
             });
-            document.getElementById('emailSendingStatus').classList.add('hidden');
+            console.log('EmailJS success:', result);
+            setEmailStatus('sent');
             toast('Verification code sent to ' + email, 'success');
         } catch(err) {
-            document.getElementById('emailSendingStatus').classList.add('hidden');
-            console.error(err);
-            toast('Email delivery failed. Check your inbox or try again.', 'error');
+            console.error('EmailJS error:', err);
+            setEmailStatus('failed');
+            document.getElementById('showCodeLink').style.display = 'inline';
+            document.getElementById('codeFallback').classList.remove('hidden');
+            toast('Email delivery failed. Code shown above.', 'error');
         }
     } else {
-        toast('Email service unavailable', 'error');
+        setEmailStatus('failed');
+        document.getElementById('showCodeLink').style.display = 'inline';
+        document.getElementById('codeFallback').classList.remove('hidden');
+        toast('Email service unavailable. Use the code shown above.', 'warning');
     }
 }
 
 function resendCode() {
-    // Remove old fallback if exists
-    const oldFallback = document.getElementById('emailFallback');
-    if (oldFallback) oldFallback.remove();
-
     tempVerifCode = Math.floor(100000 + Math.random() * 900000).toString();
-    toast('New verification code generated', 'success');
+    document.getElementById('visibleVerifCode').textContent = tempVerifCode;
+    setEmailStatus('sending');
+    document.getElementById('codeFallback').classList.add('hidden');
 
     if (emailjsReady) {
-        document.getElementById('emailSendingStatus').classList.remove('hidden');
         emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
             to_name: tempRegData.name,
             to_email: tempRegData.email,
             verification_code: tempVerifCode,
             from_name: "BitVault Security",
             reply_to: "security@bitvault.io"
-        }).then(() => {
-            document.getElementById('emailSendingStatus').classList.add('hidden');
+        }).then((result) => {
+            console.log('Resend success:', result);
+            setEmailStatus('sent');
             toast('New code sent to ' + tempRegData.email, 'success');
-        }).catch(() => {
-            document.getElementById('emailSendingStatus').classList.add('hidden');
-            toast('Email failed. Please try again.', 'error');
+        }).catch((err) => {
+            console.error('Resend failed:', err);
+            setEmailStatus('failed');
+            document.getElementById('showCodeLink').style.display = 'inline';
+            document.getElementById('codeFallback').classList.remove('hidden');
+            toast('Email failed again. Code is shown above.', 'error');
         });
     } else {
-        toast('Email service unavailable', 'error');
+        setEmailStatus('failed');
+        document.getElementById('showCodeLink').style.display = 'inline';
+        document.getElementById('codeFallback').classList.remove('hidden');
+        toast('Email service unavailable. Code is shown above.', 'warning');
     }
+}
+
+function setEmailStatus(state) {
+    const icon = document.getElementById('emailStatusIcon');
+    const text = document.getElementById('emailStatusText');
+    const sub = document.getElementById('emailStatusSub');
+    const box = document.getElementById('emailStatusBox');
+    if (!icon || !text) return;
+    if (state === 'sending') {
+        icon.textContent = '📤';
+        text.textContent = 'Sending verification code...';
+        text.style.color = 'var(--text)';
+        sub.textContent = 'Please check your inbox and spam folder';
+        box.style.borderColor = 'var(--border)';
+    } else if (state === 'sent') {
+        icon.textContent = '✅';
+        text.textContent = 'Code sent successfully!';
+        text.style.color = 'var(--success)';
+        sub.textContent = 'If you don't see it, check your spam/junk folder';
+        box.style.borderColor = 'var(--success)';
+    } else if (state === 'failed') {
+        icon.textContent = '⚠️';
+        text.textContent = 'Email delivery failed';
+        text.style.color = 'var(--warning)';
+        sub.textContent = 'Your email provider may have blocked it. Use the fallback below.';
+        box.style.borderColor = 'var(--warning)';
+    }
+}
+function revealCode() {
+    document.getElementById('codeFallback').classList.remove('hidden');
+    document.getElementById('showCodeLink').style.display = 'none';
 }
 
 function cancelVerify() {
@@ -1158,6 +1229,7 @@ function updateDashPrice() {
 
 // ================= MINING =================
 function startMiningSimulation() {
+    if (miningInterval) clearInterval(miningInterval);
     miningInterval = setInterval(async () => {
         if (!currentUser) return;
         let earned = 0;
@@ -1350,6 +1422,41 @@ function renderNotifications() {
         `).join('');
     }
 }
+// ================= ADMIN BALANCE MANAGEMENT =================
+async function addUsdToUser(email) {
+    const amt = parseFloat(prompt(`Add USD to ${email}:`));
+    if (!amt || amt <= 0) return;
+    const u = await loadUser(email);
+    if (!u) { toast('User not found', 'error'); return; }
+    u.usd = (u.usd || 0) + amt;
+    u.txs.push({ type: 'deposit', amount: amt, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Admin credit from master' });
+    addNotif(u, 'Balance Added', `$${amt.toLocaleString()} was added to your account by admin.`);
+    await saveUser(u);
+    renderAdmin();
+    toast(`Added $${amt.toLocaleString()} to ${email}`, 'success');
+}
+async function addBtcToUser(email) {
+    const amt = parseFloat(prompt(`Add BTC to ${email}:`));
+    if (!amt || amt <= 0) return;
+    const u = await loadUser(email);
+    if (!u) { toast('User not found', 'error'); return; }
+    u.btc = (u.btc || 0) + amt;
+    u.txs.push({ type: 'mining', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: 'Admin BTC credit from master' });
+    addNotif(u, 'BTC Credited', `${amt.toFixed(8)} BTC was added to your wallet by admin.`);
+    await saveUser(u);
+    renderAdmin();
+    toast(`Added ${amt.toFixed(8)} BTC to ${email}`, 'success');
+}
+async function resetUser(email) {
+    if (!confirm(`Reset ${email} to $10,000 USD and 0 BTC?`)) return;
+    const u = await loadUser(email);
+    if (!u) return;
+    u.usd = 10000; u.btc = 0; u.rigs = []; u.txs = [];
+    await saveUser(u);
+    renderAdmin();
+    toast(`Reset ${email}`, 'success');
+}
+
 async function renderAdmin() {
     if (!currentUser.isAdmin) return;
     const allUsers = await loadAllUsers();
@@ -1370,7 +1477,18 @@ async function renderAdmin() {
             <td>${(u.rigs||[]).length}</td>
             <td>${(u.referrals||[]).length}</td>
             <td style="font-size:12px;color:var(--text-muted);">${new Date(u.joined).toLocaleDateString()}</td>
-            <td><span class="status-dot ${Math.random()>0.3?'status-online':'status-offline'}"></span>${Math.random()>0.3?'Online':'Offline'}</td>
+            <td>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <span class="status-dot ${Math.random()>0.3?'status-online':'status-offline'}"></span>${Math.random()>0.3?'Online':'Offline'}
+                </div>
+            </td>
+            <td>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn btn-primary" style="width:auto;padding:5px 10px;font-size:11px;" onclick="addUsdToUser('${u.email}')">+USD</button>
+                    <button class="btn btn-outline" style="width:auto;padding:5px 10px;font-size:11px;" onclick="addBtcToUser('${u.email}')">+BTC</button>
+                    <button class="btn btn-danger" style="width:auto;padding:5px 10px;font-size:11px;" onclick="resetUser('${u.email}')">Reset</button>
+                </div>
+            </td>
         </tr>
     `).join('');
 }
