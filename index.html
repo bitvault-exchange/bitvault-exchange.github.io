@@ -566,6 +566,17 @@
         /* CRITICAL: Control Center nav item is completely hidden by default */
         .nav-item.mgmt-only { display: none !important; }
         .nav-item.mgmt-only.visible { display: flex !important; }
+
+        /* Password toggle */
+        .password-wrap { position: relative; }
+        .password-wrap input { padding-right: 44px; }
+        .pwd-toggle {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--text-muted); cursor: pointer;
+            font-size: 18px; padding: 4px; display: flex; align-items: center; justify-content: center;
+            transition: color 0.2s;
+        }
+        .pwd-toggle:hover { color: var(--text); }
     </style>
 <base target="_blank">
 </head>
@@ -618,7 +629,10 @@
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter password">
+                <div class="password-wrap">
+                    <input type="password" id="loginPassword" placeholder="Enter password">
+                    <button type="button" class="pwd-toggle" onclick="togglePwd('loginPassword',this)">👁</button>
+                </div>
             </div>
             <button class="btn btn-primary" type="button" onclick="handleLogin()">Sign In</button>
             <div class="auth-switch">
@@ -638,11 +652,17 @@
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="regPassword" placeholder="Create password">
+                <div class="password-wrap">
+                    <input type="password" id="regPassword" placeholder="Create password">
+                    <button type="button" class="pwd-toggle" onclick="togglePwd('regPassword',this)">👁</button>
+                </div>
             </div>
             <div class="form-group">
                 <label>Confirm Password</label>
-                <input type="password" id="regConfirmPassword" placeholder="Confirm password">
+                <div class="password-wrap">
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm password">
+                    <button type="button" class="pwd-toggle" onclick="togglePwd('regConfirmPassword',this)">👁</button>
+                </div>
             </div>
             <div class="form-group">
                 <label>Referral Code (Optional)</label>
@@ -1586,7 +1606,10 @@ async function handleVerify() {
     // Show welcome toast on screen
     toast('🎉 Account created! Welcome to BitVault Pro.', 'success');
 
-    showLogin();
+    // AUTO-LOGIN: Log the new user in immediately
+    currentUser = newUser;
+    localStorage.setItem('bv_current', email);
+    initApp();
 }
 
 async function handleLogin() {
@@ -2484,6 +2507,17 @@ function toggleThemeMode(e) {
     else { icon.innerHTML = '<svg width="16" height="16"><use href="#icon-sun"/></svg>'; label.textContent = 'Light Mode'; }
     localStorage.setItem('bv_theme', isDark ? 'dark' : 'light');
     document.getElementById('profileDropdown').classList.remove('active');
+}
+
+function togglePwd(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁';
+    }
 }
 
 function toast(msg, type='info') {
