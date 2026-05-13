@@ -476,111 +476,94 @@
             .trade-layout { grid-template-columns: 1fr; }
         }
         @media (max-width: 768px) {
+            body { font-size: 14px; }
             .sidebar { transform: translateX(-100%); width: 260px; }
             .sidebar.open { transform: translateX(0); }
             .main-content { margin-left: 0; }
-            .menu-toggle { display: block; }
+            .menu-toggle { display: block; font-size: 20px; }
             .topbar-balances { display: none; }
             .page { padding: 12px; }
-            .auth-box { padding: 24px 16px; margin: 10px; }
+            .auth-box { padding: 24px 16px; margin: 8px; max-width: 100%; }
+            .auth-logo h1 { font-size: 28px; }
             .topbar { padding: 0 14px; height: 56px; }
 
-            /* ALL grids become 1 column */
-            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 12px; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; gap: 12px; }
 
-            /* Cards */
-            .card { padding: 16px; border-radius: 14px; }
-            .card-value { font-size: 24px; word-break: break-all; }
+            .card { padding: 16px; border-radius: 14px; overflow-wrap: break-word; word-wrap: break-word; }
+            .card-value { font-size: 22px; word-break: break-all; }
             .card-header { flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
             .card-title { font-size: 11px; }
             .card-sub { font-size: 12px; }
 
-            /* Wallet */
             .wallet-actions { flex-direction: column; gap: 10px; }
             .wallet-actions .btn { width: 100%; padding: 12px; }
 
-            /* Trade */
             .trade-layout { grid-template-columns: 1fr; }
-            .trade-panel { padding: 16px; }
+            .trade-panel { padding: 16px; margin-top: 16px; }
             .trade-chart { padding: 14px; }
-            .trade-tabs { margin-bottom: 14px; }
-            .trade-tab { padding: 10px; font-size: 13px; }
 
-            /* Mining */
             .rig-card { padding: 16px; }
             .rig-icon { font-size: 32px; }
             .rig-name { font-size: 16px; }
-            .rig-spec { font-size: 12px; margin-bottom: 12px; }
             .rig-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .rig-stat { padding: 8px; font-size: 11px; }
-            .rig-stat b { font-size: 13px; }
-            .rig-price { font-size: 20px; margin-bottom: 10px; }
+            .rig-price { font-size: 20px; }
             .my-rig { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; }
-            .my-rig-earnings { text-align: left; }
 
-            /* Referral */
             .ref-box { padding: 18px 14px; }
             .ref-code { font-size: 16px; padding: 10px 14px; letter-spacing: 2px; }
             .ref-stats { grid-template-columns: 1fr; gap: 12px; }
-            .ref-stat .num { font-size: 22px; }
 
-            /* Auth */
+            .otp-inputs { gap: 6px; }
             .otp-inputs input { width: 38px; height: 46px; font-size: 18px; }
+            .form-group { margin-bottom: 14px; }
             .form-group input, .form-group select { padding: 11px 12px; font-size: 14px; }
             .btn { padding: 12px; font-size: 14px; }
 
-            /* Modal */
-            .modal { width: 95%; padding: 18px; border-radius: 16px; }
-            .modal-header h3 { font-size: 16px; }
-            .modal-body p { font-size: 13px; }
+            .modal { width: 94%; padding: 18px; border-radius: 16px; }
 
-            /* Tables - make them fit */
-            .tx-table { font-size: 11px; }
-            .tx-table th, .tx-table td { padding: 6px 4px; }
-            .tx-table th { font-size: 9px; }
-
-            /* Notifications */
-            .notif-item { padding: 12px; gap: 10px; }
-            .notif-icon { width: 36px; height: 36px; font-size: 16px; }
-            .notif-content h4 { font-size: 13px; }
-            .notif-content p { font-size: 12px; }
-
-            /* Order book */
-            #orderBookBids, #orderBookAsks { font-size: 12px; }
-
-            /* Chart */
             .chart-container { height: 220px; min-height: 220px; }
 
-            /* Admin Control Center - CRITICAL FIXES */
-            .admin-table { font-size: 10px; }
-            .admin-table th, .admin-table td { padding: 6px 4px; }
-            .admin-table th { font-size: 8px; letter-spacing: 0.3px; }
-            .balance-edit .val { min-width: 36px; font-size: 10px; }
-            .balance-edit button { width: 20px; height: 20px; font-size: 10px; }
-            .manage-btns { flex-direction: row; gap: 4px; }
-            .manage-btns button { padding: 3px 6px; font-size: 9px; }
-            .user-avatar { width: 24px; height: 24px; font-size: 10px; }
-            .page-title { font-size: 16px; margin-bottom: 16px; }
-
-            /* Profile dropdown */
-            .profile-dropdown { width: 200px; right: -5px; }
-
-            /* Balance pills */
-            .balance-pill { font-size: 11px; padding: 4px 10px; }
-
-            /* Toast */
-            .toast { min-width: 260px; padding: 12px 14px; font-size: 13px; }
-            .toast-container { right: 12px; top: 70px; }
-
-            /* Password toggle */
             .pwd-toggle { width: 28px; height: 28px; }
             .password-wrap input { padding-right: 40px; }
-            /* Hide non-essential admin table columns on mobile */
-            .admin-table th:nth-child(6), .admin-table td:nth-child(6),
-            .admin-table th:nth-child(7), .admin-table td:nth-child(7),
-            .admin-table th:nth-child(8), .admin-table td:nth-child(8) { display: none; }
-            /* Admin table wrapper */
-            #adminClientsTable { width: 100%; }
+
+            /* ADMIN TABLE -> CARDS ON MOBILE */
+            .admin-table { border-collapse: separate; border-spacing: 0 10px; }
+            .admin-table thead { display: none; }
+            .admin-table tbody { display: block; }
+            .admin-table tr { 
+                display: block;
+                margin-bottom: 12px; 
+                background: var(--bg-card); 
+                border: 1px solid var(--border); 
+                border-radius: 14px; 
+                padding: 16px;
+            }
+            .admin-table td { 
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border: none; 
+                padding: 6px 0; 
+                font-size: 13px;
+                border-bottom: 1px solid rgba(255,255,255,0.04);
+            }
+            .admin-table td:last-child { border-bottom: none; }
+            .admin-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-muted);
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .balance-edit { justify-content: flex-end; }
+            .manage-btns { flex-direction: row; gap: 6px; justify-content: flex-end; }
+            .manage-btns button { padding: 5px 10px; font-size: 11px; }
+            .user-avatar { width: 28px; height: 28px; font-size: 11px; }
+            .page-title { font-size: 16px; margin-bottom: 16px; }
+
+            .tx-table { font-size: 12px; }
+            .tx-table th, .tx-table td { padding: 8px 6px; }
         }
 
         .live-indicator { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--success); font-weight: 600; }
@@ -2258,18 +2241,10 @@ async function renderAdmin() {
             <td data-label="Client"><div style="display:flex;align-items:center;gap:10px;"><div class="user-avatar" style="width:28px;height:28px;font-size:11px;">${initials}</div><span style="font-weight:700;">${u.name}</span></div></td>
             <td data-label="Email" style="font-size:13px;color:var(--text-muted);">${u.email}</td>
             <td data-label="USDT Balance">
-                <div class="balance-edit">
-                    <button class="btn-minus" onclick="adjustBalance('${u.email}', 'usd', -1000)" title="- $1,000">−</button>
-                    <span class="val" id="usd-${u.email.replace(/\./g,'-')}">$${(u.usd||0).toLocaleString()}</span>
-                    <button class="btn-plus" onclick="adjustBalance('${u.email}', 'usd', 1000)" title="+ $1,000">+</button>
-                </div>
+                <span class="val" id="usd-${u.email.replace(/\./g,'-')}">$${(u.usd||0).toLocaleString()}</span>
             </td>
             <td data-label="BTC Balance">
-                <div class="balance-edit">
-                    <button class="btn-minus" onclick="adjustBalance('${u.email}', 'btc', -0.001)" title="- 0.001 BTC">−</button>
-                    <span class="val" id="btc-${u.email.replace(/\./g,'-')}">${(u.btc||0).toFixed(4)}</span>
-                    <button class="btn-plus" onclick="adjustBalance('${u.email}', 'btc', 0.001)" title="+ 0.001 BTC">+</button>
-                </div>
+                <span class="val" id="btc-${u.email.replace(/\./g,'-')}">${(u.btc||0).toFixed(8)}</span>
             </td>
             <td data-label="Mining" class="earnings-val" id="mining-${u.email.replace(/\./g,'-')}">$${miningEarnings.toFixed(2)}</td>
             <td data-label="Rigs">${(u.rigs||[]).length}</td>
@@ -2278,74 +2253,92 @@ async function renderAdmin() {
             <td data-label="Actions">
                 <div class="manage-btns">
                     <button class="btn-view" onclick="viewClientTx('${u.email}')">Ledger</button>
-                    <button class="btn-edit" onclick="openEditModal('${u.email}')">Custom</button>
+                    <button class="btn-edit" onclick="openSendModal('${u.email}', '${u.name}')">Send Funds</button>
                 </div>
             </td>
         </tr>
     `}).join('');
 }
 
-// Adjust client balance (USD or BTC)
-async function adjustBalance(email, type, amount) {
-    const user = await loadUser(email);
-    if (!user) { toast('Client not found', 'error'); return; }
-
-    if (type === 'usd') {
-        user.usd = (user.usd || 0) + amount;
-        if (user.usd < 0) user.usd = 0;
-        user.txs.push({ type: amount > 0 ? 'deposit' : 'withdraw', amount: amount, currency: 'USD', status: 'Completed', date: Date.now(), details: `Admin ${amount > 0 ? 'credit' : 'debit'} by ${currentUser.name}` });
-    } else {
-        user.btc = (user.btc || 0) + amount;
-        if (user.btc < 0) user.btc = 0;
-        user.txs.push({ type: amount > 0 ? 'deposit' : 'withdraw', amount: amount, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Admin ${amount > 0 ? 'credit' : 'debit'} by ${currentUser.name}` });
-    }
-
-    await saveUser(user);
-    renderAdmin();
-    // Balance adjusted
-}
-
-// Open custom edit modal
-function openEditModal(email) {
-    const user = users[email];
-    if (!user) return;
+// Open Send Funds modal from master to client
+function openSendModal(email, name) {
     const overlay = document.getElementById('modalOverlay');
     const content = document.getElementById('modalContent');
     overlay.classList.add('active');
     content.innerHTML = `
-        <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-edit"/></svg> Edit ${user.name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+        <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-dollar"/></svg> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
         <div class="modal-body">
-            <div class="form-group"><label>Current USD: $${(user.usd||0).toLocaleString()}</label><input type="number" id="editUsd" value="${user.usd||0}" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
-            <div class="form-group"><label>Current BTC: ${(user.btc||0).toFixed(8)}</label><input type="number" id="editBtc" value="${user.btc||0}" step="0.0001" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Transfer from your master account to ${name}.</p>
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>Currency</label>
+                <select id="sendCurrency" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;" onchange="updateSendPreview()">
+                    <option value="usd">USDT</option>
+                    <option value="btc">BTC</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>Amount</label>
+                <input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;" oninput="updateSendPreview()">
+            </div>
+            <div style="background:var(--bg);padding:12px;border-radius:10px;font-size:13px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:700;">$500,000.00 USDT</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:700;color:var(--accent);">$500,000.00 USDT</span></div>
+            </div>
         </div>
-        <button class="btn btn-primary" onclick="saveCustomBalance('${email}')">Save Changes</button>
+        <button class="btn btn-primary" id="sendBtn" onclick="sendFundsToClient('${email}')">Send Funds</button>
     `;
+    updateSendPreview();
 }
 
-async function saveCustomBalance(email) {
-    const user = await loadUser(email);
-    if (!user) return;
-    const newUsd = parseFloat(document.getElementById('editUsd').value) || 0;
-    const newBtc = parseFloat(document.getElementById('editBtc').value) || 0;
-    const oldUsd = user.usd || 0;
-    const oldBtc = user.btc || 0;
+function updateSendPreview() {
+    const currency = document.getElementById('sendCurrency')?.value || 'usd';
+    const amt = parseFloat(document.getElementById('sendAmount')?.value) || 0;
+    const masterBal = currency === 'usd' ? (currentUser.usd || 0) : (currentUser.btc || 0);
+    const after = masterBal - amt;
+    const sym = currency === 'usd' ? '$' : '';
+    const unit = currency === 'usd' ? 'USDT' : 'BTC';
+    const dec = currency === 'usd' ? 2 : 8;
 
-    if (newUsd !== oldUsd) {
-        const diff = newUsd - oldUsd;
-        user.txs.push({ type: diff > 0 ? 'deposit' : 'withdraw', amount: diff, currency: 'USD', status: 'Completed', date: Date.now(), details: `Admin adjustment by ${currentUser.name}` });
-        user.usd = newUsd;
-    }
-    if (newBtc !== oldBtc) {
-        const diff = newBtc - oldBtc;
-        user.txs.push({ type: diff > 0 ? 'deposit' : 'withdraw', amount: diff, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Admin adjustment by ${currentUser.name}` });
-        user.btc = newBtc;
+    const masterEl = document.getElementById('sendMasterBal');
+    const afterEl = document.getElementById('sendAfterBal');
+    const btn = document.getElementById('sendBtn');
+
+    if (masterEl) masterEl.textContent = sym + masterBal.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec}) + ' ' + unit;
+    if (afterEl) afterEl.textContent = sym + after.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec}) + ' ' + unit;
+    if (btn) btn.disabled = amt <= 0 || after < 0;
+}
+
+async function sendFundsToClient(email) {
+    const currency = document.getElementById('sendCurrency').value;
+    const amt = parseFloat(document.getElementById('sendAmount').value);
+    if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
+
+    const client = await loadUser(email);
+    if (!client) { toast('Client not found', 'error'); return; }
+
+    if (currency === 'usd') {
+        if (currentUser.usd < amt) { toast('Insufficient USDT balance', 'error'); return; }
+        currentUser.usd -= amt;
+        client.usd = (client.usd || 0) + amt;
+        currentUser.txs.push({ type: 'withdraw', amount: -amt, currency: 'USDT', status: 'Completed', date: Date.now(), details: `Transfer to ${client.name}` });
+        client.txs.push({ type: 'deposit', amount: amt, currency: 'USDT', status: 'Completed', date: Date.now(), details: `Received from ${currentUser.name}` });
+    } else {
+        if (currentUser.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
+        currentUser.btc -= amt;
+        client.btc = (client.btc || 0) + amt;
+        currentUser.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Transfer to ${client.name}` });
+        client.txs.push({ type: 'deposit', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Received from ${currentUser.name}` });
     }
 
-    await saveUser(user);
+    await saveUser(currentUser);
+    await saveUser(client);
     closeModal();
     renderAdmin();
-    // Balance saved
+    updateAllBalances();
+    toast(`Sent ${currency === 'usd' ? '$' + amt.toLocaleString() : amt.toFixed(8) + ' BTC'} to ${client.name}`, 'success');
 }
+
+
 
 // View client transaction history
 async function viewClientTx(email) {
