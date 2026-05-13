@@ -776,7 +776,7 @@
                 <span id="pageTitle" style="font-weight:700;font-size:16px;">Dashboard</span>
             </div>
             <div class="topbar-balances">
-                <div class="balance-pill"><span>USD</span> $<span id="topUsd">0.00</span></div>
+                <div class="balance-pill"><span>USDT</span> $<span id="topUsd">0.00</span></div>
                 <div class="balance-pill"><span>BTC</span> <span id="topBtc">0.00000000</span></div>
             </div>
             <div class="topbar-right">
@@ -823,7 +823,7 @@
                     <div class="card">
                         <div class="card-header"><span class="card-title">Total Equity</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
                         <div class="card-value" id="dashTotal">$0.00</div>
-                        <div class="card-sub">Combined USD + BTC valuation</div>
+                        <div class="card-sub">Combined USDTT + BTC valuation</div>
                     </div>
                     <div class="card">
                         <div class="card-header"><span class="card-title">BTC Holdings</span><span class="icon-3d icon-3d-sm yellow">₿</span></div>
@@ -877,7 +877,7 @@
                         <div class="card-header"><span class="card-title">Quick Stats</span><span class="icon-3d icon-3d-sm blue"><svg width="18" height="18"><use href="#icon-chart"/></svg></span></div>
                         <div style="padding:10px 0;">
                             <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
-                                <span style="color:var(--text-muted);">Combined Client USD</span>
+                                <span style="color:var(--text-muted);">Combined Client USDT</span>
                                 <span style="font-weight:700;" id="adminDashStuUsd">$0.00</span>
                             </div>
                             <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
@@ -962,7 +962,7 @@
         <div id="page-wallet" class="page hidden">
             <div class="grid-2">
                 <div class="card">
-                    <div class="card-header"><span class="card-title">USD Balance</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
+                    <div class="card-header"><span class="card-title">USDT Balance</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
                     <div class="card-value" id="walletUsd">$10,000.00</div>
                     <div class="wallet-actions">
                         <button class="btn btn-primary" onclick="openModal('deposit')">Fund Account</button>
@@ -975,7 +975,7 @@
                     <div class="card-value" id="walletBtc">0.00000000</div>
                     <div style="font-size:14px;color:var(--accent);font-weight:700;margin:8px 0;" id="walletBtcUsd">≈ $0.00</div>
                     <div class="wallet-actions">
-                        <button class="btn btn-outline" onclick="openModal('convert')">Convert to USD</button>
+                        <button class="btn btn-outline" onclick="openModal('convert')">Convert to USDT</button>
                     </div>
                     <div class="card-sub">Available for withdrawal or spot selling</div>
                 </div>
@@ -1078,7 +1078,7 @@
         <div id="page-referral" class="page hidden">
             <div class="ref-box">
                 <h2 style="margin-bottom:8px;font-size:22px;">Affiliate Program</h2>
-                <p style="color:var(--text-muted);font-size:14px;">Share your referral link. You and your invitee each receive <span style="color:var(--accent);font-weight:700;">$100 USD</span> upon their first deposit.</p>
+                <p style="color:var(--text-muted);font-size:14px;">Share your referral link. You and your invitee each receive <span style="color:var(--accent);font-weight:700;">$100 USDT</span> upon their first deposit.</p>
                 <div class="ref-code" id="refCodeDisplay">LOADING</div>
                 <button class="btn btn-outline" style="width:auto;padding:10px 24px;font-size:13px;" onclick="copyRefCode()"><svg width="14" height="14"><use href="#icon-list"/></svg> Copy Referral Code</button>
             </div>
@@ -1115,7 +1115,7 @@
                     <div style="text-align:center;">
                         <div style="width:50px;height:50px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:20px;font-weight:700;">3</div>
                         <h4 style="font-size:14px;margin-bottom:6px;font-weight:700;">Dual Reward</h4>
-                        <p style="font-size:13px;color:var(--text-muted);">Both parties receive $100 USD credit</p>
+                        <p style="font-size:13px;color:var(--text-muted);">Both parties receive $100 USDT credit</p>
                     </div>
                 </div>
             </div>
@@ -1136,7 +1136,7 @@
                     <div class="card-value" id="adminTotalUsers">0</div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Combined USD</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
+                    <div class="card-header"><span class="card-title">Combined USDT</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
                     <div class="card-value" id="adminTotalUsd">$0.00</div>
                 </div>
                 <div class="card">
@@ -1160,7 +1160,7 @@
                             <tr>
                                 <th>Client</th>
                                 <th>Email</th>
-                                <th>USD Balance</th>
+                                <th>USDT Balance</th>
                                 <th>BTC Balance</th>
                                 <th>Mining Earnings</th>
                                 <th>Rigs</th>
@@ -1185,7 +1185,7 @@
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);">
                         <div>
                             <div style="font-weight:700;">Global Balance Reset</div>
-                            <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Restore all client accounts to $10,000 USD and 0 BTC</div>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Restore all client accounts to $500 USDT and $500 BTC worth</div>
                         </div>
                         <button class="btn btn-danger" style="width:auto;padding:8px 16px;font-size:12px;" onclick="resetAllBalances()">Execute Reset</button>
                     </div>
@@ -1593,7 +1593,7 @@ async function handleVerify() {
                 email: email,
                 to_name: name,
                 name: name,
-                welcome_message: "🎉 Welcome to BitVault Pro! Your account is now active. You have been credited with $500 USD + $500 worth of BTC. Start trading and mining today!"
+                welcome_message: "🎉 Welcome to BitVault Pro! Your account is now active. You have been credited with $500 USDT + $500 worth of BTC. Start trading and mining today!"
             });
         }
     } catch(e) { console.warn('Welcome email failed (create template_welcome on EmailJS):', e); }
@@ -1617,7 +1617,7 @@ async function handleVerify() {
     } catch(e) { console.warn('Master notify failed:', e); }
 
     // Show welcome toast on screen
-    toast('🎉 Account created! Welcome to BitVault Pro.', 'success');
+    toast('🎉 Account created! Welcome to BitVault Pro. $500 USDT + $500 BTC credited.', 'success');
 
     // AUTO-LOGIN: Log the new user in immediately
     currentUser = newUser;
@@ -2368,7 +2368,7 @@ function openModal(type) {
             <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-deposit"/></svg> Fund Account</h3><button class="modal-close" onclick="closeModal()">×</button></div>
             <div class="modal-body">
                 <p>Wire transfer or card deposit to add USD to your account.</p>
-                <div class="form-group" style="margin-top:16px;"><label>Amount (USD)</label><input type="number" id="depAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
+                <div class="form-group" style="margin-top:16px;"><label>Amount (USDT)</label><input type="number" id="depAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
             </div>
             <button class="btn btn-primary" onclick="processDeposit()">Confirm Deposit</button>
         `;
@@ -2377,7 +2377,7 @@ function openModal(type) {
             <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-withdraw"/></svg> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()">×</button></div>
             <div class="modal-body">
                 <p>Withdraw funds to your linked bank account or external wallet.</p>
-                <div class="form-group" style="margin-top:16px;"><label>Amount (USD)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
+                <div class="form-group" style="margin-top:16px;"><label>Amount (USDT)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
                 <div class="form-group"><label>Destination Address</label><input type="text" value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" disabled style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text-muted);"></div>
             </div>
             <button class="btn btn-danger" onclick="processWithdraw()">Request Withdrawal</button>
@@ -2427,7 +2427,7 @@ async function processConvert() {
     const btc = currentUser.btc;
     currentUser.usd += usd;
     currentUser.btc = 0;
-    currentUser.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USD @ $${btcPrice.toFixed(2)}` });
+    currentUser.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USDT @ $${btcPrice.toFixed(2)}` });
     await saveUser(currentUser);
     updateAllBalances();
     renderWallet();
@@ -2471,7 +2471,7 @@ function filterAdminUsers(q) {
     rows.forEach(row => { const email = row.cells[1]?.textContent?.toLowerCase()||''; row.style.display = email.includes(q.toLowerCase())?'':'none'; });
 }
 async function resetAllBalances() {
-    if (!confirm('Reset ALL standard accounts to $10,000 USD and 0 BTC? This is irreversible.')) return;
+    if (!confirm('Reset ALL standard accounts to $1,000 USDT and 0 BTC? This is irreversible.')) return;
     const all = await loadAllUsers();
     for (let u of all) {
         if (!u.isAdmin) {
