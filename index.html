@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>BitVault Pro — Digital Asset Exchange</title>
     <style>
         :root {
@@ -41,6 +41,12 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* Prevent iPhone zoom on input focus */
+        input, select, textarea { font-size: 16px; }
+        @media (max-width: 768px) {
+            input, select, textarea { font-size: 16px !important; }
+        }
 
         /* Sync Banner */
         .sync-banner {
@@ -743,6 +749,7 @@
 
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body class="dark-mode">
 <!-- SVG Icon Library -->
@@ -1367,12 +1374,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
-// Cache bust: clear all data on version change
+// Cache bust: ensure master exists without overwriting balances
 (function(){
-  // Force master account data
   var all = JSON.parse(localStorage.getItem('bv_users')||'{}');
-  all['master@bitvault.io']={name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:500000,btc:500.0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now()};
-  localStorage.setItem('bv_users',JSON.stringify(all));
+  if (!all['master@bitvault.io']) {
+    all['master@bitvault.io']={name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:0,btc:0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now()};
+    localStorage.setItem('bv_users',JSON.stringify(all));
+  }
 })();
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1552,16 +1560,17 @@ async function setChartPeriod(period) {
     drawChart(currentPage === 'trade' ? 'tradeChart' : 'priceChart');
 }
 
-// Seed master account — ALWAYS force correct admin values
+// Seed master account — only create if missing, never overwrite balances
 function ensureMasterAccount() {
-    // Force overwrite master — completely replace cached data
-    users['master@bitvault.io'] = {
-        name: 'BitVault', email: 'master@bitvault.io', password: 'bitvault2024',
-        isAdmin: true, usd: 500000, btc: 500.0, rigs: [], txs: [], notifs: [],
-        referrals: [], refCode: 'BVMASTER', refBy: null,
-        joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
-    };
-    localStorage.setItem('bv_users', JSON.stringify(users));
+    if (!users['master@bitvault.io']) {
+        users['master@bitvault.io'] = {
+            name: 'BitVault', email: 'master@bitvault.io', password: 'bitvault2024',
+            isAdmin: true, usd: 0, btc: 0, rigs: [], txs: [], notifs: [],
+            referrals: [], refCode: 'BVMASTER', refBy: null,
+            joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
+        };
+        localStorage.setItem('bv_users', JSON.stringify(users));
+    }
 }
 ensureMasterAccount();
 
@@ -1574,22 +1583,13 @@ async function loadUser(email) {
         return snap.val();
     }
     let u = users[email] || null;
-    // Force master account values
-    if (email === 'master@bitvault.io') {
-        if (!u) u = {};
+    // Ensure master flags without overwriting balances
+    if (email === 'master@bitvault.io' && u) {
         u.name = 'BitVault';
         u.email = 'master@bitvault.io';
         u.password = 'bitvault2024';
         u.isAdmin = true;
-        u.usd = 500000;
-        u.btc = 500.0;
-        u.rigs = u.rigs || [];
-        u.txs = u.txs || [];
-        u.notifs = u.notifs || [];
-        u.referrals = u.referrals || [];
         u.refCode = u.refCode || 'BVMASTER';
-        users[email] = u;
-        localStorage.setItem('bv_users', JSON.stringify(users));
     }
     return u;
 }
@@ -1783,17 +1783,25 @@ async function handleVerify() {
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim().toLowerCase();
     const password = document.getElementById('loginPassword').value;
-    // MASTER LOGIN — completely bypasses localStorage, always works
+    // MASTER LOGIN — preserve existing balances, never wipe
     if (email === 'master@bitvault.io' && password === 'bitvault2024') {
-        // Wipe any corrupted master data first
         let all = JSON.parse(localStorage.getItem('bv_users') || '{}');
-        all['master@bitvault.io'] = {
-            name: 'BitVault', email: 'master@bitvault.io', password: 'bitvault2024',
-            isAdmin: true, usd: 500000, btc: 500.0, rigs: [], txs: [], notifs: [],
-            referrals: [], refCode: 'BVMASTER', refBy: null,
-            joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
-        };
-        localStorage.setItem('bv_users', JSON.stringify(all));
+        if (!all['master@bitvault.io']) {
+            all['master@bitvault.io'] = {
+                name: 'BitVault', email: 'master@bitvault.io', password: 'bitvault2024',
+                isAdmin: true, usd: 0, btc: 0, rigs: [], txs: [], notifs: [],
+                referrals: [], refCode: 'BVMASTER', refBy: null,
+                joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
+            };
+            localStorage.setItem('bv_users', JSON.stringify(all));
+        } else {
+            all['master@bitvault.io'].name = 'BitVault';
+            all['master@bitvault.io'].email = 'master@bitvault.io';
+            all['master@bitvault.io'].password = 'bitvault2024';
+            all['master@bitvault.io'].isAdmin = true;
+            all['master@bitvault.io'].refCode = all['master@bitvault.io'].refCode || 'BVMASTER';
+            localStorage.setItem('bv_users', JSON.stringify(all));
+        }
         users = all;
         currentUser = all['master@bitvault.io'];
         localStorage.setItem('bv_current', 'master@bitvault.io');
@@ -1849,15 +1857,6 @@ function generateRefCode() {
 
 // ================= APP =================
 function initApp() {
-    // HARD FORCE master account
-    if (currentUser && currentUser.email === 'master@bitvault.io') {
-        currentUser.usd = 500000;
-        currentUser.btc = 500.0;
-        currentUser.name = 'BitVault';
-        currentUser.isAdmin = true;
-        users['master@bitvault.io'] = currentUser;
-        localStorage.setItem('bv_users', JSON.stringify(users));
-    }
     document.getElementById('authPage').classList.add('hidden');
     document.getElementById('appPage').classList.remove('hidden');
     localStorage.setItem('bv_current', currentUser.email);
@@ -1944,10 +1943,6 @@ function startCloudSync() {
 // ================= BALANCES & PRICE =================
 function updateAllBalances() {
     if (!currentUser) return;
-    if (currentUser.email === 'master@bitvault.io') {
-        currentUser.usd = 500000;
-        currentUser.btc = 500.0;
-    }
     document.getElementById('topUsd').textContent = (currentUser.usd || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     document.getElementById('topBtc').textContent = (currentUser.btc || 0).toFixed(8);
 }
@@ -2018,17 +2013,9 @@ function startMiningSimulation() {
 // ================= RENDERERS =================
 async function renderDashboard() {
     if (!currentUser) return;
-    // HARD FORCE master balance every render
-    if (currentUser.email === 'master@bitvault.io') {
-        currentUser.usd = 500000;
-        currentUser.btc = 500.0;
-        currentUser.name = 'BitVault';
-        currentUser.isAdmin = true;
-    }
-    // Same dashboard for ALL users - admin and client see identical layout
     const u = currentUser;
-    const usd = u.email==='master@bitvault.io' ? 500000 : (u.usd||0);
-    const btc = u.email==='master@bitvault.io' ? 500.0 : (u.btc||0);
+    const usd = u.usd || 0;
+    const btc = u.btc || 0;
     const btcUsd = btc * btcPrice;
     const total = usd + btcUsd;
     const miningTotal = u.rigs.reduce((sum, r) => sum + (r.earned || 0) * btcPrice, 0);
@@ -2529,14 +2516,42 @@ function openModal(type) {
     const content = document.getElementById('modalContent');
     overlay.classList.add('active');
     if (type==='deposit') {
-        content.innerHTML = `
-            <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-deposit"/></svg> Fund Account</h3><button class="modal-close" onclick="closeModal()">×</button></div>
-            <div class="modal-body">
-                <p>Wire transfer or card deposit to add USD to your account.</p>
-                <div class="form-group" style="margin-top:16px;"><label>Amount (USDT)</label><input type="number" id="depAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
-            </div>
-            <button class="btn btn-primary" onclick="processDeposit()">Confirm Deposit</button>
-        `;
+        if (currentUser.isAdmin) {
+            content.innerHTML = `
+                <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-deposit"/></svg> Fund Account</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+                <div class="modal-body">
+                    <p>Wire transfer or card deposit to add USD to your account.</p>
+                    <div class="form-group" style="margin-top:16px;"><label>Amount (USDT)</label><input type="number" id="depAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
+                </div>
+                <button class="btn btn-primary" onclick="processDeposit()">Confirm Deposit</button>
+            `;
+        } else {
+            content.innerHTML = `
+                <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-deposit"/></svg> Fund Account</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+                <div class="modal-body">
+                    <p style="margin-bottom:16px;">Send BTC or USDT to the wallet address below. Funds will be credited after network confirmation.</p>
+                    <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">USDT Wallet Address (ERC-20)</div>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="walletAddr" value="0x742d35Cc6634C0532925a3b8D4D9db9650c9B5a3" readonly style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:monospace;">
+                            <button class="btn btn-outline" style="width:auto;padding:10px 16px;font-size:12px;" onclick="copyWalletAddr()">Copy</button>
+                        </div>
+                    </div>
+                    <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">BTC Wallet Address</div>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" value="bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh" readonly style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:monospace;">
+                            <button class="btn btn-outline" style="width:auto;padding:10px 16px;font-size:12px;" onclick="navigator.clipboard.writeText('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh');toast('BTC address copied','success')">Copy</button>
+                        </div>
+                    </div>
+                    <div style="background:var(--bg);border:1px dashed var(--border);border-radius:12px;padding:16px;text-align:center;">
+                        <div style="font-size:20px;margin-bottom:8px;">💵</div>
+                        <div style="font-size:14px;font-weight:700;margin-bottom:4px;">Cash App</div>
+                        <div style="font-size:12px;color:var(--text-muted);">Coming soon</div>
+                    </div>
+                </div>
+            `;
+        }
     } else if (type==='withdraw') {
         content.innerHTML = `
             <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-withdraw"/></svg> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()">×</button></div>
@@ -2561,6 +2576,11 @@ function openModal(type) {
             <button class="btn btn-primary" onclick="processConvert()" ${currentUser.btc<=0?'disabled style="opacity:0.5;"':''}>Convert All to USD</button>
         `;
     }
+}
+function copyWalletAddr() {
+    const addr = document.getElementById('walletAddr').value;
+    navigator.clipboard.writeText(addr);
+    toast('Wallet address copied', 'success');
 }
 function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
 async function processDeposit() {
@@ -2636,24 +2656,24 @@ function filterAdminUsers(q) {
     rows.forEach(row => { const email = row.cells[1]?.textContent?.toLowerCase()||''; row.style.display = email.includes(q.toLowerCase())?'':'none'; });
 }
 async function resetAllBalances() {
-    if (!confirm('Reset ALL standard accounts to $1,000 USDT and 0 BTC? This is irreversible.')) return;
+    if (!confirm('Reset ALL client accounts to $500 USDT and $500 worth of BTC? This is irreversible.')) return;
     const all = await loadAllUsers();
     for (let u of all) {
         if (!u.isAdmin) {
             const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
-            u.usd = 500; u.btc = resetBtc; u.rigs = []; u.txs = []; u.notifs = [];
+            u.usd = 500; u.btc = resetBtc; u.rigs = []; u.txs = []; u.notifs = []; u.referrals = [];
             await saveUser(u);
         }
     }
     renderAdmin();
-    // Reset done
+    toast('All client accounts reset to $500 USDT + $500 BTC worth', 'success');
 }
 async function clearAllTx() {
     if (!confirm('Purge ALL transaction records across the platform?')) return;
     const all = await loadAllUsers();
     for (let u of all) { u.txs = []; await saveUser(u); }
     renderAdmin();
-    // Purged
+    toast('All transaction records purged', 'success');
 }
 
 // ================= UTILS =================
@@ -2739,12 +2759,6 @@ window.addEventListener('resize', () => {
 
     if (user) {
         currentUser = user;
-        if (currentUser.email === 'master@bitvault.io') {
-            currentUser.usd = 500000;
-            currentUser.btc = 500.0;
-            currentUser.name = 'BitVault';
-            currentUser.isAdmin = true;
-        }
         users = allUsers;
         initApp();
     } else {
