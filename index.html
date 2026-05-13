@@ -1445,6 +1445,7 @@ async function sendVerificationEmail(name, email, code) {
 }
 
 // ================= DATA =================
+const RIG_PURCHASE_LIMIT = 3;
 const RIGS = [
     { id: 'basic', name: 'Antminer S19j', icon: '<svg width=\"16\" height=\"16\"><use href=\"#icon-mining\"/></svg>', hash: '90 TH/s', power: '3.1 kW', daily: 0.00018, price: 800, tag: 'Entry' },
     { id: 'advanced', name: 'Whatsminer M50', icon: '<svg width=\"16\" height=\"16\"><use href=\"#icon-bolt\"/></svg>', hash: '118 TH/s', power: '3.3 kW', daily: 0.00095, price: 2200, tag: 'Popular' },
@@ -1577,12 +1578,16 @@ ensureMasterAccount();
 function safeKey(email) { return email.replace(/\./g, ','); }
 function unsafeKey(key) { return key.replace(/,/g, '.'); }
 
+function getAllUsers() {
+    return JSON.parse(localStorage.getItem('bv_users') || '{}');
+}
+function setAllUsers(all) {
+    localStorage.setItem('bv_users', JSON.stringify(all));
+    users = all;
+}
 async function loadUser(email) {
-    if (firebaseOnline && db) {
-        const snap = await db.ref('users/' + safeKey(email)).once('value');
-        return snap.val();
-    }
-    let u = users[email] || null;
+    const all = getAllUsers();
+    let u = all[email] || null;
     // Ensure master flags without overwriting balances
     if (email === 'master@bitvault.io' && u) {
         u.name = 'BitVault';
@@ -1594,21 +1599,33 @@ async function loadUser(email) {
     return u;
 }
 async function saveUser(user) {
-    users[user.email] = user;
-    localStorage.setItem('bv_users', JSON.stringify(users));
+    const all = getAllUsers();
+    all[user.email] = user;
+    setAllUsers(all);
     if (firebaseOnline && db) {
-        await db.ref('users/' + safeKey(user.email)).set(user);
+        try {
+            await db.ref('users/' + safeKey(user.email)).set(user);
+        } catch(e) {
+            console.warn('Firebase save failed:', e);
+        }
     }
 }
 async function loadAllUsers() {
     if (firebaseOnline && db) {
-        const snap = await db.ref('users').once('value');
-        const data = snap.val() || {};
-        Object.keys(data).forEach(k => { users[unsafeKey(k)] = data[k]; });
-        localStorage.setItem('bv_users', JSON.stringify(users));
-        return Object.values(data);
+        try {
+            const snap = await db.ref('users').once('value');
+            const data = snap.val() || {};
+            const all = getAllUsers();
+            Object.keys(data).forEach(k => {
+                const email = unsafeKey(k);
+                if (!all[email]) all[email] = data[k];
+            });
+            setAllUsers(all);
+        } catch(e) {
+            console.warn('Firebase load failed:', e);
+        }
     }
-    return Object.values(users);
+    return Object.values(getAllUsers());
 }
 
 function updateSyncBanner() {
@@ -1740,6 +1757,8 @@ async function handleVerify() {
 
     await saveUser(newUser);
     tempRegData = null;
+    // Reload users to ensure sync
+    users = getAllUsers();
 
     // Send welcome email to new student (uses separate welcome template)
     try {
@@ -1755,8 +1774,8 @@ async function handleVerify() {
 
     // Notify master account about new signup
     try {
-        let allUsers = JSON.parse(localStorage.getItem('bv_users') || '{}');
-        let master = allUsers['master@bitvault.io'];
+        let all = getAllUsers();
+        let master = all['master@bitvault.io'];
         if (master) {
             master.notifs = master.notifs || [];
             master.notifs.unshift({
@@ -1765,9 +1784,8 @@ async function handleVerify() {
                 icon: '👤', date: Date.now(), read: false
             });
             if (master.notifs.length > 50) master.notifs.pop();
-            allUsers['master@bitvault.io'] = master;
-            localStorage.setItem('bv_users', JSON.stringify(allUsers));
-            users = allUsers;
+            all['master@bitvault.io'] = master;
+            setAllUsers(all);
         }
     } catch(e) { console.warn('Master notify failed:', e); }
 
@@ -1808,7 +1826,8 @@ async function handleLogin() {
         initApp();
         return;
     }
-    const user = await loadUser(email);
+    let all = getAllUsers();
+    let user = all[email];
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
     // Calculate background mining earnings
@@ -1834,7 +1853,9 @@ async function handleLogin() {
 
     user.lastLogin = new Date().toISOString();
     user.lastMiningUpdate = now;
-    await saveUser(user);
+    all[email] = user;
+    setAllUsers(all);
+    users = all;
     currentUser = user;
     initApp();
 }
@@ -1935,8 +1956,15 @@ function startCloudSync() {
     if (!firebaseOnline) return;
     syncInterval = setInterval(async () => {
         if (!currentUser) return;
-        currentUser.lastMiningUpdate = Date.now();
-        await saveUser(currentUser);
+        let all = getAllUsers();
+        let u = all[currentUser.email];
+        if (u) {
+            u.lastMiningUpdate = Date.now();
+            setAllUsers(all);
+            users = all;
+            currentUser = u;
+            try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+        }
     }, 10000);
 }
 
@@ -1989,8 +2017,11 @@ function updateDashPrice() {
 function startMiningSimulation() {
     miningInterval = setInterval(async () => {
         if (!currentUser) return;
+        let all = getAllUsers();
+        let u = all[currentUser.email];
+        if (!u) return;
         let earned = 0;
-        currentUser.rigs.forEach(rig => {
+        u.rigs.forEach(rig => {
             const rigData = RIGS.find(r => r.id === rig.id);
             if (rigData) {
                 const secEarn = rigData.daily / 86400;
@@ -1999,9 +2030,14 @@ function startMiningSimulation() {
             }
         });
         if (earned > 0) {
-            currentUser.btc += earned;
-            currentUser.lastMiningUpdate = Date.now();
-            await saveUser(currentUser);
+            u.btc += earned;
+            u.lastMiningUpdate = Date.now();
+            setAllUsers(all);
+            users = all;
+            currentUser = u;
+            if (firebaseOnline && db) {
+                try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+            }
             updateAllBalances();
             if (currentPage === 'dashboard') renderDashboard();
             if (currentPage === 'mining') renderMyRigs();
@@ -2097,7 +2133,15 @@ function renderWallet() {
 
 function renderMining() {
     const market = document.getElementById('rigMarket');
-    market.innerHTML = RIGS.map(rig => `
+    market.innerHTML = RIGS.map(rig => {
+        const ownedCount = currentUser.rigs.filter(r => r.id === rig.id).length;
+        const atLimit = !currentUser.isAdmin && ownedCount >= RIG_PURCHASE_LIMIT;
+        const canAfford = currentUser.usd >= rig.price;
+        const disabled = !canAfford || atLimit;
+        let btnText = 'Deploy Rig';
+        if (atLimit) btnText = `Limit Reached (${ownedCount}/${RIG_PURCHASE_LIMIT})`;
+        else if (!canAfford) btnText = 'Insufficient Funds';
+        return `
         <div class="rig-card">
             <span class="tag ${rig.tag==='Best'?'tag-best':rig.tag==='Popular'?'tag-popular':'tag-pro'}" style="background:var(--bg);color:var(--text-muted);">${rig.tag}</span>
             <div class="rig-icon">${rig.icon}</div>
@@ -2109,10 +2153,13 @@ function renderMining() {
                 <div class="rig-stat">Daily Yield <b>~${rig.daily.toFixed(4)} BTC</b></div>
                 <div class="rig-stat">Monthly Yield <b>~${(rig.daily*30).toFixed(4)} BTC</b></div>
             </div>
-            <div class="rig-price">$${rig.price.toLocaleString()}</div>
-            <button class="btn btn-primary" onclick="buyRig('${rig.id}')" ${currentUser.usd < rig.price ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>Deploy Rig</button>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <div class="rig-price">$${rig.price.toLocaleString()}</div>
+                <div style="font-size:12px;color:var(--text-muted);">Owned: <span style="color:var(--accent);font-weight:700;">${ownedCount}</span>${!currentUser.isAdmin ? ` / ${RIG_PURCHASE_LIMIT}` : ''}</div>
+            </div>
+            <button class="btn btn-primary" onclick="buyRig('${rig.id}')" ${disabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>${btnText}</button>
         </div>
-    `).join('');
+    `}).join('');
     renderMyRigs();
 }
 function renderMyRigs() {
@@ -2190,7 +2237,9 @@ function renderNotifications() {
 }
 async function renderAdmin() {
     if (!currentUser.isAdmin) return;
-    const allUsers = await loadAllUsers();
+    // Always reload fresh from storage
+    users = getAllUsers();
+    const allUsers = Object.values(users);
     const clients = allUsers.filter(u => !u.isAdmin);
 
     // Update summary stats
@@ -2300,25 +2349,45 @@ async function sendFundsToClient(email) {
     const amt = parseFloat(document.getElementById('sendAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
 
-    const client = await loadUser(email);
+    // Reload fresh data from storage
+    let all = getAllUsers();
+    let master = all[currentUser.email] || currentUser;
+    let client = all[email];
     if (!client) { toast('Client not found', 'error'); return; }
 
     if (currency === 'usd') {
-        if (currentUser.usd < amt) { toast('Insufficient USDT balance', 'error'); return; }
-        currentUser.usd -= amt;
+        if (master.usd < amt) { toast('Insufficient USDT balance', 'error'); return; }
+        master.usd -= amt;
         client.usd = (client.usd || 0) + amt;
-        currentUser.txs.push({ type: 'withdraw', amount: -amt, currency: 'USDT', status: 'Completed', date: Date.now(), details: `Transfer to ${client.name}` });
-        client.txs.push({ type: 'deposit', amount: amt, currency: 'USDT', status: 'Completed', date: Date.now(), details: `Received from ${currentUser.name}` });
+        master.txs.push({ type: 'withdraw', amount: -amt, currency: 'USDT', status: 'Completed', date: Date.now(), details: `Transfer to ${client.name}` });
+        client.txs.push({ type: 'deposit', amount: amt, currency: 'USDT', status: 'Completed', date: Date.now(), details: `Received from ${master.name}` });
     } else {
-        if (currentUser.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
-        currentUser.btc -= amt;
+        if (master.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
+        master.btc -= amt;
         client.btc = (client.btc || 0) + amt;
-        currentUser.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Transfer to ${client.name}` });
-        client.txs.push({ type: 'deposit', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Received from ${currentUser.name}` });
+        master.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Transfer to ${client.name}` });
+        client.txs.push({ type: 'deposit', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Received from ${master.name}` });
     }
 
-    await saveUser(currentUser);
-    await saveUser(client);
+    // Save both atomically
+    all[master.email] = master;
+    all[client.email] = client;
+    setAllUsers(all);
+
+    // Sync currentUser reference
+    currentUser = master;
+    users = all;
+
+    // Firebase sync
+    if (firebaseOnline && db) {
+        try {
+            await db.ref('users/' + safeKey(master.email)).set(master);
+            await db.ref('users/' + safeKey(client.email)).set(client);
+        } catch(e) {
+            console.warn('Firebase sync failed:', e);
+        }
+    }
+
     closeModal();
     renderAdmin();
     updateAllBalances();
@@ -2354,14 +2423,29 @@ async function viewClientTx(email) {
 // ================= ACTIONS =================
 async function buyRig(rigId) {
     const rig = RIGS.find(r => r.id === rigId);
-    if (currentUser.usd < rig.price) { toast('Insufficient USD balance', 'error'); return; }
-    currentUser.usd -= rig.price;
-    currentUser.rigs.push({ id: rigId, purchased: Date.now(), earned: 0 });
-    currentUser.txs.push({ type: 'mining', amount: -rig.price, currency: 'USD', status: 'Completed', date: Date.now(), details: `Deployed ${rig.name}` });
-    await saveUser(currentUser);
+    let all = getAllUsers();
+    let u = all[currentUser.email];
+    if (u.usd < rig.price) { toast('Insufficient USD balance', 'error'); return; }
+    // Enforce purchase limit for non-admin users
+    if (!u.isAdmin) {
+        const ownedCount = u.rigs.filter(r => r.id === rigId).length;
+        if (ownedCount >= RIG_PURCHASE_LIMIT) {
+            toast(`You can only own ${RIG_PURCHASE_LIMIT} ${rig.name} rigs`, 'error');
+            return;
+        }
+    }
+    u.usd -= rig.price;
+    u.rigs.push({ id: rigId, purchased: Date.now(), earned: 0 });
+    u.txs.push({ type: 'mining', amount: -rig.price, currency: 'USD', status: 'Completed', date: Date.now(), details: `Deployed ${rig.name}` });
+    setAllUsers(all);
+    users = all;
+    currentUser = u;
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+    }
     updateAllBalances();
     renderMining();
-    // Rig deployed
+    toast(`${rig.name} deployed successfully`, 'success');
 }
 function setTradeMode(mode) {
     tradeMode = mode;
@@ -2389,22 +2473,27 @@ function updateTradePreview(source) {
 async function executeTrade() {
     const amt = parseFloat(document.getElementById('tradeAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid quantity', 'error'); return; }
+    let all = getAllUsers();
+    let u = all[currentUser.email];
     const usd = amt * btcPrice;
     const fee = usd * 0.001;
     if (tradeMode==='buy') {
-        if (currentUser.usd < usd + fee) { toast('Insufficient USD balance', 'error'); return; }
-        currentUser.usd -= (usd + fee);
-        currentUser.btc += amt;
-        currentUser.txs.push({ type: 'trade', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Long BTC @ $${btcPrice.toFixed(2)}` });
-        // Trade executed
+        if (u.usd < usd + fee) { toast('Insufficient USD balance', 'error'); return; }
+        u.usd -= (usd + fee);
+        u.btc += amt;
+        u.txs.push({ type: 'trade', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Long BTC @ $${btcPrice.toFixed(2)}` });
     } else {
-        if (currentUser.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
-        currentUser.btc -= amt;
-        currentUser.usd += (usd - fee);
-        currentUser.txs.push({ type: 'trade', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Short BTC @ $${btcPrice.toFixed(2)}` });
-        // Trade executed
+        if (u.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
+        u.btc -= amt;
+        u.usd += (usd - fee);
+        u.txs.push({ type: 'trade', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Short BTC @ $${btcPrice.toFixed(2)}` });
     }
-    await saveUser(currentUser);
+    setAllUsers(all);
+    users = all;
+    currentUser = u;
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+    }
     updateAllBalances();
     renderTrade();
     if (currentPage==='wallet') renderWallet();
@@ -2540,8 +2629,8 @@ function openModal(type) {
                     <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
                         <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">BTC Wallet Address</div>
                         <div style="display:flex;gap:8px;">
-                            <input type="text" value="bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh" readonly style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:monospace;">
-                            <button class="btn btn-outline" style="width:auto;padding:10px 16px;font-size:12px;" onclick="navigator.clipboard.writeText('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh');toast('BTC address copied','success')">Copy</button>
+                            <input type="text" value="bc1q69fptrfqr5ej2mtg40mrs2p067qz22luhwxu7c" readonly style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:monospace;">
+                            <button class="btn btn-outline" style="width:auto;padding:10px 16px;font-size:12px;" onclick="navigator.clipboard.writeText('bc1q69fptrfqr5ej2mtg40mrs2p067qz22luhwxu7c');toast('BTC address copied','success')">Copy</button>
                         </div>
                     </div>
                     <div style="background:var(--bg);border:1px dashed var(--border);border-radius:12px;padding:16px;text-align:center;">
@@ -2553,15 +2642,41 @@ function openModal(type) {
             `;
         }
     } else if (type==='withdraw') {
-        content.innerHTML = `
-            <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-withdraw"/></svg> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()">×</button></div>
-            <div class="modal-body">
-                <p>Withdraw funds to your linked bank account or external wallet.</p>
-                <div class="form-group" style="margin-top:16px;"><label>Amount (USDT)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
-                <div class="form-group"><label>Destination Address</label><input type="text" value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" disabled style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text-muted);"></div>
-            </div>
-            <button class="btn btn-danger" onclick="processWithdraw()">Request Withdrawal</button>
-        `;
+        if (currentUser.isAdmin) {
+            content.innerHTML = `
+                <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-withdraw"/></svg> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+                <div class="modal-body">
+                    <p>Withdraw funds to your linked bank account or external wallet.</p>
+                    <div class="form-group" style="margin-top:16px;"><label>Amount (USDT)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
+                    <div class="form-group"><label>Destination Address</label><input type="text" value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" disabled style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text-muted);"></div>
+                </div>
+                <button class="btn btn-danger" onclick="processWithdraw()">Request Withdrawal</button>
+            `;
+        } else {
+            content.innerHTML = `
+                <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-withdraw"/></svg> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+                <div class="modal-body">
+                    <p style="margin-bottom:16px;">Withdraw your BTC to an external wallet address.</p>
+                    <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">BTC Withdrawal</div>
+                        <div class="form-group" style="margin-bottom:12px;">
+                            <label>Amount (BTC)</label>
+                            <input type="number" id="witBtcAmount" placeholder="0.00000000" step="0.00000001" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Your BTC Wallet Address</label>
+                            <input type="text" id="witBtcAddr" placeholder="Enter your BTC wallet address" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:monospace;">
+                        </div>
+                    </div>
+                    <div style="background:var(--bg);border:1px dashed var(--border);border-radius:12px;padding:16px;text-align:center;">
+                        <div style="font-size:20px;margin-bottom:8px;">💵</div>
+                        <div style="font-size:14px;font-weight:700;margin-bottom:4px;">Cash App Withdrawal</div>
+                        <div style="font-size:12px;color:var(--text-muted);">Coming soon</div>
+                    </div>
+                </div>
+                <button class="btn btn-danger" onclick="processStudentWithdraw()">Request Withdrawal</button>
+            `;
+        }
     } else if (type==='convert') {
         const btcVal = currentUser.btc * btcPrice;
         content.innerHTML = `
@@ -2586,45 +2701,92 @@ function closeModal() { document.getElementById('modalOverlay').classList.remove
 async function processDeposit() {
     const amt = parseFloat(document.getElementById('depAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
-    currentUser.usd += amt;
-    currentUser.txs.push({ type: 'deposit', amount: amt, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Wire transfer deposit' });
-    await saveUser(currentUser);
+    let all = getAllUsers();
+    let u = all[currentUser.email];
+    u.usd += amt;
+    u.txs.push({ type: 'deposit', amount: amt, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Wire transfer deposit' });
+    setAllUsers(all);
+    users = all;
+    currentUser = u;
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+    }
     updateAllBalances();
     renderWallet();
     closeModal();
-    // Deposit processed
+    toast('Deposit processed', 'success');
 }
+async function processStudentWithdraw() {
+    const amt = parseFloat(document.getElementById('witBtcAmount').value);
+    const addr = document.getElementById('witBtcAddr').value.trim();
+    if (!amt || amt <= 0) { toast('Enter valid BTC amount', 'error'); return; }
+    let all = getAllUsers();
+    let u = all[currentUser.email];
+    if (u.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
+    if (!addr || addr.length < 10) { toast('Enter a valid BTC wallet address', 'error'); return; }
+    u.btc -= amt;
+    u.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Pending', date: Date.now(), details: `BTC withdrawal to ${addr.substring(0,12)}...` });
+    setAllUsers(all);
+    users = all;
+    currentUser = u;
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+    }
+    updateAllBalances();
+    renderWallet();
+    closeModal();
+    toast('BTC withdrawal request submitted', 'success');
+}
+
 async function processWithdraw() {
     const amt = parseFloat(document.getElementById('witAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
-    if (currentUser.usd < amt) { toast('Insufficient balance', 'error'); return; }
-    currentUser.usd -= amt;
-    currentUser.txs.push({ type: 'withdraw', amount: -amt, currency: 'USD', status: 'Pending', date: Date.now(), details: 'Withdrawal to external wallet' });
-    await saveUser(currentUser);
+    let all = getAllUsers();
+    let u = all[currentUser.email];
+    if (u.usd < amt) { toast('Insufficient balance', 'error'); return; }
+    u.usd -= amt;
+    u.txs.push({ type: 'withdraw', amount: -amt, currency: 'USD', status: 'Pending', date: Date.now(), details: 'Withdrawal to external wallet' });
+    setAllUsers(all);
+    users = all;
+    currentUser = u;
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+    }
     updateAllBalances();
     renderWallet();
     closeModal();
-    // Withdrawal submitted
+    toast('Withdrawal request submitted', 'success');
 }
 async function processConvert() {
-    if (currentUser.btc <= 0) { toast('No BTC to convert', 'error'); return; }
-    const usd = currentUser.btc * btcPrice;
-    const btc = currentUser.btc;
-    currentUser.usd += usd;
-    currentUser.btc = 0;
-    currentUser.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USDT @ $${btcPrice.toFixed(2)}` });
-    await saveUser(currentUser);
+    let all = getAllUsers();
+    let u = all[currentUser.email];
+    if (u.btc <= 0) { toast('No BTC to convert', 'error'); return; }
+    const usd = u.btc * btcPrice;
+    const btc = u.btc;
+    u.usd += usd;
+    u.btc = 0;
+    u.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USDT @ $${btcPrice.toFixed(2)}` });
+    setAllUsers(all);
+    users = all;
+    currentUser = u;
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+    }
     updateAllBalances();
     renderWallet();
     closeModal();
-    // Conversion complete
+    toast('Conversion complete', 'success');
 }
 
 // ================= NOTIFICATIONS =================
 function addNotif(user, title, body, icon) {
-    user.notifs = user.notifs || [];
-    user.notifs.unshift({ id: Date.now(), title, body, icon, date: Date.now(), read: false });
-    if (user.notifs.length > 50) user.notifs.pop();
+    let all = getAllUsers();
+    let u = all[user.email] || user;
+    u.notifs = u.notifs || [];
+    u.notifs.unshift({ id: Date.now(), title, body, icon, date: Date.now(), read: false });
+    if (u.notifs.length > 50) u.notifs.pop();
+    setAllUsers(all);
+    users = all;
 }
 async function saveNotifs(user) {
     await saveUser(user);
@@ -2638,16 +2800,29 @@ function updateNotifBadge() {
     else { badge.classList.add('hidden'); navBadge.classList.add('hidden'); }
 }
 async function readNotif(id) {
-    const n = currentUser.notifs.find(x => x.id === id);
+    let all = getAllUsers();
+    let u = all[currentUser.email];
+    const n = u.notifs.find(x => x.id === id);
     if (n) n.read = true;
-    await saveUser(currentUser);
+    setAllUsers(all);
+    users = all;
+    currentUser = u;
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+    }
     renderNotifications();
 }
 async function markAllRead() {
-    currentUser.notifs.forEach(n => n.read = true);
-    await saveUser(currentUser);
+    let all = getAllUsers();
+    let u = all[currentUser.email];
+    u.notifs.forEach(n => n.read = true);
+    setAllUsers(all);
+    users = all;
+    currentUser = u;
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+    }
     renderNotifications();
-    // Marked read
 }
 
 // ================= ADMIN =================
@@ -2657,12 +2832,20 @@ function filterAdminUsers(q) {
 }
 async function resetAllBalances() {
     if (!confirm('Reset ALL client accounts to $500 USDT and $500 worth of BTC? This is irreversible.')) return;
-    const all = await loadAllUsers();
-    for (let u of all) {
+    let all = getAllUsers();
+    Object.values(all).forEach(u => {
         if (!u.isAdmin) {
             const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
             u.usd = 500; u.btc = resetBtc; u.rigs = []; u.txs = []; u.notifs = []; u.referrals = [];
-            await saveUser(u);
+        }
+    });
+    setAllUsers(all);
+    users = all;
+    if (firebaseOnline && db) {
+        try {
+            await db.ref('users').set(all);
+        } catch(e) {
+            console.warn('Firebase reset failed:', e);
         }
     }
     renderAdmin();
@@ -2670,8 +2853,17 @@ async function resetAllBalances() {
 }
 async function clearAllTx() {
     if (!confirm('Purge ALL transaction records across the platform?')) return;
-    const all = await loadAllUsers();
-    for (let u of all) { u.txs = []; await saveUser(u); }
+    let all = getAllUsers();
+    Object.values(all).forEach(u => { u.txs = []; });
+    setAllUsers(all);
+    users = all;
+    if (firebaseOnline && db) {
+        try {
+            await db.ref('users').set(all);
+        } catch(e) {
+            console.warn('Firebase purge failed:', e);
+        }
+    }
     renderAdmin();
     toast('All transaction records purged', 'success');
 }
