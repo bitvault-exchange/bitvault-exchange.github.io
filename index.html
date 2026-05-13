@@ -797,7 +797,7 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- ================= AUTH ================= -->
-<div id="authPage" class="auth-container">
+<div id="authPage" class="auth-container" style="display:none;">
     <div class="auth-box">
         <div class="auth-logo">
             <h1><span>⚡ BitVault</span> Pro</h1>
@@ -1397,25 +1397,27 @@
    ═══════════════════════════════════════════════════════════════ */
 
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAa0GBIH1WyuPKcMx6jfPHMXufLmo3xlPs",
+    authDomain: "bitvault-exchange.firebaseapp.com",
+    databaseURL: "https://bitvault-exchange-default-rtdb.firebaseio.com",
+    projectId: "bitvault-exchange",
+    storageBucket: "bitvault-exchange.firebasestorage.app",
+    messagingSenderId: "411929366665",
+    appId: "1:411929366665:web:aa5e150488aaf8624e3658"
 };
 
 let db = null;
 let firebaseOnline = false;
 
 try {
-    if (firebaseConfig.apiKey !== "YOUR_API_KEY" && firebaseConfig.databaseURL.includes("firebaseio.com")) {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-        firebaseOnline = true;
-    }
-} catch(e) { firebaseOnline = false; }
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    firebaseOnline = true;
+    console.log("Firebase connected");
+} catch(e) { 
+    console.warn("Firebase error:", e);
+    firebaseOnline = false; 
+}
 
 // ================= EMAILJS =================
 // EmailJS Config
@@ -2732,7 +2734,12 @@ window.addEventListener('resize', () => {
 (function autoLogin() {
     const sessionActive = sessionStorage.getItem('bv_session');
     const savedEmail = localStorage.getItem('bv_current');
-    if (!sessionActive || !savedEmail) return;
+
+    if (!sessionActive || !savedEmail) {
+        // No active session - show login screen
+        document.getElementById('authPage').style.display = 'flex';
+        return;
+    }
 
     const allUsers = JSON.parse(localStorage.getItem('bv_users') || '{}');
     const user = allUsers[savedEmail];
@@ -2747,6 +2754,8 @@ window.addEventListener('resize', () => {
         }
         users = allUsers;
         initApp();
+    } else {
+        document.getElementById('authPage').style.display = 'flex';
     }
 })();
 
