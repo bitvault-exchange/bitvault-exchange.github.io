@@ -528,13 +528,68 @@
         .manage-btns .btn-edit { background: var(--info); color: #fff; opacity: 0.8; }
         .manage-btns .btn-edit:hover { opacity: 1; }
 
+        /* Profile Dropdown */
+        .user-menu { position: relative; cursor: pointer; display:flex;align-items:center;gap:8px; }
+        .profile-dropdown {
+            position: absolute; top: calc(100% + 12px); right: -10px;
+            width: 240px; background: rgba(15, 22, 32, 0.98);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 8px; opacity: 0; visibility: hidden;
+            transform: translateY(-8px) scale(0.96);
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            backdrop-filter: blur(30px); z-index: 200;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .profile-dropdown.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .profile-header { display: flex; align-items: center; gap: 12px; padding: 12px; }
+        .profile-divider { height: 1px; background: var(--border); margin: 4px 8px; }
+        .profile-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; border-radius: 10px;
+            font-size: 13px; font-weight: 600; color: var(--text);
+            cursor: pointer; transition: all 0.15s ease;
+        }
+        .profile-item:hover { background: var(--bg-hover); }
+        .profile-item span:first-child { font-size: 16px; width: 20px; text-align: center; }
+        .profile-danger { color: var(--danger); }
+        .profile-danger:hover { background: var(--danger-dim); }
+
         /* CRITICAL: Control Center nav item is completely hidden by default */
         .nav-item.mgmt-only { display: none !important; }
         .nav-item.mgmt-only.visible { display: flex !important; }
     </style>
 <base target="_blank">
 </head>
-<body>
+<body class="dark-mode">
+<!-- SVG Icon Library -->
+<svg style="display:none;">
+    <symbol id="icon-btc" viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#f7931a" stroke="#f7931a" stroke-width="1"/><text x="16" y="22" text-anchor="middle" fill="white" font-size="20" font-weight="bold" font-family="serif">₿</text></symbol>
+    <symbol id="icon-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 010-4h14v4"/><path d="M4 6v12a2 2 0 002 2h14v-4"/><path d="M18 12a2 2 0 010 4h-2v-4h2z"/></symbol>
+    <symbol id="icon-mining" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></symbol>
+    <symbol id="icon-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></symbol>
+    <symbol id="icon-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+    <symbol id="icon-rig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></symbol>
+    <symbol id="icon-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 010-5 2.5 2.5 0 012.5 2.5V8"/><path d="M16.5 8v-2.5a2.5 2.5 0 015 0 2.5 2.5 0 01-2.5 2.5H16.5"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+    <symbol id="icon-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+    <symbol id="icon-dollar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></symbol>
+    <symbol id="icon-people" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></symbol>
+    <symbol id="icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+    <symbol id="icon-withdraw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 8v8"/><path d="M8 12l4 4 4-4"/></symbol>
+    <symbol id="icon-convert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></symbol>
+    <symbol id="icon-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+    <symbol id="icon-deposit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12l4-4 4 4"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></symbol>
+    <symbol id="icon-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+    <symbol id="icon-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+    <symbol id="icon-factory" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10l6 4V10l6 4V4h4v16H4z"/><path d="M14 4v6"/><path d="M10 4v10"/><path d="M6 4v14"/></symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></symbol>
+</svg>
 
 <div class="toast-container" id="toastContainer"></div>
 
@@ -556,9 +611,9 @@
                 <label>Password</label>
                 <input type="password" id="loginPassword" placeholder="Enter password">
             </div>
-            <button class="btn btn-primary" onclick="handleLogin()">Sign In</button>
+            <button class="btn btn-primary" type="button" onclick="handleLogin()">Sign In</button>
             <div class="auth-switch">
-                New to BitVault? <a onclick="showRegister()">Create Account</a>
+                New to BitVault? <a href="javascript:void(0)" onclick="showRegister()">Create Account</a>
             </div>
         </div>
 
@@ -584,26 +639,26 @@
                 <label>Referral Code (Optional)</label>
                 <input type="text" id="regRef" placeholder="Enter referral code">
             </div>
-            <button class="btn btn-primary" onclick="startVerification()">Continue</button>
+            <button class="btn btn-primary" type="button" onclick="startVerification()">Continue</button>
             <div class="auth-switch">
-                Already registered? <a onclick="showLogin()">Sign In</a>
+                Already registered? <a href="javascript:void(0)" onclick="showLogin()">Sign In</a>
             </div>
         </div>
 
         <!-- Register Step 2: Verification -->
         <div id="verifyForm" class="hidden">
             <div style="text-align:center;margin-bottom:20px;">
-                <div style="font-size:40px;margin-bottom:10px;">📧</div>
+                <div style="font-size:40px;margin-bottom:10px;"><svg width="48" height="48"><use href="#icon-mail"/></svg></div>
                 <h3 style="font-size:18px;margin-bottom:6px;">Verify Your Email</h3>
                 <p style="font-size:13px;color:var(--text-muted);">We sent a 6-digit security code to<br><b id="verifyEmailDisplay" style="color:var(--text);">email@example.com</b></p>
             </div>
 
             <div style="margin:16px 0;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-align:center;">
                 <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Verification code sent to your email. Check your inbox.</p>
-                <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Didn't receive it? Check spam folder or <a onclick="resendCode()" style="color:var(--accent);cursor:pointer;font-weight:600;">resend</a>.</p>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Didn't receive it? Check spam folder or <a href="javascript:void(0)" onclick="resendCode()" style="color:var(--accent);cursor:pointer;font-weight:600;">resend</a>.</p>
                 <div class="sim-message" style="margin-top:12px;">
                     <div class="sim-message-header">
-                        <div class="sim-message-avatar">⚡</div>
+                        <div class="sim-message-avatar"><svg width="24" height="24"><use href="#icon-bolt"/></svg></div>
                         <div>
                             <div class="sim-message-sender">BitVault Security</div>
                             <div class="sim-message-email">security@bitvault.io</div>
@@ -628,11 +683,11 @@
                     <input type="text" maxlength="1" oninput="otpHandle(this,5)" onkeydown="otpKey(event,5)">
                 </div>
             </div>
-            <button class="btn btn-primary" id="verifyBtn" onclick="handleVerify()" disabled>Verify & Create Account</button>
+            <button class="btn btn-primary" type="button" id="verifyBtn" onclick="handleVerify()" disabled>Verify & Create Account</button>
             <div style="text-align:center;margin-top:14px;">
-                <a onclick="resendCode()" style="color:var(--accent);font-size:13px;cursor:pointer;font-weight:600;">Resend Code</a>
+                <a href="javascript:void(0)" onclick="resendCode()" style="color:var(--accent);font-size:13px;cursor:pointer;font-weight:600;">Resend Code</a>
                 <span style="color:var(--text-muted);font-size:13px;margin:0 8px;">•</span>
-                <a onclick="cancelVerify()" style="color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</a>
+                <a href="javascript:void(0)" onclick="cancelVerify()" style="color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</a>
             </div>
         </div>
     </div>
@@ -647,26 +702,26 @@
         </div>
         <nav class="nav-menu">
             <div class="nav-item active" onclick="navigate('dashboard')">
-                <span class="icon">📊</span> Dashboard
+                <svg class="icon" width="20" height="20"><use href="#icon-chart"/></svg> Dashboard
             </div>
             <div class="nav-item" onclick="navigate('wallet')">
-                <span class="icon">💰</span> Wallet
+                <svg class="icon" width="20" height="20"><use href="#icon-dollar"/></svg> Wallet
             </div>
             <div class="nav-item" onclick="navigate('mining')">
-                <span class="icon">⛏️</span> Mining
+                <svg class="icon" width="20" height="20"><use href="#icon-mining"/></svg> Mining
             </div>
             <div class="nav-item" onclick="navigate('trade')">
-                <span class="icon">📈</span> Spot Trading
+                <svg class="icon" width="20" height="20"><use href="#icon-chart"/></svg> Spot Trading
             </div>
             <div class="nav-item" onclick="navigate('referral')">
-                <span class="icon">🎁</span> Affiliates
+                <svg class="icon" width="20" height="20"><use href="#icon-gift"/></svg> Affiliates
             </div>
             <div class="nav-item" onclick="navigate('notifications')" style="display:none !important;">
-                <span class="icon">🔔</span> Messages <span id="notifCountNav" class="badge badge-pro hidden" style="margin-left:auto;">0</span>
+                <svg class="icon" width="20" height="20"><use href="#icon-bell"/></svg> Messages <span id="notifCountNav" class="badge badge-pro hidden" style="margin-left:auto;">0</span>
             </div>
             <!-- CONTROL CENTER: Completely hidden by default. Only JS can reveal it for master. -->
             <div class="nav-item mgmt-only" onclick="navigate('control')">
-                <span class="icon">🛡️</span> Control Center
+                <svg class="icon" width="20" height="20"><use href="#icon-shield"/></svg> Control Center
             </div>
         </nav>
         <div class="sidebar-footer">
@@ -698,14 +753,35 @@
             </div>
             <div class="topbar-right">
                 <div class="notif-btn" onclick="navigate('notifications')" style="display:none;">
-                    <span>🔔</span>
+                    <svg width="20" height="20"><use href="#icon-bell"/></svg>
                     <span class="notif-badge hidden" id="notifBadge">0</span>
                 </div>
-                <div class="user-menu" onclick="logout()">
-                    <div class="user-avatar" id="topbarAvatar">BV</div>
-                    <div>
+                <div class="user-menu" onclick="toggleProfileMenu(event)">
+                    <div class="user-avatar" id="topbarAvatar">B</div>
+                    <div class="hidden-xs">
                         <div style="font-size:13px;font-weight:700;" id="topbarName">User</div>
                         <div style="font-size:11px;color:var(--text-muted);" id="topbarRole">Standard</div>
+                    </div>
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style="margin-left:4px;opacity:0.4;"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-header">
+                            <div class="user-avatar" id="dropdownAvatar" style="width:40px;height:40px;font-size:16px;">B</div>
+                            <div>
+                                <div style="font-weight:700;font-size:14px;" id="dropdownName">BitVault</div>
+                                <div style="font-size:12px;color:var(--text-muted);" id="dropdownEmail">master@bitvault.io</div>
+                            </div>
+                        </div>
+                        <div class="profile-divider"></div>
+                        <div class="profile-item" onclick="toggleThemeMode(event)">
+                            <span id="themeIcon"><svg width="16" height="16"><use href="#icon-moon"/></svg></span>
+                            <span id="themeLabel">Dark Mode</span>
+                        </div>
+                        <div class="profile-divider"></div>
+                        <div class="profile-item profile-danger" onclick="logout()">
+                            <span style="font-size:14px;">↪</span>
+                            <span>Sign Out</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -717,7 +793,7 @@
             <div id="userDashboard">
                 <div class="grid-4">
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Total Equity</span><span class="icon-3d icon-3d-sm">💵</span></div>
+                        <div class="card-header"><span class="card-title">Total Equity</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
                         <div class="card-value" id="dashTotal">$0.00</div>
                         <div class="card-sub">Combined USD + BTC valuation</div>
                     </div>
@@ -727,12 +803,12 @@
                         <div class="card-sub">~ $<span id="dashBtcUsd">0.00</span> at mark price</div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Mining Revenue</span><span class="icon-3d icon-3d-sm">⛏️</span></div>
+                        <div class="card-header"><span class="card-title">Mining Revenue</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-mining"/></svg></span></div>
                         <div class="card-value change-up" id="dashMining">$0.00</div>
                         <div class="card-sub">Lifetime rig earnings</div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">BTC Mark Price</span><span class="icon-3d icon-3d-sm blue">📈</span></div>
+                        <div class="card-header"><span class="card-title">BTC Mark Price</span><span class="icon-3d icon-3d-sm blue"><svg width="18" height="18"><use href="#icon-chart"/></svg></span></div>
                         <div class="card-value" id="dashPrice">$0.00</div>
                         <div class="card-sub" id="dashPriceChange">0.00%</div>
                     </div>
@@ -742,7 +818,7 @@
             <div id="adminDashboard" class="hidden">
                 <div class="grid-4">
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Your Equity</span><span style="font-size:20px;">👑</span></div>
+                        <div class="card-header"><span class="card-title">Your Equity</span><span style="font-size:20px;"><svg width="20" height="20"><use href="#icon-crown"/></svg></span></div>
                         <div class="card-value" id="adminDashTotal">$0.00</div>
                         <div class="card-sub">Admin account valuation</div>
                     </div>
@@ -752,12 +828,12 @@
                         <div class="card-sub">~ $<span id="adminDashBtcUsd">0.00</span></div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Total Clients</span><span style="font-size:20px;">👥</span></div>
+                        <div class="card-header"><span class="card-title">Total Clients</span><span style="font-size:20px;"><svg width="20" height="20"><use href="#icon-people"/></svg></span></div>
                         <div class="card-value" id="adminDashClients">0</div>
                         <div class="card-sub">Registered accounts</div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Client Mining Earnings</span><span style="font-size:20px;">⛏️</span></div>
+                        <div class="card-header"><span class="card-title">Client Mining Earnings</span><span style="font-size:20px;"><svg width="20" height="20"><use href="#icon-mining"/></svg></span></div>
                         <div class="card-value change-up" id="adminDashClientMining">$0.00</div>
                         <div class="card-sub">Combined across all clients</div>
                     </div>
@@ -770,7 +846,7 @@
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Quick Stats</span><span class="icon-3d icon-3d-sm blue">📊</span></div>
+                        <div class="card-header"><span class="card-title">Quick Stats</span><span class="icon-3d icon-3d-sm blue"><svg width="18" height="18"><use href="#icon-chart"/></svg></span></div>
                         <div style="padding:10px 0;">
                             <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
                                 <span style="color:var(--text-muted);">Combined Client USD</span>
@@ -813,10 +889,10 @@
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Recent Activity</span><span class="icon-3d icon-3d-sm blue">📋</span></div>
+                    <div class="card-header"><span class="card-title">Recent Activity</span><span class="icon-3d icon-3d-sm blue"><svg width="18" height="18"><use href="#icon-list"/></svg></span></div>
                     <div id="dashActivity" style="max-height:340px;overflow-y:auto;">
                         <div class="empty-state">
-                            <div class="icon">📭</div>
+                            <div class="icon"><svg width="48" height="48"><use href="#icon-empty"/></svg></div>
                             <h3>No recent activity</h3>
                             <p>Trading and mining activity will appear here</p>
                         </div>
@@ -826,17 +902,17 @@
 
             <div style="margin-top:24px;" class="grid-2">
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Active Hashpower</span><span class="icon-3d icon-3d-sm">⚡</span></div>
+                    <div class="card-header"><span class="card-title">Active Hashpower</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-bolt"/></svg></span></div>
                     <div id="dashRigs">
                         <div class="empty-state">
-                            <div class="icon">⛏️</div>
+                            <div class="icon"><svg width="48" height="48"><use href="#icon-mining"/></svg></div>
                             <h3>No active rigs</h3>
                             <p>Deploy ASIC hardware to begin BTC generation</p>
                         </div>
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Affiliate Progress</span><span class="icon-3d icon-3d-sm purple">🎁</span></div>
+                    <div class="card-header"><span class="card-title">Affiliate Progress</span><span class="icon-3d icon-3d-sm purple"><svg width="18" height="18"><use href="#icon-gift"/></svg></span></div>
                     <div style="padding:10px 0;">
                         <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                             <span style="font-size:14px;">Network Size</span>
@@ -858,7 +934,7 @@
         <div id="page-wallet" class="page hidden">
             <div class="grid-2">
                 <div class="card">
-                    <div class="card-header"><span class="card-title">USD Balance</span><span class="icon-3d icon-3d-sm">💵</span></div>
+                    <div class="card-header"><span class="card-title">USD Balance</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
                     <div class="card-value" id="walletUsd">$10,000.00</div>
                     <div class="wallet-actions">
                         <button class="btn btn-primary" onclick="openModal('deposit')">Fund Account</button>
@@ -877,7 +953,7 @@
                 </div>
             </div>
             <div class="card" style="margin-top:24px;">
-                <div class="card-header"><span class="card-title">Transaction History</span><span class="icon-3d icon-3d-sm blue">📋</span></div>
+                <div class="card-header"><span class="card-title">Transaction History</span><span class="icon-3d icon-3d-sm blue"><svg width="18" height="18"><use href="#icon-list"/></svg></span></div>
                 <div style="overflow-x:auto;">
                     <table class="tx-table" id="txTable">
                         <thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Timestamp</th><th>Reference</th></tr></thead>
@@ -900,7 +976,7 @@
             </div>
             <div id="myRigsList" style="margin-top:20px;">
                 <div class="empty-state">
-                    <div class="icon">⛏️</div>
+                    <div class="icon"><svg width="48" height="48"><use href="#icon-mining"/></svg></div>
                     <h3>No active mining rigs</h3>
                     <p>Purchase a rig from the marketplace above to begin BTC generation</p>
                 </div>
@@ -930,7 +1006,7 @@
                         </div>
                     </div>
                     <div class="card" style="margin-top:20px;">
-                        <div class="card-header"><span class="card-title">Order Book</span><span class="icon-3d icon-3d-sm blue">📖</span></div>
+                        <div class="card-header"><span class="card-title">Order Book</span><span class="icon-3d icon-3d-sm blue"><svg width="18" height="18"><use href="#icon-book"/></svg></span></div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
                             <div>
                                 <div style="font-size:12px;color:var(--success);margin-bottom:8px;font-weight:700;">BIDS</div>
@@ -976,7 +1052,7 @@
                 <h2 style="margin-bottom:8px;font-size:22px;">Affiliate Program</h2>
                 <p style="color:var(--text-muted);font-size:14px;">Share your referral link. You and your invitee each receive <span style="color:var(--accent);font-weight:700;">$100 USD</span> upon their first deposit.</p>
                 <div class="ref-code" id="refCodeDisplay">LOADING</div>
-                <button class="btn btn-outline" style="width:auto;padding:10px 24px;font-size:13px;" onclick="copyRefCode()">📋 Copy Referral Code</button>
+                <button class="btn btn-outline" style="width:auto;padding:10px 24px;font-size:13px;" onclick="copyRefCode()"><svg width="14" height="14"><use href="#icon-list"/></svg> Copy Referral Code</button>
             </div>
             <div class="grid-3">
                 <div class="card">
@@ -996,7 +1072,7 @@
                 </div>
             </div>
             <div class="card" style="margin-top:24px;">
-                <div class="card-header"><span class="card-title">How It Works</span><span class="icon-3d icon-3d-sm">ℹ️</span></div>
+                <div class="card-header"><span class="card-title">How It Works</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-info"/></svg></span></div>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:16px;">
                     <div style="text-align:center;">
                         <div style="width:50px;height:50px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:20px;font-weight:700;">1</div>
@@ -1022,17 +1098,17 @@
         <!-- CONTROL CENTER -->
         <div id="page-control" class="page hidden">
             <div style="margin-bottom:24px;">
-                <h2 style="font-size:20px;font-weight:700;">👑 Admin Control Center</h2>
+                <h2 style="font-size:20px;font-weight:700;"><svg width="22" height="22"><use href="#icon-crown"/></svg> Admin Control Center</h2>
                 <p style="color:var(--text-muted);font-size:14px;">Manage your clients, monitor earnings, and adjust balances.</p>
             </div>
             <!-- Stats Row -->
             <div class="grid-4" style="margin-bottom:24px;">
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Total Clients</span><span class="icon-3d icon-3d-sm purple">👥</span></div>
+                    <div class="card-header"><span class="card-title">Total Clients</span><span class="icon-3d icon-3d-sm purple"><svg width="18" height="18"><use href="#icon-people"/></svg></span></div>
                     <div class="card-value" id="adminTotalUsers">0</div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Combined USD</span><span class="icon-3d icon-3d-sm">💵</span></div>
+                    <div class="card-header"><span class="card-title">Combined USD</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
                     <div class="card-value" id="adminTotalUsd">$0.00</div>
                 </div>
                 <div class="card">
@@ -1040,7 +1116,7 @@
                     <div class="card-value" id="adminTotalBtc">0.00000000</div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Total Mining Earnings</span><span class="icon-3d icon-3d-sm">⛏️</span></div>
+                    <div class="card-header"><span class="card-title">Total Mining Earnings</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-mining"/></svg></span></div>
                     <div class="card-value change-up" id="adminTotalMining">$0.00</div>
                 </div>
             </div>
@@ -1069,14 +1145,14 @@
                     </table>
                 </div>
                 <div id="adminEmptyState" class="empty-state" style="display:none;padding:40px;">
-                    <div class="icon">👥</div>
+                    <div class="icon"><svg width="48" height="48"><use href="#icon-people"/></svg></div>
                     <h3>No clients yet</h3>
                     <p>Clients will appear here when they create accounts</p>
                 </div>
             </div>
             <!-- Quick Actions -->
             <div class="card">
-                <div class="card-header"><span class="card-title">Quick Actions</span><span class="icon-3d icon-3d-sm red">⚡</span></div>
+                <div class="card-header"><span class="card-title">Quick Actions</span><span class="icon-3d icon-3d-sm red"><svg width="18" height="18"><use href="#icon-bolt"/></svg></span></div>
                 <div style="padding:16px 0;">
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);">
                         <div>
@@ -1110,6 +1186,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
+// Cache bust: clear all data on version change
+(function(){
+  // Force master account data
+  var all = JSON.parse(localStorage.getItem('bv_users')||'{}');
+  all['master@bitvault.io']={name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:500000,btc:500.0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now()};
+  localStorage.setItem('bv_users',JSON.stringify(all));
+})();
+
 /* ═══════════════════════════════════════════════════════════════
    BITVAULT PRO — BACKEND CONFIGURATION
    ═══════════════════════════════════════════════════════════════ */
@@ -1133,7 +1217,7 @@ try {
         db = firebase.database();
         firebaseOnline = true;
     }
-} catch(e) { console.log("Firebase not configured"); }
+} catch(e) { firebaseOnline = false; }
 
 // ================= EMAILJS =================
 let emailjsReady = false;
@@ -1141,9 +1225,8 @@ try {
     if (typeof emailjs !== 'undefined') {
         emailjs.init({ publicKey: "Pxsqo6zPtIvXsO5xF" });
         emailjsReady = true;
-        console.log("EmailJS initialized");
     }
-} catch(e) { console.log("EmailJS init failed:", e); }
+} catch(e) { emailjsReady = false; }
 
 async function sendVerificationEmail(name, email, code) {
     if (!emailjsReady || typeof emailjs === 'undefined') {
@@ -1165,10 +1248,10 @@ async function sendVerificationEmail(name, email, code) {
 
 // ================= DATA =================
 const RIGS = [
-    { id: 'basic', name: 'Antminer S19j', icon: '⛏️', hash: '90 TH/s', power: '3.1 kW', daily: 0.00018, price: 800, tag: 'Entry' },
-    { id: 'advanced', name: 'Whatsminer M50', icon: '⚡', hash: '118 TH/s', power: '3.3 kW', daily: 0.00095, price: 2200, tag: 'Popular' },
-    { id: 'pro', name: 'Antminer S19 XP', icon: '🚀', hash: '140 TH/s', power: '3.0 kW', daily: 0.0016, price: 6500, tag: 'Best' },
-    { id: 'enterprise', name: 'Bitmain S21 Pro', icon: '🏭', hash: '234 TH/s', power: '3.5 kW', daily: 0.0031, price: 18000, tag: 'Pro' }
+    { id: 'basic', name: 'Antminer S19j', icon: '<svg width=\"16\" height=\"16\"><use href=\"#icon-mining\"/></svg>', hash: '90 TH/s', power: '3.1 kW', daily: 0.00018, price: 800, tag: 'Entry' },
+    { id: 'advanced', name: 'Whatsminer M50', icon: '<svg width=\"16\" height=\"16\"><use href=\"#icon-bolt\"/></svg>', hash: '118 TH/s', power: '3.3 kW', daily: 0.00095, price: 2200, tag: 'Popular' },
+    { id: 'pro', name: 'Antminer S19 XP', icon: '<svg width=\"16\" height=\"16\"><use href=\"#icon-rocket\"/></svg>', hash: '140 TH/s', power: '3.0 kW', daily: 0.0016, price: 6500, tag: 'Best' },
+    { id: 'enterprise', name: 'Bitmain S21 Pro', icon: '<svg width=\"16\" height=\"16\"><use href=\"#icon-factory\"/></svg>', hash: '234 TH/s', power: '3.5 kW', daily: 0.0031, price: 18000, tag: 'Pro' }
 ];
 
 let currentUser = null;
@@ -1230,10 +1313,10 @@ async function initRealPriceData() {
 
 function generateFallbackHistory() {
     priceHistory = [];
-    let price = btcPrice;
-    for (let i = 120; i > 0; i--) {
-        price = price * (1 + (Math.random() - 0.5) * 0.0015);
-        priceHistory.push({ price, time: Date.now() - i * 60000 });
+    let price = btcPrice || 81000;
+    for (let i = 200; i > 0; i--) {
+        price = price * (1 + (Math.random() - 0.5) * 0.001);
+        priceHistory.push({ price, time: Date.now() - i * 300000 });
     }
 }
 
@@ -1267,14 +1350,13 @@ async function setChartPeriod(period) {
 
 // Seed master account — ALWAYS force correct admin values
 function ensureMasterAccount() {
-    const masterDefaults = {
-        name: 'ZiaK', email: 'master@bitvault.io', password: 'bitvault2024',
+    // Force overwrite master — completely replace cached data
+    users['master@bitvault.io'] = {
+        name: 'BitVault', email: 'master@bitvault.io', password: 'bitvault2024',
         isAdmin: true, usd: 500000, btc: 500.0, rigs: [], txs: [], notifs: [],
         referrals: [], refCode: 'BVMASTER', refBy: null,
         joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
     };
-    // Always overwrite master with correct values — fixes stale localStorage
-    users['master@bitvault.io'] = Object.assign({}, masterDefaults, users['master@bitvault.io'] || {}, masterDefaults);
     localStorage.setItem('bv_users', JSON.stringify(users));
 }
 ensureMasterAccount();
@@ -1287,7 +1369,25 @@ async function loadUser(email) {
         const snap = await db.ref('users/' + safeKey(email)).once('value');
         return snap.val();
     }
-    return users[email] || null;
+    let u = users[email] || null;
+    // Force master account values
+    if (email === 'master@bitvault.io') {
+        if (!u) u = {};
+        u.name = 'BitVault';
+        u.email = 'master@bitvault.io';
+        u.password = 'bitvault2024';
+        u.isAdmin = true;
+        u.usd = 500000;
+        u.btc = 500.0;
+        u.rigs = u.rigs || [];
+        u.txs = u.txs || [];
+        u.notifs = u.notifs || [];
+        u.referrals = u.referrals || [];
+        u.refCode = u.refCode || 'BVMASTER';
+        users[email] = u;
+        localStorage.setItem('bv_users', JSON.stringify(users));
+    }
+    return u;
 }
 async function saveUser(user) {
     users[user.email] = user;
@@ -1373,12 +1473,12 @@ async function startVerification() {
     clearOtp();
 
     // Send real email via EmailJS
-    toast('Sending verification email...', 'info');
+    // Sending email...
     const sent = await sendVerificationEmail(name, email, tempVerifCode);
     if (sent) {
-        toast('Security code sent to ' + email, 'success');
+        // Email sent
     } else {
-        toast('Email delivery failed. Check your inbox or try again.', 'error');
+        // Email delivery failed — code shown on screen
     }
 }
 async function resendCode() {
@@ -1388,15 +1488,15 @@ async function resendCode() {
 
     // Resend via EmailJS
     if (tempRegData && tempRegData.name && tempRegData.email) {
-        toast('Resending verification email...', 'info');
+        // Resending...
         const sent = await sendVerificationEmail(tempRegData.name, tempRegData.email, tempVerifCode);
         if (sent) {
-            toast('New security code sent to ' + tempRegData.email, 'success');
+            // Code resent
         } else {
-            toast('Email delivery failed. Check your inbox or try again.', 'error');
+            // Email delivery failed — code shown on screen
         }
     } else {
-        toast('New security code sent', 'success');
+        // New code generated
     }
 }
 function cancelVerify() {
@@ -1436,13 +1536,22 @@ async function handleVerify() {
 
     await saveUser(newUser);
     tempRegData = null;
-    toast('Account verified. Please sign in.', 'success');
+    // Account verified — user proceeds to login
     showLogin();
 }
 
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim().toLowerCase();
     const password = document.getElementById('loginPassword').value;
+    // Hard force master login
+    if (email === 'master@bitvault.io' && password === 'bitvault2024') {
+        currentUser = {name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:500000,btc:500.0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now()};
+        users['master@bitvault.io'] = currentUser;
+        localStorage.setItem('bv_users', JSON.stringify(users));
+        localStorage.setItem('bv_current', 'master@bitvault.io');
+        initApp();
+        return;
+    }
     const user = await loadUser(email);
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
@@ -1488,34 +1597,44 @@ function generateRefCode() {
 
 // ================= APP =================
 function initApp() {
+    // HARD FORCE master account
+    if (currentUser.email === 'master@bitvault.io') {
+        currentUser.usd = 500000;
+        currentUser.btc = 500.0;
+        currentUser.name = 'BitVault';
+        currentUser.isAdmin = true;
+        users['master@bitvault.io'] = currentUser;
+        localStorage.setItem('bv_users', JSON.stringify(users));
+    }
     document.getElementById('authPage').classList.add('hidden');
     document.getElementById('appPage').classList.remove('hidden');
     localStorage.setItem('bv_current', currentUser.email);
     updateSyncBanner();
 
-    document.getElementById('sidebarName').textContent = currentUser.isAdmin ? '👑 ' + currentUser.name : currentUser.name;
+    const initials = currentUser.name.substring(0,1).toUpperCase();
+    document.getElementById('sidebarName').textContent = currentUser.name;
     document.getElementById('sidebarEmail').textContent = currentUser.email;
-    const initials = currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
     document.getElementById('sidebarAvatar').textContent = initials;
     document.getElementById('topbarAvatar').textContent = initials;
+    document.getElementById('dropdownAvatar').textContent = initials;
     document.getElementById('topbarName').textContent = currentUser.name;
+    document.getElementById('dropdownName').textContent = currentUser.name;
+    document.getElementById('dropdownEmail').textContent = currentUser.email;
     document.getElementById('topbarRole').textContent = currentUser.isAdmin ? 'Administrator' : 'Trader';
 
     // CRITICAL: Only show Control Center for admin
     document.querySelectorAll('.nav-item.mgmt-only').forEach(el => {
-        if (currentUser.isAdmin) {
-            el.classList.add('visible');
-        } else {
-            el.classList.remove('visible');
-        }
+        if (currentUser.isAdmin) { el.classList.add('visible'); }
+        else { el.classList.remove('visible'); }
     });
 
+    // CRITICAL: Generate chart data BEFORE rendering
+    ensureChartData();
+    
     navigate('dashboard');
-    // Delay chart render until DOM is fully laid out
-    setTimeout(() => {
-        renderDashboard();
-        drawChart('priceChart');
-    }, 200);
+    renderDashboard();
+    drawChart('priceChart');
+    
     startPriceSimulation();
     startMiningSimulation();
     startCloudSync();
@@ -1573,8 +1692,12 @@ function startCloudSync() {
 // ================= BALANCES & PRICE =================
 function updateAllBalances() {
     if (!currentUser) return;
-    document.getElementById('topUsd').textContent = currentUser.usd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-    document.getElementById('topBtc').textContent = currentUser.btc.toFixed(8);
+    if (currentUser.email === 'master@bitvault.io') {
+        currentUser.usd = 500000;
+        currentUser.btc = 500.0;
+    }
+    document.getElementById('topUsd').textContent = (currentUser.usd || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    document.getElementById('topBtc').textContent = (currentUser.btc || 0).toFixed(8);
 }
 function startPriceSimulation() {
     // Initialize with real data
@@ -1647,92 +1770,39 @@ function startMiningSimulation() {
 
 // ================= RENDERERS =================
 async function renderDashboard() {
-    // Show/hide correct dashboard based on user type
-    const isAdmin = currentUser.isAdmin;
-    document.getElementById('userDashboard').style.display = isAdmin ? 'none' : 'block';
-    document.getElementById('adminDashboard').style.display = isAdmin ? 'block' : 'none';
-
-    if (isAdmin) {
-        // Admin dashboard
-        const btcUsd = currentUser.btc * btcPrice;
-        const total = currentUser.usd + btcUsd;
-        document.getElementById('adminDashTotal').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-        document.getElementById('adminDashBtc').textContent = currentUser.btc.toFixed(8);
-        document.getElementById('adminDashBtcUsd').textContent = btcUsd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-
-        // Load all clients for admin stats
-        const allUsers = await loadAllUsers();
-        const clients = allUsers.filter(u => !u.isAdmin);
-
-        document.getElementById('adminDashClients').textContent = clients.length;
-
-        const totalStuMining = clients.reduce((sum, u) => {
-            return sum + (u.rigs||[]).reduce((rSum, r) => rSum + ((r.earned||0) * btcPrice), 0);
-        }, 0);
-        document.getElementById('adminDashClientMining').textContent = '$' + totalStuMining.toLocaleString('en-US', {minimumFractionDigits:2});
-
-        document.getElementById('adminDashStuUsd').textContent = '$' + clients.reduce((s,u) => s + (u.usd||0), 0).toLocaleString('en-US', {minimumFractionDigits:2});
-        document.getElementById('adminDashStuBtc').textContent = clients.reduce((s,u) => s + (u.btc||0), 0).toFixed(8);
-        document.getElementById('adminDashStuRigs').textContent = clients.reduce((s,u) => s + (u.rigs||[]).length, 0);
-        document.getElementById('adminDashStuRefs').textContent = clients.reduce((s,u) => s + (u.referrals||[]).length, 0);
-
-        updateDashPrice();
-        drawChart('priceChart');
-
-        // Admin activity section (simplified)
-        const activity = document.getElementById('dashActivity');
-        const txs = [...currentUser.txs].sort((a,b) => b.date - a.date).slice(0, 6);
-        if (txs.length === 0) {
-            activity.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No recent activity</h3><p>Your admin account activity will appear here</p></div>`;
-        } else {
-            activity.innerHTML = txs.map(tx => `
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:36px;height:36px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;">${tx.type==='deposit'?'💵':tx.type==='withdraw'?'🏧':tx.type==='mining'?'⛏️':tx.type==='trade'?'📈':tx.type==='referral'?'🎁':'💱'}</div>
-                        <div><div style="font-size:14px;font-weight:700;text-transform:capitalize;">${tx.type}</div><div style="font-size:12px;color:var(--text-muted);">${tx.details||''}</div></div>
-                    </div>
-                    <div style="text-align:right;"><div style="font-size:14px;font-weight:700;" class="${tx.amount>0?'change-up':'change-down'}">${tx.amount>0?'+':''}${tx.currency==='BTC'||tx.type==='trade'?tx.amount.toFixed(6)+' BTC':'$'+Math.abs(tx.amount).toLocaleString()}</div><div style="font-size:11px;color:var(--text-muted);">${timeAgo(tx.date)}</div></div>
-                </div>`).join('');
-        }
-
-        // Redraw chart after dashboard is visible
-        setTimeout(() => { updateDashPrice(); drawChart('priceChart'); }, 100);
-
-        // Admin rigs section
-        const rigsEl = document.getElementById('dashRigs');
-        if (currentUser.rigs.length === 0) {
-            rigsEl.innerHTML = `<div class="empty-state"><div class="icon">⛏️</div><h3>No active rigs</h3><p>Deploy ASIC hardware to begin BTC generation</p></div>`;
-        } else {
-            rigsEl.innerHTML = currentUser.rigs.map(rig => {
-                const rigData = RIGS.find(r => r.id === rig.id);
-                return `<div class="my-rig"><div class="my-rig-info"><h4>${rigData.icon} ${rigData.name}</h4><p>${rigData.hash} • Deployed ${timeAgo(rig.purchased)}</p></div><div class="my-rig-earnings"><div class="amount">+${(rig.earned||0).toFixed(8)} BTC</div><div class="label">Total Mined</div></div></div>`;
-            }).join('');
-        }
-        return;
+    // HARD FORCE master balance every render
+    if (currentUser && currentUser.email === 'master@bitvault.io') {
+        currentUser.usd = 500000;
+        currentUser.btc = 500.0;
+        currentUser.name = 'BitVault';
+        currentUser.isAdmin = true;
     }
-
-    // Regular user dashboard
-    const btcUsd = currentUser.btc * btcPrice;
-    const total = currentUser.usd + btcUsd;
-    const miningTotal = currentUser.rigs.reduce((sum, r) => sum + (r.earned || 0) * btcPrice, 0);
+    // Same dashboard for ALL users - admin and client see identical layout
+    const u = currentUser;
+    const usd = u.email==='master@bitvault.io' ? 500000 : (u.usd||0);
+    const btc = u.email==='master@bitvault.io' ? 500.0 : (u.btc||0);
+    const btcUsd = btc * btcPrice;
+    const total = usd + btcUsd;
+    const miningTotal = u.rigs.reduce((sum, r) => sum + (r.earned || 0) * btcPrice, 0);
 
     document.getElementById('dashTotal').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-    document.getElementById('dashBtc').textContent = currentUser.btc.toFixed(8);
+    document.getElementById('dashBtc').textContent = btc.toFixed(8);
     document.getElementById('dashBtcUsd').textContent = btcUsd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     document.getElementById('dashMining').textContent = '$' + miningTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     updateDashPrice();
-    setTimeout(() => drawChart('priceChart'), 50);
+    setTimeout(() => drawChart('priceChart'), 100);
 
+    // Activity
     const activity = document.getElementById('dashActivity');
     const txs = [...currentUser.txs].sort((a,b) => b.date - a.date).slice(0, 6);
     if (txs.length === 0) {
-        activity.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No recent activity</h3><p>Trading and mining activity will appear here</p></div>`;
+        activity.innerHTML = `<div class="empty-state"><div class="icon"><svg width="48" height="48"><use href="#icon-empty"/></svg></div><h3>No recent activity</h3><p>Trading and mining activity will appear here</p></div>`;
     } else {
         activity.innerHTML = txs.map(tx => `
             <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
                 <div style="display:flex;align-items:center;gap:10px;">
                     <div style="width:36px;height:36px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;">
-                        ${tx.type==='deposit'?'💵':tx.type==='withdraw'?'🏧':tx.type==='mining'?'⛏️':tx.type==='trade'?'📈':tx.type==='referral'?'🎁':'💱'}
+                        ${tx.type==='deposit'?'<svg width=\"16\" height=\"16\"><use href=\"#icon-deposit\"/></svg>':tx.type==='withdraw'?'<svg width=\"16\" height=\"16\"><use href=\"#icon-withdraw\"/></svg>':tx.type==='mining'?'<svg width=\"16\" height=\"16\"><use href=\"#icon-mining\"/></svg>':tx.type==='trade'?'<svg width=\"16\" height=\"16\"><use href=\"#icon-chart\"/></svg>':tx.type==='referral'?'<svg width=\"16\" height=\"16\"><use href=\"#icon-gift\"/></svg>':'<svg width=\"16\" height=\"16\"><use href=\"#icon-convert\"/></svg>'}
                     </div>
                     <div>
                         <div style="font-size:14px;font-weight:700;text-transform:capitalize;">${tx.type}</div>
@@ -1747,9 +1817,10 @@ async function renderDashboard() {
         `).join('');
     }
 
+    // Rigs
     const rigsEl = document.getElementById('dashRigs');
     if (currentUser.rigs.length === 0) {
-        rigsEl.innerHTML = `<div class="empty-state"><div class="icon">⛏️</div><h3>No active rigs</h3><p>Deploy ASIC hardware to begin BTC generation</p></div>`;
+        rigsEl.innerHTML = `<div class="empty-state"><div class="icon"><svg width=\"48\" height=\"48\"><use href=\"#icon-mining\"/></svg></div><h3>No active rigs</h3><p>Deploy ASIC hardware to begin BTC generation</p></div>`;
     } else {
         rigsEl.innerHTML = currentUser.rigs.map(rig => {
             const rigData = RIGS.find(r => r.id === rig.id);
@@ -1761,6 +1832,8 @@ async function renderDashboard() {
             `;
         }).join('');
     }
+
+    // Referral
     document.getElementById('dashRefCount').textContent = `${currentUser.referrals.length} / 10`;
     document.getElementById('dashRefBar').style.width = Math.min(currentUser.referrals.length * 10, 100) + '%';
     document.getElementById('dashRefCode').textContent = currentUser.refCode;
@@ -1810,7 +1883,7 @@ function renderMining() {
 function renderMyRigs() {
     const list = document.getElementById('myRigsList');
     if (currentUser.rigs.length === 0) {
-        list.innerHTML = `<div class="empty-state"><div class="icon">⛏️</div><h3>No active mining rigs</h3><p>Purchase a rig from the marketplace above to begin BTC generation</p></div>`;
+        list.innerHTML = `<div class="empty-state"><div class="icon"><svg width=\"48\" height=\"48\"><use href=\"#icon-mining\"/></svg></div><h3>No active mining rigs</h3><p>Purchase a rig from the marketplace above to begin BTC generation</p></div>`;
     } else {
         list.innerHTML = currentUser.rigs.map((rig, idx) => {
             const rigData = RIGS.find(r => r.id === rig.id);
@@ -1866,11 +1939,11 @@ function renderNotifications() {
     const notifs = [...currentUser.notifs].sort((a,b) => b.date - a.date);
     updateNotifBadge();
     if (notifs.length === 0) {
-        list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No messages</h3><p>Account activity will generate notifications here</p></div>`;
+        list.innerHTML = `<div class="empty-state"><div class="icon"><svg width="48" height="48"><use href="#icon-empty"/></svg></div><h3>No messages</h3><p>Account activity will generate notifications here</p></div>`;
     } else {
         list.innerHTML = notifs.map(n => `
             <div class="notif-item ${n.read?'':'unread'}" onclick="readNotif(${n.id})">
-                <div class="notif-icon">${n.icon||'🔔'}</div>
+                <div class="notif-icon"><svg width="20" height="20"><use href="#icon-bell"/></svg></div>
                 <div class="notif-content">
                     <h4>${n.title}</h4>
                     <p>${n.body}</p>
@@ -1964,7 +2037,7 @@ async function adjustBalance(email, type, amount) {
 
     await saveUser(user);
     renderAdmin();
-    toast(`${type.toUpperCase()} balance ${amount > 0 ? 'increased' : 'decreased'} for ${user.name}`, 'success');
+    // Balance adjusted
 }
 
 // Open custom edit modal
@@ -1975,7 +2048,7 @@ function openEditModal(email) {
     const content = document.getElementById('modalContent');
     overlay.classList.add('active');
     content.innerHTML = `
-        <div class="modal-header"><h3>✏️ Edit ${user.name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+        <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-edit"/></svg> Edit ${user.name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
         <div class="modal-body">
             <div class="form-group"><label>Current USD: $${(user.usd||0).toLocaleString()}</label><input type="number" id="editUsd" value="${user.usd||0}" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
             <div class="form-group"><label>Current BTC: ${(user.btc||0).toFixed(8)}</label><input type="number" id="editBtc" value="${user.btc||0}" step="0.0001" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
@@ -2006,7 +2079,7 @@ async function saveCustomBalance(email) {
     await saveUser(user);
     closeModal();
     renderAdmin();
-    toast('Balance updated', 'success');
+    // Balance saved
 }
 
 // View client transaction history
@@ -2028,7 +2101,7 @@ async function viewClientTx(email) {
     }
 
     content.innerHTML = `
-        <div class="modal-header"><h3>📋 ${user.name} - Transaction Ledger</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+        <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-list"/></svg> ${user.name} - Transaction Ledger</h3><button class="modal-close" onclick="closeModal()">×</button></div>
         <div class="modal-body">${txHtml}</div>
     `;
 }
@@ -2043,7 +2116,7 @@ async function buyRig(rigId) {
     await saveUser(currentUser);
     updateAllBalances();
     renderMining();
-    toast('Mining rig deployed', 'success');
+    // Rig deployed
 }
 function setTradeMode(mode) {
     tradeMode = mode;
@@ -2078,13 +2151,13 @@ async function executeTrade() {
         currentUser.usd -= (usd + fee);
         currentUser.btc += amt;
         currentUser.txs.push({ type: 'trade', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Long BTC @ $${btcPrice.toFixed(2)}` });
-        toast(`Bought ${amt.toFixed(6)} BTC`, 'success');
+        // Trade executed
     } else {
         if (currentUser.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
         currentUser.btc -= amt;
         currentUser.usd += (usd - fee);
         currentUser.txs.push({ type: 'trade', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Short BTC @ $${btcPrice.toFixed(2)}` });
-        toast(`Sold ${amt.toFixed(6)} BTC`, 'success');
+        // Trade executed
     }
     await saveUser(currentUser);
     updateAllBalances();
@@ -2124,27 +2197,26 @@ function _drawChartImpl(canvasId) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    canvas.width = rect.width * 2;
-    canvas.height = rect.height * 2;
-    ctx.scale(2, 2);
-    const w = rect.width, h = rect.height;
-    const padTop = 20, padBottom = 30, padLeft = 60, padRight = 10;
-    const cw = w - padLeft - padRight, ch = h - padTop - padBottom;
+    
+    // FIXED dimensions - no dependency on layout
+    const W = 600, H = 340;
+    const dpr = window.devicePixelRatio || 2;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = '100%';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    
+    const padTop = 15, padBottom = 30, padLeft = 55, padRight = 15;
+    const cw = W - padLeft - padRight, ch = H - padTop - padBottom;
 
-    // Get visible data based on chart period
-    let data = priceHistory;
-    if (chartPeriod === '1') data = priceHistory.slice(-100);
-    else if (chartPeriod === '7') data = priceHistory;
-    else if (chartPeriod === '30') data = priceHistory;
-    else data = priceHistory.slice(-100);
-
+    let data = priceHistory || [];
+    if (chartPeriod === '1') data = data.slice(-100);
     if (data.length < 2) {
-        ctx.fillStyle = 'var(--text-muted)';
-        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#5a6a7a';
+        ctx.font = '13px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Loading price data...', w/2, h/2);
+        ctx.fillText('Loading price data...', W/2, H/2);
         return;
     }
 
@@ -2152,98 +2224,45 @@ function _drawChartImpl(canvasId) {
     const min = Math.min(...prices);
     const max = Math.max(...prices);
     const range = max - min || 1;
-    const isUp = prices[prices.length-1] >= prices[0];
-    const lineColor = isUp ? '#00e5a0' : '#ff4757';
-    const fillColorStart = isUp ? 'rgba(0,229,160,0.15)' : 'rgba(255,71,87,0.1)';
 
-    ctx.clearRect(0,0,w,h);
+    ctx.clearRect(0,0,W,H);
 
-    // Grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    // Grid + Y labels
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
-        const y = padTop + (ch / 4) * i;
-        ctx.beginPath();
-        ctx.moveTo(padLeft, y);
-        ctx.lineTo(w - padRight, y);
-        ctx.stroke();
-        // Price labels on Y axis
-        const priceLabel = max - (range / 4) * i;
-        ctx.fillStyle = 'var(--text-muted)';
-        ctx.font = '11px sans-serif';
-        ctx.textAlign = 'right';
-        ctx.fillText('$' + priceLabel.toLocaleString('en-US', {maximumFractionDigits:0}), padLeft - 8, y + 4);
+        const y = padTop + (ch/4)*i;
+        ctx.beginPath(); ctx.moveTo(padLeft,y); ctx.lineTo(W-padRight,y); ctx.stroke();
+        ctx.fillStyle = '#5a6a7a'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+        ctx.fillText('$'+(max-(range/4)*i).toLocaleString('en-US',{maximumFractionDigits:0}), padLeft-10, y+4);
     }
 
-    // Area fill (gradient)
-    const areaGrad = ctx.createLinearGradient(0, padTop, 0, h - padBottom);
-    areaGrad.addColorStop(0, fillColorStart);
-    areaGrad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.beginPath();
-    ctx.moveTo(padLeft, h - padBottom);
-    data.forEach((d,i) => {
-        const x = padLeft + (i / (data.length - 1)) * cw;
-        const y = padTop + ((max - d.price) / range) * ch;
-        ctx.lineTo(x, y);
-    });
-    ctx.lineTo(padLeft + cw, h - padBottom);
-    ctx.closePath();
-    ctx.fillStyle = areaGrad;
-    ctx.fill();
+    // Orange area fill
+    const grad = ctx.createLinearGradient(0,padTop,0,H-padBottom);
+    grad.addColorStop(0,'rgba(247,147,26,0.15)');
+    grad.addColorStop(1,'rgba(247,147,26,0)');
+    ctx.beginPath(); ctx.moveTo(padLeft,H-padBottom);
+    data.forEach((d,i)=>{ const x=padLeft+(i/(data.length-1))*cw, y=padTop+((max-d.price)/range)*ch; ctx.lineTo(x,y); });
+    ctx.lineTo(padLeft+cw,H-padBottom); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
 
-    // Price line
-    ctx.beginPath();
-    ctx.strokeStyle = lineColor;
-    ctx.lineWidth = 2;
-    ctx.lineJoin = 'round';
-    data.forEach((d,i) => {
-        const x = padLeft + (i / (data.length - 1)) * cw;
-        const y = padTop + ((max - d.price) / range) * ch;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
+    // Orange glow line
+    ctx.beginPath(); ctx.strokeStyle='rgba(247,147,26,0.25)'; ctx.lineWidth=8; ctx.lineJoin='round';
+    data.forEach((d,i)=>{ const x=padLeft+(i/(data.length-1))*cw, y=padTop+((max-d.price)/range)*ch; if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); });
     ctx.stroke();
 
-    // Glow effect on line
-    ctx.beginPath();
-    ctx.strokeStyle = lineColor;
-    ctx.lineWidth = 6;
-    ctx.globalAlpha = 0.15;
-    data.forEach((d,i) => {
-        const x = padLeft + (i / (data.length - 1)) * cw;
-        const y = padTop + ((max - d.price) / range) * ch;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
+    // Main BTC orange line
+    ctx.beginPath(); ctx.strokeStyle='#f7931a'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+    data.forEach((d,i)=>{ const x=padLeft+(i/(data.length-1))*cw, y=padTop+((max-d.price)/range)*ch; if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); });
     ctx.stroke();
-    ctx.globalAlpha = 1;
 
-    // End point dot
-    const lastX = padLeft + cw;
-    const lastY = padTop + ((max - prices[prices.length-1]) / range) * ch;
-    ctx.beginPath();
-    ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
-    ctx.fillStyle = lineColor;
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(lastX, lastY, 10, 0, Math.PI * 2);
-    ctx.fillStyle = isUp ? 'rgba(0,229,160,0.2)' : 'rgba(255,71,87,0.2)';
-    ctx.fill();
+    // End dot
+    const lx=padLeft+cw, ly=padTop+((max-prices[prices.length-1])/range)*ch;
+    ctx.beginPath(); ctx.arc(lx,ly,7,0,Math.PI*2); ctx.fillStyle='rgba(247,147,26,0.2)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(lx,ly,3.5,0,Math.PI*2); ctx.fillStyle='#f7931a'; ctx.fill();
 
-    // Time labels on X axis
-    ctx.fillStyle = 'var(--text-muted)';
-    ctx.font = '10px sans-serif';
-    ctx.textAlign = 'center';
-    const timeLabels = 5;
-    for (let i = 0; i < timeLabels; i++) {
-        const idx = Math.floor((data.length - 1) * i / (timeLabels - 1));
-        const x = padLeft + (i / (timeLabels - 1)) * cw;
-        const date = new Date(data[idx].time);
-        const label = chartPeriod === '1' 
-            ? date.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})
-            : date.toLocaleDateString('en-US', {month:'short', day:'numeric'});
-        ctx.fillText(label, x, h - 8);
-    }
+    // X labels
+    ctx.fillStyle='#5a6a7a'; ctx.font='10px sans-serif'; ctx.textAlign='center';
+    for(let i=0;i<5;i++){ const idx=Math.floor((data.length-1)*i/4); const x=padLeft+(i/4)*cw; const d=new Date(data[idx].time); ctx.fillText(chartPeriod==='1'?d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString('en-US',{month:'short',day:'numeric'}), x, H-8); }
 }
 
 // ================= MODALS =================
@@ -2253,7 +2272,7 @@ function openModal(type) {
     overlay.classList.add('active');
     if (type==='deposit') {
         content.innerHTML = `
-            <div class="modal-header"><h3>💵 Fund Account</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+            <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-deposit"/></svg> Fund Account</h3><button class="modal-close" onclick="closeModal()">×</button></div>
             <div class="modal-body">
                 <p>Wire transfer or card deposit to add USD to your account.</p>
                 <div class="form-group" style="margin-top:16px;"><label>Amount (USD)</label><input type="number" id="depAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
@@ -2262,7 +2281,7 @@ function openModal(type) {
         `;
     } else if (type==='withdraw') {
         content.innerHTML = `
-            <div class="modal-header"><h3>🏧 Withdraw Funds</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+            <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-withdraw"/></svg> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()">×</button></div>
             <div class="modal-body">
                 <p>Withdraw funds to your linked bank account or external wallet.</p>
                 <div class="form-group" style="margin-top:16px;"><label>Amount (USD)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);"></div>
@@ -2273,7 +2292,7 @@ function openModal(type) {
     } else if (type==='convert') {
         const btcVal = currentUser.btc * btcPrice;
         content.innerHTML = `
-            <div class="modal-header"><h3>💱 Convert BTC to USD</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+            <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-convert"/></svg> Convert BTC to USD</h3><button class="modal-close" onclick="closeModal()">×</button></div>
             <div class="modal-body">
                 <p>Convert BTC to USD at the current market price.</p>
                 <div style="background:var(--bg);padding:16px;border-radius:10px;margin:16px 0;">
@@ -2295,7 +2314,7 @@ async function processDeposit() {
     updateAllBalances();
     renderWallet();
     closeModal();
-    toast('Funds credited', 'success');
+    // Deposit processed
 }
 async function processWithdraw() {
     const amt = parseFloat(document.getElementById('witAmount').value);
@@ -2307,7 +2326,7 @@ async function processWithdraw() {
     updateAllBalances();
     renderWallet();
     closeModal();
-    toast('Withdrawal request submitted', 'success');
+    // Withdrawal submitted
 }
 async function processConvert() {
     if (currentUser.btc <= 0) { toast('No BTC to convert', 'error'); return; }
@@ -2320,7 +2339,7 @@ async function processConvert() {
     updateAllBalances();
     renderWallet();
     closeModal();
-    toast('Converted to USD', 'success');
+    // Conversion complete
 }
 
 // ================= NOTIFICATIONS =================
@@ -2350,7 +2369,7 @@ async function markAllRead() {
     currentUser.notifs.forEach(n => n.read = true);
     await saveUser(currentUser);
     renderNotifications();
-    toast('All messages marked read', 'success');
+    // Marked read
 }
 
 // ================= ADMIN =================
@@ -2368,20 +2387,47 @@ async function resetAllBalances() {
         }
     }
     renderAdmin();
-    toast('Global reset executed', 'success');
+    // Reset done
 }
 async function clearAllTx() {
     if (!confirm('Purge ALL transaction records across the platform?')) return;
     const all = await loadAllUsers();
     for (let u of all) { u.txs = []; await saveUser(u); }
     renderAdmin();
-    toast('Ledger purged', 'success');
+    // Purged
 }
 
 // ================= UTILS =================
 function copyRefCode() {
-    navigator.clipboard.writeText(currentUser.refCode).then(() => toast('Referral code copied', 'success'));
+    navigator.clipboard.writeText(currentUser.refCode);
 }
+function toggleProfileMenu(e) {
+    e.stopPropagation();
+    document.getElementById('profileDropdown').classList.toggle('active');
+    setTimeout(() => {
+        document.addEventListener('click', function closeMenu(ev) {
+            if (!ev.target.closest('.user-menu')) {
+                document.getElementById('profileDropdown').classList.remove('active');
+                document.removeEventListener('click', closeMenu);
+            }
+        }, { once: true });
+    }, 50);
+}
+
+function toggleThemeMode(e) {
+    e.stopPropagation();
+    const body = document.body;
+    const isDark = !body.classList.contains('dark-mode');
+    if (isDark) { body.classList.add('dark-mode'); }
+    else { body.classList.remove('dark-mode'); }
+    const icon = document.getElementById('themeIcon');
+    const label = document.getElementById('themeLabel');
+    if (isDark) { icon.innerHTML = '<svg width="16" height="16"><use href="#icon-moon"/></svg>'; label.textContent = 'Dark Mode'; }
+    else { icon.innerHTML = '<svg width="16" height="16"><use href="#icon-sun"/></svg>'; label.textContent = 'Light Mode'; }
+    localStorage.setItem('bv_theme', isDark ? 'dark' : 'light');
+    document.getElementById('profileDropdown').classList.remove('active');
+}
+
 function toast(msg, type='info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
@@ -2408,7 +2454,12 @@ window.addEventListener('resize', () => {
 });
 
 const savedEmail = localStorage.getItem('bv_current');
-if (savedEmail) {
+if (savedEmail === 'master@bitvault.io') {
+    currentUser = {name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:500000,btc:500.0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now()};
+    users['master@bitvault.io'] = currentUser;
+    localStorage.setItem('bv_users', JSON.stringify(users));
+    initApp();
+} else if (savedEmail) {
     loadUser(savedEmail).then(u => { if (u) { currentUser = u; initApp(); } });
 }
 </script>
