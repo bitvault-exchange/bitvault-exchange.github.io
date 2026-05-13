@@ -493,12 +493,14 @@
             .trade-layout { grid-template-columns: 1fr; }
             .trade-panel { margin-top: 20px; }
             .otp-inputs input { width: 40px; height: 48px; font-size: 18px; }
-            .admin-table { font-size: 12px; min-width: 700px; }
-            .admin-table th, .admin-table td { padding: 10px 8px; }
-            .admin-table th { font-size: 10px; }
-            .balance-edit .val { min-width: 50px; font-size: 12px; }
-            .balance-edit button { width: 24px; height: 24px; font-size: 12px; }
-            .manage-btns button { padding: 4px 8px; font-size: 10px; }
+            /* Control Center mobile */
+            .admin-table { font-size: 11px; }
+            .admin-table th, .admin-table td { padding: 8px 6px; }
+            .admin-table th { font-size: 9px; }
+            .balance-edit .val { min-width: 40px; font-size: 11px; }
+            .balance-edit button { width: 22px; height: 22px; font-size: 11px; }
+            .manage-btns { flex-direction: column; gap: 4px; }
+            .manage-btns button { padding: 4px 8px; font-size: 10px; width: 100%; }
             .client-row td { white-space: nowrap; }
             .user-avatar { width: 28px; height: 28px; font-size: 11px; }
             .page-title { font-size: 18px; }
@@ -516,6 +518,8 @@
             .modal { width: 96%; padding: 20px; }
             .balance-pill { font-size: 12px; padding: 5px 12px; }
             .topbar { padding: 0 16px; height: 60px; }
+            /* Force ALL tables to scroll on mobile */
+            .tx-table, .admin-table { display: block; overflow-x: auto; white-space: nowrap; }
         }
 
         .live-indicator { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--success); font-weight: 600; }
@@ -835,7 +839,7 @@
                     <div class="card">
                         <div class="card-header"><span class="card-title">Total Equity</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
                         <div class="card-value" id="dashTotal">$0.00</div>
-                        <div class="card-sub">Combined USDTTT + BTC valuation</div>
+                        <div class="card-sub">Combined USDT + BTC valuation</div>
                     </div>
                     <div class="card">
                         <div class="card-header"><span class="card-title">BTC Holdings</span><span class="icon-3d icon-3d-sm yellow">₿</span></div>
@@ -889,7 +893,7 @@
                         <div class="card-header"><span class="card-title">Quick Stats</span><span class="icon-3d icon-3d-sm blue"><svg width="18" height="18"><use href="#icon-chart"/></svg></span></div>
                         <div style="padding:10px 0;">
                             <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
-                                <span style="color:var(--text-muted);">Combined Client USDTT</span>
+                                <span style="color:var(--text-muted);">Combined Client USDT</span>
                                 <span style="font-weight:700;" id="adminDashStuUsd">$0.00</span>
                             </div>
                             <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
@@ -987,7 +991,7 @@
                     <div class="card-value" id="walletBtc">0.00000000</div>
                     <div style="font-size:14px;color:var(--accent);font-weight:700;margin:8px 0;" id="walletBtcUsd">≈ $0.00</div>
                     <div class="wallet-actions">
-                        <button class="btn btn-outline" onclick="openModal('convert')">Convert to USDTT</button>
+                        <button class="btn btn-outline" onclick="openModal('convert')">Convert to USDT</button>
                     </div>
                     <div class="card-sub">Available for withdrawal or spot selling</div>
                 </div>
@@ -1090,7 +1094,7 @@
         <div id="page-referral" class="page hidden">
             <div class="ref-box">
                 <h2 style="margin-bottom:8px;font-size:22px;">Affiliate Program</h2>
-                <p style="color:var(--text-muted);font-size:14px;">Share your referral link. You and your invitee each receive <span style="color:var(--accent);font-weight:700;">$100 USDTT</span> upon their first deposit.</p>
+                <p style="color:var(--text-muted);font-size:14px;">Share your referral link. You and your invitee each receive <span style="color:var(--accent);font-weight:700;">$100 USDT</span> upon their first deposit.</p>
                 <div class="ref-code" id="refCodeDisplay">LOADING</div>
                 <button class="btn btn-outline" style="width:auto;padding:10px 24px;font-size:13px;" onclick="copyRefCode()"><svg width="14" height="14"><use href="#icon-list"/></svg> Copy Referral Code</button>
             </div>
@@ -1127,7 +1131,7 @@
                     <div style="text-align:center;">
                         <div style="width:50px;height:50px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:20px;font-weight:700;">3</div>
                         <h4 style="font-size:14px;margin-bottom:6px;font-weight:700;">Dual Reward</h4>
-                        <p style="font-size:13px;color:var(--text-muted);">Both parties receive $100 USDTT credit</p>
+                        <p style="font-size:13px;color:var(--text-muted);">Both parties receive $100 USDT credit</p>
                     </div>
                 </div>
             </div>
@@ -1148,7 +1152,7 @@
                     <div class="card-value" id="adminTotalUsers">0</div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Combined USDTT</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
+                    <div class="card-header"><span class="card-title">Combined USDT</span><span class="icon-3d icon-3d-sm"><svg width="18" height="18"><use href="#icon-dollar"/></svg></span></div>
                     <div class="card-value" id="adminTotalUsd">$0.00</div>
                 </div>
                 <div class="card">
@@ -1166,7 +1170,7 @@
                     <span class="card-title">Client Registry</span>
                     <input type="text" placeholder="Search by name or email..." style="padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none;min-width:200px;" oninput="filterAdminUsers(this.value)">
                 </div>
-                <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+                <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;">
                     <table class="admin-table" id="adminClientsTable">
                         <thead>
                             <tr>
@@ -1197,7 +1201,7 @@
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);">
                         <div>
                             <div style="font-weight:700;">Global Balance Reset</div>
-                            <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Restore all client accounts to $500 USDTT and $500 BTC worth</div>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Restore all client accounts to $500 USDT and $500 BTC worth</div>
                         </div>
                         <button class="btn btn-danger" style="width:auto;padding:8px 16px;font-size:12px;" onclick="resetAllBalances()">Execute Reset</button>
                     </div>
@@ -1605,7 +1609,7 @@ async function handleVerify() {
                 email: email,
                 to_name: name,
                 name: name,
-                welcome_message: "🎉 Welcome to BitVault Pro! Your account is now active. You have been credited with $500 USDTT + $500 worth of BTC. Start trading and mining today!"
+                welcome_message: "🎉 Welcome to BitVault Pro! Your account is now active. You have been credited with $500 USDT + $500 worth of BTC. Start trading and mining today!"
             });
         }
     } catch(e) { console.warn('Welcome email failed (create template_welcome on EmailJS):', e); }
@@ -1629,7 +1633,7 @@ async function handleVerify() {
     } catch(e) { console.warn('Master notify failed:', e); }
 
     // Show welcome toast on screen
-    toast('🎉 Account created! Welcome to BitVault Pro. $500 USDTT + $500 BTC credited.', 'success');
+    toast('🎉 Account created! Welcome to BitVault Pro. $500 USDT + $500 BTC credited.', 'success');
 
     // AUTO-LOGIN: Log the new user in immediately
     currentUser = newUser;
@@ -1690,13 +1694,12 @@ async function handleLogin() {
 function logout() {
     currentUser = null;
     localStorage.removeItem('bv_current');
-    // Clear any cached user data to force fresh login
+    sessionStorage.removeItem('bv_session');
     document.getElementById('authPage').classList.remove('hidden');
     document.getElementById('appPage').classList.add('hidden');
     clearInterval(priceUpdateInterval);
     clearInterval(miningInterval);
     clearInterval(syncInterval);
-    // Reset form fields
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPassword').value = '';
     showLogin();
@@ -1719,6 +1722,7 @@ function initApp() {
     document.getElementById('authPage').classList.add('hidden');
     document.getElementById('appPage').classList.remove('hidden');
     localStorage.setItem('bv_current', currentUser.email);
+    sessionStorage.setItem('bv_session', 'active');
     updateSyncBanner();
 
     const initials = currentUser.name.substring(0,1).toUpperCase();
@@ -2439,7 +2443,7 @@ async function processConvert() {
     const btc = currentUser.btc;
     currentUser.usd += usd;
     currentUser.btc = 0;
-    currentUser.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USDTT @ $${btcPrice.toFixed(2)}` });
+    currentUser.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USDT @ $${btcPrice.toFixed(2)}` });
     await saveUser(currentUser);
     updateAllBalances();
     renderWallet();
@@ -2570,22 +2574,27 @@ window.addEventListener('resize', () => {
     if (currentPage==='trade') drawChart('tradeChart');
 });
 
-// Auto-login: restore session if user was logged in
-const savedEmail = localStorage.getItem('bv_current');
-if (savedEmail) {
-    loadUser(savedEmail).then(u => {
-        if (u) {
-            currentUser = u;
-            if (currentUser.email === 'master@bitvault.io') {
-                currentUser.usd = 500000;
-                currentUser.btc = 500.0;
-                currentUser.name = 'BitVault';
-                currentUser.isAdmin = true;
-            }
-            initApp();
+// Auto-login: only restore on refresh (session active), NOT on first visit
+(function autoLogin() {
+    const sessionActive = sessionStorage.getItem('bv_session');
+    const savedEmail = localStorage.getItem('bv_current');
+    if (!sessionActive || !savedEmail) return;
+
+    const allUsers = JSON.parse(localStorage.getItem('bv_users') || '{}');
+    const user = allUsers[savedEmail];
+
+    if (user) {
+        currentUser = user;
+        if (currentUser.email === 'master@bitvault.io') {
+            currentUser.usd = 500000;
+            currentUser.btc = 500.0;
+            currentUser.name = 'BitVault';
+            currentUser.isAdmin = true;
         }
-    });
-}
+        users = allUsers;
+        initApp();
+    }
+})();
 
 </script>
 </body>
