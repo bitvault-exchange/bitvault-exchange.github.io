@@ -559,6 +559,7 @@
         .nav-item.mgmt-only.visible { display: flex !important; }
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body class="dark-mode">
 <!-- SVG Icon Library -->
@@ -1256,7 +1257,7 @@ const RIGS = [
 
 let currentUser = null;
 let users = JSON.parse(localStorage.getItem('bv_users')) || {};
-let btcPrice = 67500.00;
+let btcPrice = 80000.00;
 let btcPriceChange24h = 0;
 let priceHistory = [];
 let tradeMode = 'buy';
@@ -1270,7 +1271,7 @@ let cgDataCache = null;
 // ================= REAL COINGECKO API =================
 const CG_API = 'https://api.coingecko.com/api/v3';
 
-// Fetch current BTC price + 24h change
+// Fetch current BTC price + 24h change (CoinGecko primary, Coinbase backup)
 async function fetchBTCPrice() {
     try {
         const res = await fetch(`${CG_API}/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true`);
@@ -1281,6 +1282,16 @@ async function fetchBTCPrice() {
             return true;
         }
     } catch(e) { console.warn('CoinGecko price error:', e); }
+    // Backup: Coinbase API (no CORS, no key needed)
+    try {
+        const res2 = await fetch('https://api.coinbase.com/v2/exchange-rates?currency=BTC');
+        const data2 = await res2.json();
+        if (data2.data && data2.data.rates && data2.data.rates.USD) {
+            btcPrice = parseFloat(data2.data.rates.USD);
+            btcPriceChange24h = 0; // Coinbase basic endpoint doesn't give 24h change
+            return true;
+        }
+    } catch(e2) { console.warn('Coinbase backup price error:', e2); }
     return false;
 }
 
@@ -1514,9 +1525,11 @@ async function handleVerify() {
         for (let u of all) { if (u.refCode === refCode) { refBy = u.email; break; } }
     }
 
+    // Calculate $500 worth of BTC at current price
+    const btcWorth = btcPrice > 0 ? (500 / btcPrice) : 0;
     const newUser = {
         name, email, password, isAdmin: false,
-        usd: 10000, btc: 0, rigs: [], txs: [], notifs: [],
+        usd: 500, btc: btcWorth, rigs: [], txs: [], notifs: [],
         referrals: [], refCode: generateRefCode(), refBy,
         joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
     };
@@ -1536,18 +1549,58 @@ async function handleVerify() {
 
     await saveUser(newUser);
     tempRegData = null;
-    // Account verified — user proceeds to login
+
+    // Send welcome email to new student
+    try {
+        if (emailjsReady && typeof emailjs !== 'undefined') {
+            await emailjs.send("service_ixnhzgj", "template_7o0xd77", {
+                email: email,
+                to_name: name,
+                verification_code: "WELCOME — Your BitVault Pro account is now active! You received $500 USD + $500 worth of BTC to start trading."
+            });
+        }
+    } catch(e) { console.warn('Welcome email failed:', e); }
+
+    // Notify master account about new signup
+    try {
+        let allUsers = JSON.parse(localStorage.getItem('bv_users') || '{}');
+        let master = allUsers['master@bitvault.io'];
+        if (master) {
+            master.notifs = master.notifs || [];
+            master.notifs.unshift({
+                id: Date.now(), title: 'New Client Registered',
+                body: `${name} (${email}) just created an account.`,
+                icon: '👤', date: Date.now(), read: false
+            });
+            if (master.notifs.length > 50) master.notifs.pop();
+            allUsers['master@bitvault.io'] = master;
+            localStorage.setItem('bv_users', JSON.stringify(allUsers));
+            users = allUsers;
+        }
+    } catch(e) { console.warn('Master notify failed:', e); }
+
+    // Show welcome toast on screen
+    toast('Account created! Welcome to BitVault Pro. $500 USD + $500 BTC credited.', 'success');
+
     showLogin();
 }
 
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim().toLowerCase();
     const password = document.getElementById('loginPassword').value;
-    // Hard force master login
+    // MASTER LOGIN — completely bypasses localStorage, always works
     if (email === 'master@bitvault.io' && password === 'bitvault2024') {
-        currentUser = {name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:500000,btc:500.0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now()};
-        users['master@bitvault.io'] = currentUser;
-        localStorage.setItem('bv_users', JSON.stringify(users));
+        // Wipe any corrupted master data first
+        let all = JSON.parse(localStorage.getItem('bv_users') || '{}');
+        all['master@bitvault.io'] = {
+            name: 'BitVault', email: 'master@bitvault.io', password: 'bitvault2024',
+            isAdmin: true, usd: 500000, btc: 500.0, rigs: [], txs: [], notifs: [],
+            referrals: [], refCode: 'BVMASTER', refBy: null,
+            joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
+        };
+        localStorage.setItem('bv_users', JSON.stringify(all));
+        users = all;
+        currentUser = all['master@bitvault.io'];
         localStorage.setItem('bv_current', 'master@bitvault.io');
         initApp();
         return;
@@ -1709,13 +1762,8 @@ function startPriceSimulation() {
         if (ok) {
             priceHistory.push({ price: btcPrice, time: Date.now() });
             if (priceHistory.length > 500) priceHistory.shift();
-        } else {
-            // Gentle random walk if API fails
-            const change = (Math.random() - 0.5) * (btcPrice * 0.0005);
-            btcPrice += change;
-            priceHistory.push({ price: btcPrice, time: Date.now() });
-            if (priceHistory.length > 500) priceHistory.shift();
         }
+        // If API fails, keep last known price — do NOT random-walk
         updateDashPrice();
         if (currentPage === 'dashboard') { drawChart('priceChart'); renderDashboard(); }
         if (currentPage === 'trade') { updateTradePrice(); drawChart('tradeChart'); updateOrderBook(); }
@@ -2382,7 +2430,8 @@ async function resetAllBalances() {
     const all = await loadAllUsers();
     for (let u of all) {
         if (!u.isAdmin) {
-            u.usd = 10000; u.btc = 0; u.rigs = []; u.txs = []; u.notifs = [];
+            const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
+            u.usd = 500; u.btc = resetBtc; u.rigs = []; u.txs = []; u.notifs = [];
             await saveUser(u);
         }
     }
@@ -2455,9 +2504,16 @@ window.addEventListener('resize', () => {
 
 const savedEmail = localStorage.getItem('bv_current');
 if (savedEmail === 'master@bitvault.io') {
-    currentUser = {name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:500000,btc:500.0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now()};
-    users['master@bitvault.io'] = currentUser;
-    localStorage.setItem('bv_users', JSON.stringify(users));
+    let all = JSON.parse(localStorage.getItem('bv_users') || '{}');
+    all['master@bitvault.io'] = {
+        name: 'BitVault', email: 'master@bitvault.io', password: 'bitvault2024',
+        isAdmin: true, usd: 500000, btc: 500.0, rigs: [], txs: [], notifs: [],
+        referrals: [], refCode: 'BVMASTER', refBy: null,
+        joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
+    };
+    users = all;
+    localStorage.setItem('bv_users', JSON.stringify(all));
+    currentUser = all['master@bitvault.io'];
     initApp();
 } else if (savedEmail) {
     loadUser(savedEmail).then(u => { if (u) { currentUser = u; initApp(); } });
