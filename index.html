@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
     <title>BitVault Pro — Digital Asset Exchange</title>
     <style>
         :root {
@@ -745,6 +745,56 @@
 
             .tx-table { font-size: 12px; }
             .tx-table th, .tx-table td { padding: 8px 6px; }
+        }
+
+        /* ===== AGGRESSIVE MOBILE FIT ===== */
+        @media (max-width: 480px) {
+            .auth-box { padding: 20px 14px; border-radius: 16px; }
+            .auth-logo h1 { font-size: 24px; }
+            .page { padding: 10px; }
+            .card { padding: 14px; border-radius: 12px; }
+            .card-value { font-size: 20px; }
+            .wallet-actions .btn { padding: 10px; font-size: 13px; }
+            .modal { width: 96%; padding: 16px; border-radius: 14px; max-height: 85vh; }
+            .modal-header h3 { font-size: 16px; }
+            .form-group input, .form-group select { padding: 10px 12px; font-size: 16px; }
+            .btn { padding: 10px; font-size: 14px; }
+            .topbar { height: 52px; padding: 0 12px; }
+            .topbar-name { font-size: 12px; }
+            .sidebar { width: 240px; }
+            .user-avatar { width: 28px; height: 28px; font-size: 11px; }
+            .sync-banner { font-size: 11px; padding: 8px; }
+            .otp-inputs input { width: 36px; height: 44px; font-size: 16px; }
+            .chart-container { height: 180px; min-height: 180px; }
+            .trade-chart { padding: 12px; }
+            .trade-panel { padding: 14px; }
+            .rig-card { padding: 14px; }
+            .rig-price { font-size: 18px; }
+            .ref-code { font-size: 14px; padding: 8px 12px; }
+            .admin-table td { font-size: 12px; padding: 4px 0; }
+            .manage-btns button { padding: 4px 8px; font-size: 10px; }
+            .balance-edit button { width: 24px; height: 24px; font-size: 12px; }
+            .notif-item { padding: 12px; }
+            .notif-icon { width: 36px; height: 36px; font-size: 16px; }
+            .toast { min-width: 260px; padding: 12px 14px; font-size: 13px; }
+            .profile-dropdown { width: 220px; right: -6px; }
+        }
+
+        /* Prevent all zoom behaviors */
+        html, body {
+            touch-action: manipulation;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            overflow-x: hidden;
+        }
+        input, select, textarea, button {
+            touch-action: manipulation;
+            font-size: 16px !important;
+        }
+        /* iPhone safe area */
+        .app-layout {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
     </style>
@@ -1578,15 +1628,51 @@ ensureMasterAccount();
 function safeKey(email) { return email.replace(/\./g, ','); }
 function unsafeKey(key) { return key.replace(/,/g, '.'); }
 
-function getAllUsers() {
-    return JSON.parse(localStorage.getItem('bv_users') || '{}');
+// ========== FIREBASE-FIRST DATA LAYER ==========
+// All reads go to Firebase first, localStorage is cache-only
+async function getAllUsers() {
+    if (firebaseOnline && db) {
+        try {
+            const snap = await db.ref('users').once('value');
+            const data = snap.val() || {};
+            // Convert Firebase keys back to email keys
+            const decoded = {};
+            Object.keys(data).forEach(k => {
+                decoded[unsafeKey(k)] = data[k];
+            });
+            // Update local cache
+            localStorage.setItem('bv_users', JSON.stringify(decoded));
+            users = decoded;
+            return decoded;
+        } catch(e) {
+            console.warn('Firebase read failed, using cache:', e);
+        }
+    }
+    // Fallback to localStorage
+    const cached = JSON.parse(localStorage.getItem('bv_users') || '{}');
+    users = cached;
+    return cached;
 }
-function setAllUsers(all) {
+
+async function setAllUsers(all) {
     localStorage.setItem('bv_users', JSON.stringify(all));
     users = all;
+    if (firebaseOnline && db) {
+        try {
+            // Encode keys for Firebase (replace . with ,)
+            const encoded = {};
+            Object.keys(all).forEach(k => {
+                encoded[safeKey(k)] = all[k];
+            });
+            await db.ref('users').set(encoded);
+        } catch(e) {
+            console.warn('Firebase write failed:', e);
+        }
+    }
 }
+
 async function loadUser(email) {
-    const all = getAllUsers();
+    const all = await getAllUsers();
     let u = all[email] || null;
     // Ensure master flags without overwriting balances
     if (email === 'master@bitvault.io' && u) {
@@ -1598,34 +1684,16 @@ async function loadUser(email) {
     }
     return u;
 }
+
 async function saveUser(user) {
-    const all = getAllUsers();
+    const all = await getAllUsers();
     all[user.email] = user;
-    setAllUsers(all);
-    if (firebaseOnline && db) {
-        try {
-            await db.ref('users/' + safeKey(user.email)).set(user);
-        } catch(e) {
-            console.warn('Firebase save failed:', e);
-        }
-    }
+    await setAllUsers(all);
 }
+
 async function loadAllUsers() {
-    if (firebaseOnline && db) {
-        try {
-            const snap = await db.ref('users').once('value');
-            const data = snap.val() || {};
-            const all = getAllUsers();
-            Object.keys(data).forEach(k => {
-                const email = unsafeKey(k);
-                if (!all[email]) all[email] = data[k];
-            });
-            setAllUsers(all);
-        } catch(e) {
-            console.warn('Firebase load failed:', e);
-        }
-    }
-    return Object.values(getAllUsers());
+    const all = await getAllUsers();
+    return Object.values(all);
 }
 
 function updateSyncBanner() {
@@ -1758,7 +1826,7 @@ async function handleVerify() {
     await saveUser(newUser);
     tempRegData = null;
     // Reload users to ensure sync
-    users = getAllUsers();
+    users = await getAllUsers();
 
     // Send welcome email to new student (uses separate welcome template)
     try {
@@ -1774,7 +1842,7 @@ async function handleVerify() {
 
     // Notify master account about new signup
     try {
-        let all = getAllUsers();
+        let all = await getAllUsers();
         let master = all['master@bitvault.io'];
         if (master) {
             master.notifs = master.notifs || [];
@@ -1785,7 +1853,7 @@ async function handleVerify() {
             });
             if (master.notifs.length > 50) master.notifs.pop();
             all['master@bitvault.io'] = master;
-            setAllUsers(all);
+            await setAllUsers(all);
         }
     } catch(e) { console.warn('Master notify failed:', e); }
 
@@ -1826,7 +1894,7 @@ async function handleLogin() {
         initApp();
         return;
     }
-    let all = getAllUsers();
+    let all = await getAllUsers();
     let user = all[email];
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
@@ -1854,8 +1922,7 @@ async function handleLogin() {
     user.lastLogin = new Date().toISOString();
     user.lastMiningUpdate = now;
     all[email] = user;
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
     currentUser = user;
     initApp();
 }
@@ -1956,11 +2023,11 @@ function startCloudSync() {
     if (!firebaseOnline) return;
     syncInterval = setInterval(async () => {
         if (!currentUser) return;
-        let all = getAllUsers();
+        let all = await getAllUsers();
         let u = all[currentUser.email];
         if (u) {
             u.lastMiningUpdate = Date.now();
-            setAllUsers(all);
+            await setAllUsers(all);
             users = all;
             currentUser = u;
             try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2017,7 +2084,7 @@ function updateDashPrice() {
 function startMiningSimulation() {
     miningInterval = setInterval(async () => {
         if (!currentUser) return;
-        let all = getAllUsers();
+        let all = await getAllUsers();
         let u = all[currentUser.email];
         if (!u) return;
         let earned = 0;
@@ -2032,8 +2099,7 @@ function startMiningSimulation() {
         if (earned > 0) {
             u.btc += earned;
             u.lastMiningUpdate = Date.now();
-            setAllUsers(all);
-            users = all;
+            await setAllUsers(all);
             currentUser = u;
             if (firebaseOnline && db) {
                 try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2237,8 +2303,8 @@ function renderNotifications() {
 }
 async function renderAdmin() {
     if (!currentUser.isAdmin) return;
-    // Always reload fresh from storage
-    users = getAllUsers();
+    // Always reload fresh from Firebase first
+    users = await getAllUsers();
     const allUsers = Object.values(users);
     const clients = allUsers.filter(u => !u.isAdmin);
 
@@ -2349,47 +2415,39 @@ async function sendFundsToClient(email) {
     const amt = parseFloat(document.getElementById('sendAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
 
-    // Reload fresh data from storage
-    let all = getAllUsers();
-    let master = all[currentUser.email] || currentUser;
+    // Reload fresh data from Firebase
+    let all = await getAllUsers();
+    let master = all[currentUser.email];
     let client = all[email];
+    if (!master) { toast('Master account error', 'error'); return; }
     if (!client) { toast('Client not found', 'error'); return; }
 
     if (currency === 'usd') {
-        if (master.usd < amt) { toast('Insufficient USDT balance', 'error'); return; }
-        master.usd -= amt;
+        if ((master.usd || 0) < amt) { toast('Insufficient USDT balance', 'error'); return; }
+        master.usd = (master.usd || 0) - amt;
         client.usd = (client.usd || 0) + amt;
+        master.txs = master.txs || [];
+        client.txs = client.txs || [];
         master.txs.push({ type: 'withdraw', amount: -amt, currency: 'USDT', status: 'Completed', date: Date.now(), details: `Transfer to ${client.name}` });
         client.txs.push({ type: 'deposit', amount: amt, currency: 'USDT', status: 'Completed', date: Date.now(), details: `Received from ${master.name}` });
     } else {
-        if (master.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
-        master.btc -= amt;
+        if ((master.btc || 0) < amt) { toast('Insufficient BTC balance', 'error'); return; }
+        master.btc = (master.btc || 0) - amt;
         client.btc = (client.btc || 0) + amt;
+        master.txs = master.txs || [];
+        client.txs = client.txs || [];
         master.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Transfer to ${client.name}` });
         client.txs.push({ type: 'deposit', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Received from ${master.name}` });
     }
 
-    // Save both atomically
+    // Save both atomically to Firebase + localStorage
     all[master.email] = master;
     all[client.email] = client;
-    setAllUsers(all);
-
-    // Sync currentUser reference
+    await setAllUsers(all);
     currentUser = master;
-    users = all;
-
-    // Firebase sync
-    if (firebaseOnline && db) {
-        try {
-            await db.ref('users/' + safeKey(master.email)).set(master);
-            await db.ref('users/' + safeKey(client.email)).set(client);
-        } catch(e) {
-            console.warn('Firebase sync failed:', e);
-        }
-    }
 
     closeModal();
-    renderAdmin();
+    await renderAdmin();
     updateAllBalances();
     toast(`Sent ${currency === 'usd' ? '$' + amt.toLocaleString() : amt.toFixed(8) + ' BTC'} to ${client.name}`, 'success');
 }
@@ -2423,7 +2481,7 @@ async function viewClientTx(email) {
 // ================= ACTIONS =================
 async function buyRig(rigId) {
     const rig = RIGS.find(r => r.id === rigId);
-    let all = getAllUsers();
+    let all = await getAllUsers();
     let u = all[currentUser.email];
     if (u.usd < rig.price) { toast('Insufficient USD balance', 'error'); return; }
     // Enforce purchase limit for non-admin users
@@ -2437,8 +2495,7 @@ async function buyRig(rigId) {
     u.usd -= rig.price;
     u.rigs.push({ id: rigId, purchased: Date.now(), earned: 0 });
     u.txs.push({ type: 'mining', amount: -rig.price, currency: 'USD', status: 'Completed', date: Date.now(), details: `Deployed ${rig.name}` });
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2473,7 +2530,7 @@ function updateTradePreview(source) {
 async function executeTrade() {
     const amt = parseFloat(document.getElementById('tradeAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid quantity', 'error'); return; }
-    let all = getAllUsers();
+    let all = await getAllUsers();
     let u = all[currentUser.email];
     const usd = amt * btcPrice;
     const fee = usd * 0.001;
@@ -2488,8 +2545,7 @@ async function executeTrade() {
         u.usd += (usd - fee);
         u.txs.push({ type: 'trade', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Short BTC @ $${btcPrice.toFixed(2)}` });
     }
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2701,12 +2757,11 @@ function closeModal() { document.getElementById('modalOverlay').classList.remove
 async function processDeposit() {
     const amt = parseFloat(document.getElementById('depAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
-    let all = getAllUsers();
+    let all = await getAllUsers();
     let u = all[currentUser.email];
     u.usd += amt;
     u.txs.push({ type: 'deposit', amount: amt, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Wire transfer deposit' });
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2720,14 +2775,13 @@ async function processStudentWithdraw() {
     const amt = parseFloat(document.getElementById('witBtcAmount').value);
     const addr = document.getElementById('witBtcAddr').value.trim();
     if (!amt || amt <= 0) { toast('Enter valid BTC amount', 'error'); return; }
-    let all = getAllUsers();
+    let all = await getAllUsers();
     let u = all[currentUser.email];
     if (u.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
     if (!addr || addr.length < 10) { toast('Enter a valid BTC wallet address', 'error'); return; }
     u.btc -= amt;
     u.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Pending', date: Date.now(), details: `BTC withdrawal to ${addr.substring(0,12)}...` });
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2741,13 +2795,12 @@ async function processStudentWithdraw() {
 async function processWithdraw() {
     const amt = parseFloat(document.getElementById('witAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
-    let all = getAllUsers();
+    let all = await getAllUsers();
     let u = all[currentUser.email];
     if (u.usd < amt) { toast('Insufficient balance', 'error'); return; }
     u.usd -= amt;
     u.txs.push({ type: 'withdraw', amount: -amt, currency: 'USD', status: 'Pending', date: Date.now(), details: 'Withdrawal to external wallet' });
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2758,7 +2811,7 @@ async function processWithdraw() {
     toast('Withdrawal request submitted', 'success');
 }
 async function processConvert() {
-    let all = getAllUsers();
+    let all = await getAllUsers();
     let u = all[currentUser.email];
     if (u.btc <= 0) { toast('No BTC to convert', 'error'); return; }
     const usd = u.btc * btcPrice;
@@ -2766,8 +2819,7 @@ async function processConvert() {
     u.usd += usd;
     u.btc = 0;
     u.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USDT @ $${btcPrice.toFixed(2)}` });
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2779,14 +2831,13 @@ async function processConvert() {
 }
 
 // ================= NOTIFICATIONS =================
-function addNotif(user, title, body, icon) {
-    let all = getAllUsers();
+async function addNotif(user, title, body, icon) {
+    let all = await getAllUsers();
     let u = all[user.email] || user;
     u.notifs = u.notifs || [];
     u.notifs.unshift({ id: Date.now(), title, body, icon, date: Date.now(), read: false });
     if (u.notifs.length > 50) u.notifs.pop();
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
 }
 async function saveNotifs(user) {
     await saveUser(user);
@@ -2800,12 +2851,11 @@ function updateNotifBadge() {
     else { badge.classList.add('hidden'); navBadge.classList.add('hidden'); }
 }
 async function readNotif(id) {
-    let all = getAllUsers();
+    let all = await getAllUsers();
     let u = all[currentUser.email];
     const n = u.notifs.find(x => x.id === id);
     if (n) n.read = true;
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2813,11 +2863,10 @@ async function readNotif(id) {
     renderNotifications();
 }
 async function markAllRead() {
-    let all = getAllUsers();
+    let all = await getAllUsers();
     let u = all[currentUser.email];
     u.notifs.forEach(n => n.read = true);
-    setAllUsers(all);
-    users = all;
+    await setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2832,39 +2881,23 @@ function filterAdminUsers(q) {
 }
 async function resetAllBalances() {
     if (!confirm('Reset ALL client accounts to $500 USDT and $500 worth of BTC? This is irreversible.')) return;
-    let all = getAllUsers();
+    let all = await getAllUsers();
     Object.values(all).forEach(u => {
         if (!u.isAdmin) {
             const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
             u.usd = 500; u.btc = resetBtc; u.rigs = []; u.txs = []; u.notifs = []; u.referrals = [];
         }
     });
-    setAllUsers(all);
-    users = all;
-    if (firebaseOnline && db) {
-        try {
-            await db.ref('users').set(all);
-        } catch(e) {
-            console.warn('Firebase reset failed:', e);
-        }
-    }
-    renderAdmin();
+    await setAllUsers(all);
+    await renderAdmin();
     toast('All client accounts reset to $500 USDT + $500 BTC worth', 'success');
 }
 async function clearAllTx() {
     if (!confirm('Purge ALL transaction records across the platform?')) return;
-    let all = getAllUsers();
+    let all = await getAllUsers();
     Object.values(all).forEach(u => { u.txs = []; });
-    setAllUsers(all);
-    users = all;
-    if (firebaseOnline && db) {
-        try {
-            await db.ref('users').set(all);
-        } catch(e) {
-            console.warn('Firebase purge failed:', e);
-        }
-    }
-    renderAdmin();
+    await setAllUsers(all);
+    await renderAdmin();
     toast('All transaction records purged', 'success');
 }
 
