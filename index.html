@@ -485,6 +485,15 @@
             .topbar-balances { display: none; }
             .page { padding: 16px; }
             .auth-box { padding: 28px 20px; }
+            /* Wallet mobile fixes */
+            .wallet-actions { flex-direction: column; gap: 10px; }
+            .wallet-actions .btn { width: 100%; }
+            .tx-table { font-size: 12px; }
+            .tx-table th, .tx-table td { padding: 8px 6px; }
+            .card-value { font-size: 22px; }
+            .trade-layout { grid-template-columns: 1fr; }
+            .trade-panel { margin-top: 20px; }
+            .otp-inputs input { width: 40px; height: 48px; font-size: 18px; }
         }
 
         .live-indicator { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--success); font-weight: 600; }
@@ -654,22 +663,8 @@
             </div>
 
             <div style="margin:16px 0;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-align:center;">
-                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Verification code sent to your email. Check your inbox.</p>
-                <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Didn't receive it? Check spam folder or <a href="javascript:void(0)" onclick="resendCode()" style="color:var(--accent);cursor:pointer;font-weight:600;">resend</a>.</p>
-                <div class="sim-message" style="margin-top:12px;">
-                    <div class="sim-message-header">
-                        <div class="sim-message-avatar"><svg width="24" height="24"><use href="#icon-bolt"/></svg></div>
-                        <div>
-                            <div class="sim-message-sender">BitVault Security</div>
-                            <div class="sim-message-email">security@bitvault.io</div>
-                        </div>
-                    </div>
-                    <div class="sim-message-body">
-                        <p style="margin-bottom:8px;">Your verification code is:</p>
-                        <div class="sim-code" id="simCodeDisplay">------</div>
-                        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">This code expires in 10 minutes. Do not share it with anyone.</p>
-                    </div>
-                </div>
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">A 6-digit security code has been sent to your email.</p>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Check your inbox and enter the code below.<br>Didn't receive it? Check spam folder or <a href="javascript:void(0)" onclick="resendCode()" style="color:var(--accent);cursor:pointer;font-weight:600;">resend</a>.</p>
             </div>
 
             <div class="form-group" style="margin-top:16px;">
@@ -1220,28 +1215,35 @@ try {
 } catch(e) { firebaseOnline = false; }
 
 // ================= EMAILJS =================
+// EmailJS Config
+const EMAILJS_PUBLIC_KEY = "Pxsqo6zPtIvXsO5xF";
+const EMAILJS_SERVICE_ID = "service_ixnhzgj";
+const EMAILJS_VERIFY_TEMPLATE = "template_7o0xd77";
+// TODO: Create a separate welcome template on EmailJS and paste the ID below:
+const EMAILJS_WELCOME_TEMPLATE = "template_176ozxn";
+
 let emailjsReady = false;
 try {
     if (typeof emailjs !== 'undefined') {
-        emailjs.init({ publicKey: "Pxsqo6zPtIvXsO5xF" });
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
         emailjsReady = true;
     }
 } catch(e) { emailjsReady = false; }
 
 async function sendVerificationEmail(name, email, code) {
     if (!emailjsReady || typeof emailjs === 'undefined') {
-        console.warn("EmailJS not available - code shown on screen as backup");
+        console.warn("EmailJS not available");
         return false;
     }
     try {
-        await emailjs.send("service_ixnhzgj", "template_7o0xd77", {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_VERIFY_TEMPLATE, {
             email: email,
             to_name: name,
             verification_code: code
         });
         return true;
     } catch(err) {
-        console.error("EmailJS send failed:", err);
+        console.error("EmailJS verification send failed:", err);
         return false;
     }
 }
@@ -1480,7 +1482,6 @@ async function startVerification() {
     tempVerifCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     document.getElementById('verifyEmailDisplay').textContent = email;
-    document.getElementById('simCodeDisplay').textContent = tempVerifCode;
 
     document.getElementById('registerForm').classList.add('hidden');
     document.getElementById('verifyForm').classList.remove('hidden');
@@ -1497,7 +1498,6 @@ async function startVerification() {
 }
 async function resendCode() {
     tempVerifCode = Math.floor(100000 + Math.random() * 900000).toString();
-    document.getElementById('simCodeDisplay').textContent = tempVerifCode;
     clearOtp();
 
     // Resend via EmailJS
@@ -1553,16 +1553,17 @@ async function handleVerify() {
     await saveUser(newUser);
     tempRegData = null;
 
-    // Send welcome email to new student
+    // Send welcome email to new student (uses separate welcome template)
     try {
         if (emailjsReady && typeof emailjs !== 'undefined') {
-            await emailjs.send("service_ixnhzgj", "template_7o0xd77", {
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
                 email: email,
                 to_name: name,
-                verification_code: "WELCOME — Your BitVault Pro account is now active! You received $500 USD + $500 worth of BTC to start trading."
+                name: name,
+                welcome_message: "🎉 Welcome to BitVault Pro! Your account is now active. You have been credited with $500 USD + $500 worth of BTC. Start trading and mining today!"
             });
         }
-    } catch(e) { console.warn('Welcome email failed:', e); }
+    } catch(e) { console.warn('Welcome email failed (create template_welcome on EmailJS):', e); }
 
     // Notify master account about new signup
     try {
@@ -1583,7 +1584,7 @@ async function handleVerify() {
     } catch(e) { console.warn('Master notify failed:', e); }
 
     // Show welcome toast on screen
-    toast('Account created! Welcome to BitVault Pro. $500 USD + $500 BTC credited.', 'success');
+    toast('🎉 Account created! Welcome to BitVault Pro.', 'success');
 
     showLogin();
 }
