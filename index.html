@@ -1631,44 +1631,33 @@ function unsafeKey(key) { return key.replace(/,/g, '.'); }
 
 // ========== FIREBASE-FIRST DATA LAYER ==========
 // All reads go to Firebase first, localStorage is cache-only
-async function getAllUsers() {
-    if (firebaseOnline && db) {
-        try {
-            const snap = await db.ref('users').once('value');
-            const data = snap.val() || {};
-            // Convert Firebase keys back to email keys
-            const decoded = {};
-            Object.keys(data).forEach(k => {
-                decoded[unsafeKey(k)] = data[k];
-            });
-            // Update local cache
-            localStorage.setItem('bv_users', JSON.stringify(decoded));
-            users = decoded;
-            return decoded;
-        } catch(e) {
-            console.warn('Firebase read failed, using cache:', e);
+function getAllUsers() {
+    try {
+        const raw = localStorage.getItem('bv_users');
+        if (!raw || raw === 'null' || raw === 'undefined') {
+            users = {};
+            return {};
         }
+        const cached = JSON.parse(raw);
+        users = cached || {};
+        return users;
+    } catch(e) {
+        console.error('getAllUsers error:', e);
+        users = {};
+        return {};
     }
-    // Fallback to localStorage
-    const cached = JSON.parse(localStorage.getItem('bv_users') || '{}');
-    users = cached;
-    return cached;
 }
 
-async function setAllUsers(all) {
+function setAllUsers(all) {
     localStorage.setItem('bv_users', JSON.stringify(all));
     users = all;
     if (firebaseOnline && db) {
-        try {
-            // Encode keys for Firebase (replace . with ,)
-            const encoded = {};
-            Object.keys(all).forEach(k => {
-                encoded[safeKey(k)] = all[k];
-            });
-            await db.ref('users').set(encoded);
-        } catch(e) {
-            console.warn('Firebase write failed:', e);
-        }
+        // Fire-and-forget Firebase sync in background
+        const encoded = {};
+        Object.keys(all).forEach(k => {
+            encoded[safeKey(k)] = all[k];
+        });
+        db.ref('users').set(encoded).catch(e => console.warn('Firebase write failed:', e));
     }
 }
 
@@ -1873,7 +1862,7 @@ async function handleLogin() {
     const password = document.getElementById('loginPassword').value;
     // MASTER LOGIN — preserve existing balances, never wipe
     if (email === 'master@bitvault.io' && password === 'bitvault2024') {
-        let all = JSON.parse(localStorage.getItem('bv_users') || '{}');
+        let all = getAllUsers();
         if (!all['master@bitvault.io']) {
             all['master@bitvault.io'] = {
                 name: 'BitVault', email: 'master@bitvault.io', password: 'bitvault2024',
@@ -1881,16 +1870,13 @@ async function handleLogin() {
                 referrals: [], refCode: 'BVMASTER', refBy: null,
                 joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
             };
-            localStorage.setItem('bv_users', JSON.stringify(all));
-        } else {
-            all['master@bitvault.io'].name = 'BitVault';
-            all['master@bitvault.io'].email = 'master@bitvault.io';
-            all['master@bitvault.io'].password = 'bitvault2024';
-            all['master@bitvault.io'].isAdmin = true;
-            all['master@bitvault.io'].refCode = all['master@bitvault.io'].refCode || 'BVMASTER';
-            localStorage.setItem('bv_users', JSON.stringify(all));
         }
-        users = all;
+        all['master@bitvault.io'].name = 'BitVault';
+        all['master@bitvault.io'].email = 'master@bitvault.io';
+        all['master@bitvault.io'].password = 'bitvault2024';
+        all['master@bitvault.io'].isAdmin = true;
+        all['master@bitvault.io'].refCode = all['master@bitvault.io'].refCode || 'BVMASTER';
+        setAllUsers(all);
         currentUser = all['master@bitvault.io'];
         localStorage.setItem('bv_current', 'master@bitvault.io');
         initApp();
@@ -2016,7 +2002,7 @@ function navigate(page) {
     if (page === 'trade') renderTrade();
     if (page === 'referral') renderReferral();
     
-    if (page === 'control') renderAdmin();
+    if (page === 'control') { try { renderAdmin(); } catch(e) { console.error('navigate renderAdmin error:', e); } }
 }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 
@@ -2326,12 +2312,12 @@ function renderNotifications() {
         `).join('');
     }
 }
-async function renderAdmin() {
-    if (!currentUser.isAdmin) return;
-    // Always reload fresh from Firebase first
-    users = getAllUsers();
-    const allUsers = Object.values(users);
-    const clients = allUsers.filter(u => !u.isAdmin);
+function renderAdmin() {
+    try {
+        if (!currentUser || !currentUser.isAdmin) return;
+        users = getAllUsers();
+        const allUsers = Object.values(users || {});
+        const clients = allUsers.filter(u => u && !u.isAdmin);
 
     // Update summary stats
     document.getElementById('adminTotalUsers').textContent = clients.length;
@@ -2362,31 +2348,42 @@ async function renderAdmin() {
     table.style.display = 'table';
 
     tbody.innerHTML = clients.map(u => {
-        const userRigs = u.rigs || [];
-        const miningEarnings = userRigs.reduce((sum, r) => sum + ((r.earned||0) * btcPrice), 0);
-        const initials = u.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-        return `
-        <tr class="client-row" data-email="${u.email}">
-            <td data-label="Client"><div style="display:flex;align-items:center;gap:10px;"><div class="user-avatar" style="width:28px;height:28px;font-size:11px;">${initials}</div><span style="font-weight:700;">${u.name}</span></div></td>
-            <td data-label="Email" style="font-size:13px;color:var(--text-muted);">${u.email}</td>
-            <td data-label="USDT Balance">
-                <span class="val" id="usd-${u.email.replace(/\./g,'-')}">$${(u.usd||0).toLocaleString()}</span>
-            </td>
-            <td data-label="BTC Balance">
-                <span class="val" id="btc-${u.email.replace(/\./g,'-')}">${(u.btc||0).toFixed(8)}</span>
-            </td>
-            <td data-label="Mining" class="earnings-val" id="mining-${u.email.replace(/\./g,'-')}">$${miningEarnings.toFixed(2)}</td>
-            <td data-label="Rigs">${(u.rigs || []).length}</td>
-            <td data-label="Refs">${(u.referrals || []).length}</td>
-            <td data-label="Joined" style="font-size:12px;color:var(--text-muted);">${new Date(u.joined).toLocaleDateString()}</td>
-            <td data-label="Actions">
-                <div class="manage-btns">
-                    <button class="btn-view" onclick="viewClientTx('${u.email}')">Ledger</button>
-                    <button class="btn-edit" onclick="openSendModal('${u.email}', '${u.name}')">Send Funds</button>
-                </div>
-            </td>
-        </tr>
-    `}).join('');
+        try {
+            const userRigs = u.rigs || [];
+            const miningEarnings = userRigs.reduce((sum, r) => sum + ((r.earned||0) * btcPrice), 0);
+            const initials = (u.name || 'U').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+            return `
+            <tr class="client-row" data-email="${u.email}">
+                <td data-label="Client"><div style="display:flex;align-items:center;gap:10px;"><div class="user-avatar" style="width:28px;height:28px;font-size:11px;">${initials}</div><span style="font-weight:700;">${u.name || 'Unknown'}</span></div></td>
+                <td data-label="Email" style="font-size:13px;color:var(--text-muted);">${u.email}</td>
+                <td data-label="USDT Balance">
+                    <span class="val" id="usd-${u.email.replace(/\./g,'-')}">$${(u.usd||0).toLocaleString()}</span>
+                </td>
+                <td data-label="BTC Balance">
+                    <span class="val" id="btc-${u.email.replace(/\./g,'-')}">${(u.btc||0).toFixed(8)}</span>
+                </td>
+                <td data-label="Mining" class="earnings-val" id="mining-${u.email.replace(/\./g,'-')}">$${miningEarnings.toFixed(2)}</td>
+                <td data-label="Rigs">${(u.rigs || []).length}</td>
+                <td data-label="Refs">${(u.referrals || []).length}</td>
+                <td data-label="Joined" style="font-size:12px;color:var(--text-muted);">${u.joined ? new Date(u.joined).toLocaleDateString() : '-'}</td>
+                <td data-label="Actions">
+                    <div class="manage-btns">
+                        <button class="btn-view" onclick="viewClientTx('${u.email}')">Ledger</button>
+                        <button class="btn-edit" onclick="openSendModal('${u.email}', '${u.name || 'Unknown'}')">Send Funds</button>
+                    </div>
+                </td>
+            </tr>
+            `;
+        } catch(err) {
+            console.error('Client row error:', err, u);
+            return '';
+        }
+    }).join('');
+    } catch(e) {
+        console.error('renderAdmin error:', e);
+        const tbody = document.getElementById('adminUsersBody');
+        if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--danger);">Error loading clients. Check console.</td></tr>';
+    }
 }
 
 // Open Send Funds modal from master to client
@@ -2474,7 +2471,7 @@ async function sendFundsToClient(email) {
     currentUser = master;
 
     closeModal();
-    await renderAdmin();
+    renderAdmin();
     updateAllBalances();
     toast(`Sent ${currency === 'usd' ? '$' + amt.toLocaleString() : amt.toFixed(8) + ' BTC'} to ${client.name}`, 'success');
 }
@@ -2977,7 +2974,7 @@ async function resetAllBalances() {
         }
     });
     setAllUsers(all);
-    await renderAdmin();
+    renderAdmin();
     toast('All client accounts reset to $500 USDT + $500 BTC worth', 'success');
 }
 async function clearAllTx() {
@@ -2985,7 +2982,7 @@ async function clearAllTx() {
     let all = getAllUsers();
     Object.values(all).forEach(u => { u.txs = []; });
     setAllUsers(all);
-    await renderAdmin();
+    renderAdmin();
     toast('All transaction records purged', 'success');
 }
 
