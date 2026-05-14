@@ -1619,42 +1619,32 @@ let tempRegData = null;
 let tempVerifCode = '';
 let cgDataCache = null;
 
-// ================= REAL COINGECKO API =================
-const CG_API = 'https://api.coingecko.com/api/v3';
-
-// Fetch current BTC price + 24h change (CoinGecko primary, Coinbase backup)
+// ================= REAL BINANCE API =================
+// Fetch current BTC price + 24h change from Binance (CORS-friendly, no key needed)
 async function fetchBTCPrice() {
     try {
-        const res = await fetch(`${CG_API}/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true`);
+        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
         const data = await res.json();
-        if (data.bitcoin) {
-            btcPrice = data.bitcoin.usd;
-            btcPriceChange24h = data.bitcoin.usd_24h_change || 0;
+        if (data && data.lastPrice) {
+            btcPrice = parseFloat(data.lastPrice);
+            btcPriceChange24h = parseFloat(data.priceChangePercent) || 0;
             return true;
         }
-    } catch(e) { console.warn('CoinGecko price error:', e); }
-    // Backup: Coinbase API (no CORS, no key needed)
-    try {
-        const res2 = await fetch('https://api.coinbase.com/v2/exchange-rates?currency=BTC');
-        const data2 = await res2.json();
-        if (data2.data && data2.data.rates && data2.data.rates.USD) {
-            btcPrice = parseFloat(data2.data.rates.USD);
-            btcPriceChange24h = 0; // Coinbase basic endpoint doesn't give 24h change
-            return true;
-        }
-    } catch(e2) { console.warn('Coinbase backup price error:', e2); }
+    } catch(e) { console.warn('Binance price error:', e); }
     return false;
 }
 
-// Fetch historical chart data from CoinGecko
+// Fetch historical chart data from Binance (CORS-friendly, no key needed)
 async function fetchBTCHistory(days) {
     try {
-        const res = await fetch(`${CG_API}/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`);
+        const interval = days <= 1 ? '5m' : days <= 7 ? '1h' : '4h';
+        const limit = days <= 1 ? 288 : days <= 7 ? 168 : 90;
+        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${limit}`);
         const data = await res.json();
-        if (data.prices && data.prices.length > 0) {
-            return data.prices.map(p => ({ price: p[1], time: p[0] }));
+        if (Array.isArray(data) && data.length > 0) {
+            return data.map(k => ({ price: parseFloat(k[4]), time: k[0] }));
         }
-    } catch(e) { console.warn('CoinGecko history error:', e); }
+    } catch(e) { console.warn('Binance history error:', e); }
     return null;
 }
 
@@ -2002,27 +1992,41 @@ async function handleLogin() {
 
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
-    // Check if account is frozen — always verify latest from Firebase
-    if (user.frozen) {
-        // Try to get latest status from Firebase in case it was just unfrozen
-        let stillFrozen = true;
-        if (firebaseOnline && db) {
-            try {
-                const snap = await db.ref('users/' + safeKey(email)).once('value');
-                const fbUser = snap.val();
-                if (fbUser) {
-                    stillFrozen = fbUser.frozen || false;
-                    if (!stillFrozen) {
-                        // Update local copy with unfrozen status
-                        all[email] = fbUser;
-                        setAllUsers(all);
-                        user = fbUser;
+    // CRITICAL: Load fresh data from Firebase on login so deposits/admin changes appear
+    if (firebaseOnline && db) {
+        try {
+            const snap = await db.ref('users/' + safeKey(email)).once('value');
+            const fbUser = snap.val();
+            if (fbUser) {
+                const localAll = getAllUsers();
+                const localUser = localAll[email];
+                const fbMod = fbUser.lastModified || 0;
+                const localMod = localUser ? (localUser.lastModified || 0) : 0;
+                if (fbMod > localMod) {
+                    let merged = {...fbUser};
+                    if (localUser && (localUser.lastMiningUpdate || 0) > (fbUser.lastMiningUpdate || 0)) {
+                        merged.btc = localUser.btc;
+                        merged.rigs = JSON.parse(JSON.stringify(localUser.rigs));
+                        merged.lastMiningUpdate = localUser.lastMiningUpdate;
+                        if (fbUser.txs && localUser.txs) {
+                            const fbTxIds = new Set(fbUser.txs.map(t => t.date + '|' + (t.details || '')));
+                            const localOnlyTxs = localUser.txs.filter(t => !fbTxIds.has(t.date + '|' + (t.details || '')));
+                            merged.txs = [...fbUser.txs, ...localOnlyTxs].sort((a,b) => b.date - a.date);
+                        } else if (localUser.txs) {
+                            merged.txs = [...localUser.txs].sort((a,b) => b.date - a.date);
+                        }
                     }
+                    localAll[email] = merged;
+                    localStorage.setItem('bv_users', JSON.stringify(localAll));
+                    users = localAll;
+                    user = merged;
                 }
-            } catch(e) {}
-        }
-        if (stillFrozen) { toast('Account frozen. Contact administrator.', 'error'); return; }
+            }
+        } catch(e) { console.warn('Firebase login sync failed:', e); }
     }
+
+    // Check if account is frozen
+    if (user.frozen) { toast('Account frozen. Contact administrator.', 'error'); return; }
 
     // Calculate background mining earnings
     const now = Date.now();
@@ -2104,29 +2108,36 @@ async function initApp() {
     sessionStorage.setItem('bv_session', 'active');
     updateSyncBanner();
 
-    // CRITICAL: Sync from Firebase first so cross-device changes appear
+    // CRITICAL: Sync from Firebase first so cross-device changes appear (deposits, admin changes)
     if (firebaseOnline && db) {
         try {
-            const snap = await db.ref('users').once('value');
-            const fbData = snap.val();
-            if (fbData) {
-                const decoded = {};
-                Object.keys(fbData).forEach(k => { decoded[unsafeKey(k)] = fbData[k]; });
+            const snap = await db.ref('users/' + safeKey(currentUser.email)).once('value');
+            const fbUser = snap.val();
+            if (fbUser) {
                 const localAll = getAllUsers();
-                Object.keys(decoded).forEach(email => {
-                    if (email === currentUser.email) {
-                        const localUser = localAll[email];
-                        const fbUser = decoded[email];
-                        if (localUser && fbUser) {
-                            const localTime = localUser.lastMiningUpdate || 0;
-                            const fbTime = fbUser.lastMiningUpdate || 0;
-                            if (fbTime > localTime) { localAll[email] = fbUser; }
+                const localUser = localAll[currentUser.email];
+                const fbMod = fbUser.lastModified || 0;
+                const localMod = localUser ? (localUser.lastModified || 0) : 0;
+                if (fbMod > localMod) {
+                    let merged = {...fbUser};
+                    // Preserve local mining if newer
+                    if (localUser && (localUser.lastMiningUpdate || 0) > (fbUser.lastMiningUpdate || 0)) {
+                        merged.btc = localUser.btc;
+                        merged.rigs = JSON.parse(JSON.stringify(localUser.rigs));
+                        merged.lastMiningUpdate = localUser.lastMiningUpdate;
+                        if (fbUser.txs && localUser.txs) {
+                            const fbTxIds = new Set(fbUser.txs.map(t => t.date + '|' + (t.details || '')));
+                            const localOnlyTxs = localUser.txs.filter(t => !fbTxIds.has(t.date + '|' + (t.details || '')));
+                            merged.txs = [...fbUser.txs, ...localOnlyTxs].sort((a,b) => b.date - a.date);
+                        } else if (localUser.txs) {
+                            merged.txs = [...localUser.txs].sort((a,b) => b.date - a.date);
                         }
-                    } else { localAll[email] = decoded[email]; }
-                });
-                setAllUsers(localAll);
-                const refreshed = localAll[currentUser.email];
-                if (refreshed) currentUser = refreshed;
+                    }
+                    localAll[currentUser.email] = merged;
+                    localStorage.setItem('bv_users', JSON.stringify(localAll));
+                    users = localAll;
+                    currentUser = merged;
+                }
             }
         } catch(e) { console.warn('Firebase sync failed:', e); }
     }
@@ -2282,7 +2293,7 @@ function startPriceSimulation() {
     // Initialize with real data
     initRealPriceData();
 
-    // Poll CoinGecko every 30 seconds for live price
+    // Poll Binance every 30 seconds for live price
     priceUpdateInterval = setInterval(async () => {
         const ok = await fetchBTCPrice();
         if (ok) {
