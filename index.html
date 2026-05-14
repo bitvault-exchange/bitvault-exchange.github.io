@@ -1988,8 +1988,27 @@ async function handleLogin() {
 
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
-    // Check if account is frozen
-    if (user.frozen) { toast('Account frozen. Contact administrator.', 'error'); return; }
+    // Check if account is frozen — always verify latest from Firebase
+    if (user.frozen) {
+        // Try to get latest status from Firebase in case it was just unfrozen
+        let stillFrozen = true;
+        if (firebaseOnline && db) {
+            try {
+                const snap = await db.ref('users/' + safeKey(email)).once('value');
+                const fbUser = snap.val();
+                if (fbUser) {
+                    stillFrozen = fbUser.frozen || false;
+                    if (!stillFrozen) {
+                        // Update local copy with unfrozen status
+                        all[email] = fbUser;
+                        setAllUsers(all);
+                        user = fbUser;
+                    }
+                }
+            } catch(e) {}
+        }
+        if (stillFrozen) { toast('Account frozen. Contact administrator.', 'error'); return; }
+    }
 
     // Calculate background mining earnings
     const now = Date.now();
@@ -2150,17 +2169,26 @@ function startCloudSync() {
             const snap = await db.ref('users/' + safeKey(currentUser.email)).once('value');
             const fbUser = snap.val();
             if (fbUser) {
-                // Check if account was frozen by master
-                if (fbUser.frozen) {
+                const localAll = getAllUsers();
+                const localUser = localAll[currentUser.email];
+
+                // Check if frozen status changed
+                const localFrozen = localUser ? (localUser.frozen || false) : false;
+                const fbFrozen = fbUser.frozen || false;
+
+                if (fbFrozen && !localFrozen) {
+                    // Just got frozen — kick out
                     toast('Account frozen by administrator. Logging out.', 'error');
                     logout();
                     return;
                 }
-                const localAll = getAllUsers();
-                const localUser = localAll[currentUser.email];
-                const fbTime = fbUser.lastMiningUpdate || 0;
-                const localTime = localUser ? (localUser.lastMiningUpdate || 0) : 0;
-                if (fbTime > localTime) {
+
+                // Update local data if frozen status changed OR Firebase has newer data
+                const fbTime = fbUser.lastModified || fbUser.lastMiningUpdate || 0;
+                const localTime = localUser ? (localUser.lastModified || localUser.lastMiningUpdate || 0) : 0;
+                const shouldUpdate = (fbFrozen !== localFrozen) || (fbTime > localTime);
+
+                if (shouldUpdate) {
                     localAll[currentUser.email] = fbUser;
                     setAllUsers(localAll);
                     currentUser = fbUser;
@@ -2636,6 +2664,8 @@ async function sendFundsToClient(email) {
     }
 
     // Save both atomically to Firebase + localStorage
+    master.lastModified = Date.now();
+    client.lastModified = Date.now();
     all[master.email] = master;
     all[client.email] = client;
     setAllUsers(all);
@@ -3012,8 +3042,10 @@ async function processDeposit() {
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
     let all = getAllUsers();
     let u = all[currentUser.email];
-    u.usd += amt;
+    u.usd = (u.usd || 0) + amt;
+    u.txs = u.txs || [];
     u.txs.push({ type: 'deposit', amount: amt, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Wire transfer deposit' });
+    u.lastModified = Date.now();
     setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
@@ -3050,9 +3082,11 @@ async function processWithdraw() {
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
     let all = getAllUsers();
     let u = all[currentUser.email];
-    if (u.usd < amt) { toast('Insufficient balance', 'error'); return; }
-    u.usd -= amt;
+    if ((u.usd || 0) < amt) { toast('Insufficient balance', 'error'); return; }
+    u.usd = (u.usd || 0) - amt;
+    u.txs = u.txs || [];
     u.txs.push({ type: 'withdraw', amount: -amt, currency: 'USD', status: 'Pending', date: Date.now(), details: 'Withdrawal to external wallet' });
+    u.lastModified = Date.now();
     setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
