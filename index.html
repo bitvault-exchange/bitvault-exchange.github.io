@@ -2503,31 +2503,38 @@ async function viewClientTx(email) {
 }
 
 // ================= ACTIONS =================
-async function buyRig(rigId) {
-    const rig = RIGS.find(r => r.id === rigId);
-    let all = getAllUsers();
-    let u = all[currentUser.email];
-    if (u.usd < rig.price) { toast('Insufficient USD balance', 'error'); return; }
-    // Enforce purchase limit for non-admin users
-    if (!u.isAdmin) {
-        const ownedCount = u.rigs.filter(r => r.id === rigId).length;
-        if (ownedCount >= RIG_PURCHASE_LIMIT) {
-            toast(`You can only own ${RIG_PURCHASE_LIMIT} ${rig.name} rigs`, 'error');
-            return;
+function buyRig(rigId) {
+    try {
+        const rig = RIGS.find(r => r.id === rigId);
+        if (!rig) { toast('Rig not found', 'error'); return; }
+        let all = getAllUsers();
+        let u = all[currentUser.email];
+        if (!u) { toast('User data error', 'error'); return; }
+        if ((u.usd || 0) < rig.price) { toast('Insufficient USD balance', 'error'); return; }
+        if (!u.isAdmin) {
+            const ownedCount = (u.rigs || []).filter(r => r.id === rigId).length;
+            if (ownedCount >= RIG_PURCHASE_LIMIT) {
+                toast('Limit reached: ' + ownedCount + '/' + RIG_PURCHASE_LIMIT + ' ' + rig.name, 'error');
+                return;
+            }
         }
+        u.usd = (u.usd || 0) - rig.price;
+        u.rigs = u.rigs || [];
+        u.rigs.push({ id: rigId, purchased: Date.now(), earned: 0 });
+        u.txs = u.txs || [];
+        u.txs.push({ type: 'mining', amount: -rig.price, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Deployed ' + rig.name });
+        setAllUsers(all);
+        currentUser = u;
+        if (firebaseOnline && db) {
+            db.ref('users/' + safeKey(u.email)).set(u).catch(e => {});
+        }
+        updateAllBalances();
+        renderMining();
+        toast(rig.name + ' deployed successfully', 'success');
+    } catch(e) {
+        console.error('buyRig error:', e);
+        toast('Deploy failed: ' + e.message, 'error');
     }
-    u.usd -= rig.price;
-    u.rigs = u.rigs || [];
-    u.rigs.push({ id: rigId, purchased: Date.now(), earned: 0 });
-    u.txs.push({ type: 'mining', amount: -rig.price, currency: 'USD', status: 'Completed', date: Date.now(), details: `Deployed ${rig.name}` });
-    setAllUsers(all);
-    currentUser = u;
-    if (firebaseOnline && db) {
-        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
-    }
-    updateAllBalances();
-    renderMining();
-    toast(`${rig.name} deployed successfully`, 'success');
 }
 function setTradeMode(mode) {
     tradeMode = mode;
@@ -2552,45 +2559,52 @@ function updateTradePreview(source) {
     document.getElementById('previewFee').textContent = '$' + fee.toFixed(2);
     document.getElementById('previewTotal').textContent = '$' + Math.abs(total).toFixed(2);
 }
-async function executeTrade() {
-    const amt = parseFloat(document.getElementById('tradeAmount').value);
-    if (!amt || amt <= 0) { toast('Enter valid quantity', 'error'); return; }
-    let all = getAllUsers();
-    let u = all[currentUser.email];
-    const usd = amt * btcPrice;
-    const fee = usd * 0.001;
-    if (tradeMode==='buy') {
-        if (u.usd < usd + fee) { toast('Insufficient USD balance', 'error'); return; }
-        u.usd -= (usd + fee);
-        u.btc += amt;
-        u.txs.push({ type: 'trade', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Long BTC @ $${btcPrice.toFixed(2)}` });
-    } else {
-        if (u.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
-        u.btc -= amt;
-        u.usd += (usd - fee);
-        u.txs.push({ type: 'trade', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Short BTC @ $${btcPrice.toFixed(2)}` });
+function executeTrade() {
+    try {
+        const amt = parseFloat(document.getElementById('tradeAmount').value);
+        if (!amt || amt <= 0) { toast('Enter valid quantity', 'error'); return; }
+        let all = getAllUsers();
+        let u = all[currentUser.email];
+        if (!u) { toast('User error', 'error'); return; }
+        const usd = amt * btcPrice;
+        const fee = usd * 0.001;
+        if (tradeMode==='buy') {
+            if ((u.usd || 0) < usd + fee) { toast('Insufficient USD balance', 'error'); return; }
+            u.usd = (u.usd || 0) - (usd + fee);
+            u.btc = (u.btc || 0) + amt;
+            u.txs = u.txs || [];
+            u.txs.push({ type: 'trade', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: 'Long BTC @ $' + btcPrice.toFixed(2) });
+        } else {
+            if ((u.btc || 0) < amt) { toast('Insufficient BTC balance', 'error'); return; }
+            u.btc = (u.btc || 0) - amt;
+            u.usd = (u.usd || 0) + (usd - fee);
+            u.txs = u.txs || [];
+            u.txs.push({ type: 'trade', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: 'Short BTC @ $' + btcPrice.toFixed(2) });
+        }
+        setAllUsers(all);
+        currentUser = u;
+        if (firebaseOnline && db) {
+            db.ref('users/' + safeKey(u.email)).set(u).catch(e => {});
+        }
+        if (tradeMode === 'buy' && !u.isAdmin && emailjsReady) {
+            try {
+                const fakeTxid = '0x' + Array.from({length:64},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
+                    email: u.email,
+                    to_name: u.name,
+                    name: u.name,
+                    welcome_message: 'BTC Purchase Confirmed! You purchased ' + amt.toFixed(8) + ' BTC at $' + btcPrice.toLocaleString() + '. TXID: ' + fakeTxid.substring(0,18) + '...' + fakeTxid.substring(60) + ' (Pending confirmation)'
+                }).catch(e => {});
+            } catch(e) {}
+        }
+        updateAllBalances();
+        renderTrade();
+        if (currentPage==='wallet') renderWallet();
+        if (currentPage==='dashboard') renderDashboard();
+    } catch(e) {
+        console.error('executeTrade error:', e);
+        toast('Trade failed: ' + e.message, 'error');
     }
-    setAllUsers(all);
-    currentUser = u;
-    if (firebaseOnline && db) {
-        try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
-    }
-    // Send email notification for BTC purchase to non-admin users
-    if (tradeMode === 'buy' && !u.isAdmin && emailjsReady) {
-        try {
-            const fakeTxid = '0x' + Array.from({length:64},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
-                email: u.email,
-                to_name: u.name,
-                name: u.name,
-                welcome_message: 'BTC Purchase Confirmed! You purchased ' + amt.toFixed(8) + ' BTC at $' + btcPrice.toLocaleString() + '. TXID: ' + fakeTxid.substring(0,18) + '...' + fakeTxid.substring(60) + ' (Pending confirmation)'
-            });
-        } catch(e) { console.warn('Purchase email failed:', e); }
-    }
-    updateAllBalances();
-    renderTrade();
-    if (currentPage==='wallet') renderWallet();
-    if (currentPage==='dashboard') renderDashboard();
 }
 function updateTradePrice() {
     document.getElementById('tradePrice').textContent = '$' + btcPrice.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
