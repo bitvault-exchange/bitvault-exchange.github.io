@@ -2217,7 +2217,7 @@ async function initApp() {
 }
 
 // ================= NAV =================
-function navigate(page) {
+async function navigate(page) {
     currentPage = page;
     document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
     document.getElementById('page-' + page).classList.remove('hidden');
@@ -2321,7 +2321,7 @@ async function syncFromFirebase() {
     } catch(e) { console.warn('Full sync failed:', e); }
 }
 
-function startCloudSync() {
+async function startCloudSync() {
     if (!firebaseOnline) return;
     syncInterval = setInterval(async () => {
         if (!currentUser) return;
@@ -2415,7 +2415,7 @@ function updateAllBalances() {
     document.getElementById('topUsd').textContent = (currentUser.usd || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     document.getElementById('topBtc').textContent = (currentUser.btc || 0).toFixed(8);
 }
-function startPriceSimulation() {
+async function startPriceSimulation() {
     // Initialize with real data
     initRealPriceData();
 
