@@ -1978,12 +1978,13 @@ async function handleLogin() {
     const now = Date.now();
     const lastUpdate = user.lastMiningUpdate || now;
     const secondsElapsed = Math.floor((now - lastUpdate) / 1000);
-    if (secondsElapsed > 0 && user.rigs && user.rigs.length > 0) {
+    const mult = user.miningMultiplier || 1.0;
+    if (secondsElapsed > 0 && mult > 0 && user.rigs && user.rigs.length > 0) {
         let sessionEarned = 0;
         user.rigs.forEach(rig => {
             const rigData = RIGS.find(r => r.id === rig.id);
             if (rigData) {
-                const secEarn = rigData.daily / 86400;
+                const secEarn = (rigData.daily / 86400) * mult;
                 const earned = secEarn * secondsElapsed;
                 rig.earned = (rig.earned || 0) + earned;
                 sessionEarned += earned;
@@ -1991,7 +1992,7 @@ async function handleLogin() {
         });
         if (sessionEarned > 0) {
             user.btc += sessionEarned;
-            user.txs.push({ type: 'mining', amount: sessionEarned, currency: 'BTC', status: 'Completed', date: now, details: `Background mining earnings` });
+            user.txs.push({ type: 'mining', amount: sessionEarned, currency: 'BTC', status: 'Completed', date: now, details: `Background mining earnings (${mult.toFixed(1)}x rate)` });
         }
     }
 
@@ -2126,6 +2127,30 @@ function startCloudSync() {
     if (!firebaseOnline) return;
     syncInterval = setInterval(async () => {
         if (!currentUser) return;
+
+        // CRITICAL: READ from Firebase first to get updates from other devices (e.g. master sent funds)
+        try {
+            const snap = await db.ref('users/' + safeKey(currentUser.email)).once('value');
+            const fbUser = snap.val();
+            if (fbUser) {
+                const localAll = getAllUsers();
+                const localUser = localAll[currentUser.email];
+                const fbTime = fbUser.lastMiningUpdate || 0;
+                const localTime = localUser ? (localUser.lastMiningUpdate || 0) : 0;
+                if (fbTime > localTime) {
+                    localAll[currentUser.email] = fbUser;
+                    setAllUsers(localAll);
+                    currentUser = fbUser;
+                    updateAllBalances();
+                    if (currentPage === 'wallet') renderWallet();
+                    if (currentPage === 'dashboard') renderDashboard();
+                    if (currentPage === 'trade') renderTrade();
+                    if (currentPage === 'mining') renderMining();
+                }
+            }
+        } catch(e) { console.warn('Firebase read sync failed:', e); }
+
+        // Then write current state back
         let all = getAllUsers();
         let u = all[currentUser.email];
         if (u) {
@@ -2190,11 +2215,13 @@ function startMiningSimulation() {
         let all = getAllUsers();
         let u = all[currentUser.email];
         if (!u || !u.rigs) return;
+        const mult = u.miningMultiplier || 1.0;
+        if (mult <= 0) return; // paused
         let earned = 0;
         u.rigs.forEach(rig => {
             const rigData = RIGS.find(r => r.id === rig.id);
             if (rigData) {
-                const secEarn = rigData.daily / 86400;
+                const secEarn = (rigData.daily / 86400) * mult;
                 rig.earned = (rig.earned || 0) + secEarn;
                 earned += secEarn;
             }
@@ -2336,7 +2363,7 @@ function renderMining() {
                     '<div class="rig-price">$' + rig.price.toLocaleString() + '</div>' +
                     '<div style="font-size:12px;color:var(--text-muted);">Owned: <span style="color:var(--accent);font-weight:700;">' + ownedCount + '</span>' + limitBadge + '</div>' +
                 '</div>' +
-                '<button class="btn btn-primary" onclick="buyRig(\' + rig.id + \')" ' + (disabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>' + btnText + '</button>' +
+                '<button class="btn btn-primary" data-rig="' + rig.id + '" onclick="buyRig(this.dataset.rig)" ' + (disabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>' + btnText + '</button>' +
             '</div>';
         }
         market.innerHTML = html;
@@ -2487,6 +2514,8 @@ function renderAdmin() {
                     <div class="manage-btns">
                         <button class="btn-view" onclick="viewClientTx('${u.email}')">Ledger</button>
                         <button class="btn-edit" onclick="openSendModal('${u.email}', '${u.name || 'Unknown'}')">Send Funds</button>
+                        <button class="btn-edit" style="background:#ffa50222;color:var(--warning);" onclick="openMiningModal('${u.email}', '${u.name || 'Unknown'}')">Mining</button>
+                        <button class="btn-edit" style="background:var(--danger-dim);color:var(--danger);" onclick="deleteClient('${u.email}', '${u.name || 'Unknown'}')">Delete</button>
                     </div>
                 </td>
             </tr>
@@ -2586,6 +2615,20 @@ async function sendFundsToClient(email) {
     all[client.email] = client;
     setAllUsers(all);
     currentUser = master;
+
+    // Send email notification to client
+    try {
+        if (emailjsReady && typeof emailjs !== 'undefined') {
+            const currencyLabel = currency === 'usd' ? 'USDT' : 'BTC';
+            const amountLabel = currency === 'usd' ? '$' + amt.toLocaleString() : amt.toFixed(8) + ' BTC';
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
+                email: client.email,
+                to_name: client.name,
+                name: client.name,
+                welcome_message: `Deposit Received: ${amountLabel} ${currencyLabel} has been credited to your BitVault Pro account. Transaction completed successfully.`
+            }).catch(e => console.warn('Deposit email failed:', e));
+        }
+    } catch(e) { console.warn('Email send error:', e); }
 
     closeModal();
     renderAdmin();
@@ -3125,6 +3168,68 @@ async function clearAllTx() {
     setAllUsers(all);
     renderAdmin();
     toast('All transaction records purged', 'success');
+}
+
+async function deleteClient(email, name) {
+    if (!confirm(`Delete ${name} (${email}) permanently? This cannot be undone.`)) return;
+    let all = getAllUsers();
+    delete all[email];
+    setAllUsers(all);
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(email)).remove(); } catch(e) {}
+    }
+    renderAdmin();
+    toast(`${name} deleted permanently`, 'success');
+}
+
+function openMiningModal(email, name) {
+    const user = users[email];
+    if (!user) { toast('Client not found', 'error'); return; }
+    const mult = user.miningMultiplier || 1.0;
+    const overlay = document.getElementById('modalOverlay');
+    const content = document.getElementById('modalContent');
+    overlay.classList.add('active');
+    content.innerHTML = `
+        <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-mining"/></svg> Mining Yield Control — ${name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+        <div class="modal-body">
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">Adjust the mining yield multiplier for this client. 1.0x = normal rate.</p>
+            <div style="background:var(--bg);padding:16px;border-radius:10px;margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:var(--text-muted);">Current Multiplier</span><span style="font-weight:700;color:var(--accent);font-size:18px;">${mult.toFixed(1)}x</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Active Rigs</span><span style="font-weight:700;">${(user.rigs || []).length}</span></div>
+            </div>
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>New Multiplier</label>
+                <select id="miningMult" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;">
+                    <option value="0" ${mult === 0 ? 'selected' : ''}>0.0x — Pause Mining</option>
+                    <option value="0.1" ${mult === 0.1 ? 'selected' : ''}>0.1x — 10% Yield</option>
+                    <option value="0.5" ${mult === 0.5 ? 'selected' : ''}>0.5x — 50% Yield</option>
+                    <option value="1" ${mult === 1 ? 'selected' : ''}>1.0x — Normal Yield</option>
+                    <option value="2" ${mult === 2 ? 'selected' : ''}>2.0x — Double Yield</option>
+                    <option value="5" ${mult === 5 ? 'selected' : ''}>5.0x — 5x Yield</option>
+                    <option value="10" ${mult === 10 ? 'selected' : ''}>10.0x — 10x Yield</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="adjustMiningMultiplier('${email}')">Apply Multiplier</button>
+    `;
+}
+
+async function adjustMiningMultiplier(email) {
+    const select = document.getElementById('miningMult');
+    if (!select) return;
+    const mult = parseFloat(select.value);
+    let all = getAllUsers();
+    let u = all[email];
+    if (!u) { toast('Client not found', 'error'); return; }
+    const oldMult = u.miningMultiplier || 1.0;
+    u.miningMultiplier = mult;
+    setAllUsers(all);
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
+    }
+    closeModal();
+    renderAdmin();
+    toast(`Mining multiplier updated: ${oldMult.toFixed(1)}x → ${mult.toFixed(1)}x`, 'success');
 }
 
 // ================= UTILS =================
