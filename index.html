@@ -1766,6 +1766,10 @@ async function saveUser(user) {
     const all = getAllUsers();
     all[user.email] = user;
     setAllUsers(all);
+    // Also write individual user to Firebase for immediate cross-device access
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(user.email)).set(user); } catch(e) {}
+    }
 }
 
 async function loadAllUsers() {
@@ -1974,7 +1978,7 @@ async function handleLogin() {
     let user = all[email];
 
     // CRITICAL: If user not found locally, check Firebase (account created on another device)
-    if (!user && firebaseOnline && db) {
+    if (!user && db) {
         try {
             const snap = await db.ref('users/' + safeKey(email)).once('value');
             const fbUser = snap.val();
@@ -1982,8 +1986,32 @@ async function handleLogin() {
                 all[email] = fbUser;
                 setAllUsers(all);
                 user = fbUser;
+                console.log('Account loaded from Firebase:', email);
+            } else {
+                console.warn('Firebase lookup: user not found or password mismatch');
             }
         } catch(e) { console.warn('Firebase login lookup failed:', e); }
+    }
+
+    // Fallback: if still not found, try loading ALL users from Firebase
+    if (!user && db) {
+        try {
+            const snap = await db.ref('users').once('value');
+            const fbData = snap.val();
+            if (fbData) {
+                const decoded = {};
+                Object.keys(fbData).forEach(k => {
+                    decoded[unsafeKey(k)] = fbData[k];
+                });
+                const fbUser = decoded[email];
+                if (fbUser && fbUser.password === password) {
+                    all[email] = fbUser;
+                    setAllUsers(all);
+                    user = fbUser;
+                    console.log('Account loaded from Firebase (full scan):', email);
+                }
+            }
+        } catch(e) { console.warn('Firebase full scan failed:', e); }
     }
 
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
