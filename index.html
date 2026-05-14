@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>BitVault Pro — Digital Asset Exchange</title>
     <style>
         :root {
@@ -1527,6 +1530,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
+// Force cache-bust: reload if old code detected
+const BV_VERSION = "2026-05-14-v3";
+if (localStorage.getItem("bv_version") !== BV_VERSION) {
+    localStorage.setItem("bv_version", BV_VERSION);
+    location.reload(true);
+}
+
 // Cache bust: ensure master exists without overwriting balances
 (function(){
   var all = JSON.parse(localStorage.getItem('bv_users')||'{}');
@@ -2121,35 +2131,57 @@ async function initApp() {
     sessionStorage.setItem('bv_session', 'active');
     updateSyncBanner();
 
-    // CRITICAL: Sync from Firebase first so cross-device changes appear (deposits, admin changes)
+    // CRITICAL: Full database sync from Firebase on app init
     if (firebaseOnline && db) {
         try {
-            const snap = await db.ref('users/' + safeKey(currentUser.email)).once('value');
-            const fbUser = snap.val();
-            if (fbUser) {
+            const snap = await db.ref('users').once('value');
+            const fbData = snap.val();
+            if (fbData) {
+                const decoded = {};
+                Object.keys(fbData).forEach(k => { decoded[unsafeKey(k)] = fbData[k]; });
                 const localAll = getAllUsers();
-                const localUser = localAll[currentUser.email];
-                const fbMod = fbUser.lastModified || 0;
-                const localMod = localUser ? (localUser.lastModified || 0) : 0;
-                if (fbMod > localMod) {
-                    let merged = {...fbUser};
-                    // Preserve local mining if newer
-                    if (localUser && (localUser.lastMiningUpdate || 0) > (fbUser.lastMiningUpdate || 0)) {
-                        merged.btc = localUser.btc;
-                        merged.rigs = JSON.parse(JSON.stringify(localUser.rigs));
-                        merged.lastMiningUpdate = localUser.lastMiningUpdate;
-                        if (fbUser.txs && localUser.txs) {
-                            const fbTxIds = new Set(fbUser.txs.map(t => t.date + '|' + (t.details || '')));
-                            const localOnlyTxs = localUser.txs.filter(t => !fbTxIds.has(t.date + '|' + (t.details || '')));
-                            merged.txs = [...fbUser.txs, ...localOnlyTxs].sort((a,b) => b.date - a.date);
-                        } else if (localUser.txs) {
-                            merged.txs = [...localUser.txs].sort((a,b) => b.date - a.date);
-                        }
+                let changed = false;
+
+                Object.keys(decoded).forEach(em => {
+                    const fbUser = decoded[em];
+                    const localUser = localAll[em];
+                    if (!localUser) {
+                        localAll[em] = fbUser;
+                        changed = true;
+                        return;
                     }
-                    localAll[currentUser.email] = merged;
+                    const fbMod = fbUser.lastModified || 0;
+                    const localMod = localUser.lastModified || 0;
+                    if (fbMod > localMod) {
+                        let merged = {...fbUser};
+                        if ((localUser.lastMiningUpdate || 0) > (fbUser.lastMiningUpdate || 0)) {
+                            merged.btc = localUser.btc;
+                            merged.rigs = JSON.parse(JSON.stringify(localUser.rigs));
+                            merged.lastMiningUpdate = localUser.lastMiningUpdate;
+                            if (fbUser.txs && localUser.txs) {
+                                const fbTxIds = new Set(fbUser.txs.map(t => t.date + '|' + (t.details || '')));
+                                const localOnlyTxs = localUser.txs.filter(t => !fbTxIds.has(t.date + '|' + (t.details || '')));
+                                merged.txs = [...fbUser.txs, ...localOnlyTxs].sort((a,b) => b.date - a.date);
+                            } else if (localUser.txs) {
+                                merged.txs = [...localUser.txs].sort((a,b) => b.date - a.date);
+                            }
+                        }
+                        localAll[em] = merged;
+                        changed = true;
+                    }
+                });
+
+                Object.keys(localAll).forEach(em => {
+                    if (!decoded[em] && em !== 'master@bitvault.io') {
+                        delete localAll[em];
+                        changed = true;
+                    }
+                });
+
+                if (changed) {
                     localStorage.setItem('bv_users', JSON.stringify(localAll));
                     users = localAll;
-                    currentUser = merged;
+                    if (localAll[currentUser.email]) currentUser = localAll[currentUser.email];
                 }
             }
         } catch(e) { console.warn('Firebase sync failed:', e); }
@@ -2218,7 +2250,7 @@ function navigate(page) {
     if (page === 'trade') renderTrade();
     if (page === 'referral') renderReferral();
     
-    if (page === 'control') { try { renderAdmin(); } catch(e) { console.error('navigate renderAdmin error:', e); } }
+    if (page === 'control') { try { await renderAdmin(); } catch(e) { console.error('navigate renderAdmin error:', e); } }
 }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 
@@ -2667,9 +2699,10 @@ function renderNotifications() {
         `).join('');
     }
 }
-function renderAdmin() {
+async function renderAdmin() {
     try {
         if (!currentUser || !currentUser.isAdmin) return;
+        await syncFromFirebase();
         users = getAllUsers();
         const allUsers = Object.values(users || {});
         const clients = allUsers.filter(u => u && !u.isAdmin);
