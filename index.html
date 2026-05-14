@@ -2235,7 +2235,7 @@ function renderMining() {
                     '<div class="rig-price">$' + rig.price.toLocaleString() + '</div>' +
                     '<div style="font-size:12px;color:var(--text-muted);">Owned: <span style="color:var(--accent);font-weight:700;">' + ownedCount + '</span>' + limitBadge + '</div>' +
                 '</div>' +
-                '<button class="btn btn-primary" onclick="buyRig('' + rig.id + '')" ' + (disabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>' + btnText + '</button>' +
+                '<button class="btn btn-primary" onclick="buyRig(\' + rig.id + \')" ' + (disabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>' + btnText + '</button>' +
             '</div>';
         }
         market.innerHTML = html;
