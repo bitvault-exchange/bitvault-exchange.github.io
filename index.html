@@ -3386,21 +3386,36 @@ function filterAdminUsers(q) {
 async function resetAllBalances() {
     if (!confirm('Reset ALL client accounts to $500 USDT and $500 worth of BTC? This is irreversible.')) return;
     let all = getAllUsers();
+    const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
     Object.values(all).forEach(u => {
         if (!u.isAdmin) {
-            const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
             u.usd = 500; u.btc = resetBtc; u.rigs = []; u.txs = []; u.notifs = []; u.referrals = [];
+            u.lastModified = Date.now();
         }
     });
     setAllUsers(all);
+    // Push each reset client to Firebase
+    if (firebaseOnline && db) {
+        for (const email in all) {
+            if (!all[email].isAdmin) {
+                try { await db.ref('users/' + safeKey(email)).set(all[email]); } catch(e) {}
+            }
+        }
+    }
     renderAdmin();
     toast('All client accounts reset to $500 USDT + $500 BTC worth', 'success');
 }
 async function clearAllTx() {
     if (!confirm('Purge ALL transaction records across the platform?')) return;
     let all = getAllUsers();
-    Object.values(all).forEach(u => { u.txs = []; });
+    Object.values(all).forEach(u => { u.txs = []; u.lastModified = Date.now(); });
     setAllUsers(all);
+    // Push each client to Firebase
+    if (firebaseOnline && db) {
+        for (const email in all) {
+            try { await db.ref('users/' + safeKey(email)).set(all[email]); } catch(e) {}
+        }
+    }
     renderAdmin();
     toast('All transaction records purged', 'success');
 }
@@ -3444,6 +3459,7 @@ async function resetSingleClient(email, name) {
     u.referrals = [];
     u.mining = 0;
     u.miningMultiplier = 1.0;
+    u.lastModified = Date.now();
     setAllUsers(all);
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
@@ -3493,6 +3509,7 @@ async function adjustMiningMultiplier(email) {
     if (!u) { toast('Client not found', 'error'); return; }
     const oldMult = u.miningMultiplier || 1.0;
     u.miningMultiplier = mult;
+    u.lastModified = Date.now();
     setAllUsers(all);
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
