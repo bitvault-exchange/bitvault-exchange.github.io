@@ -1974,6 +1974,9 @@ async function handleLogin() {
     let user = all[email];
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
+    // Check if account is frozen
+    if (user.frozen) { toast('Account frozen. Contact administrator.', 'error'); return; }
+
     // Calculate background mining earnings
     const now = Date.now();
     const lastUpdate = user.lastMiningUpdate || now;
@@ -2133,6 +2136,12 @@ function startCloudSync() {
             const snap = await db.ref('users/' + safeKey(currentUser.email)).once('value');
             const fbUser = snap.val();
             if (fbUser) {
+                // Check if account was frozen by master
+                if (fbUser.frozen) {
+                    toast('Account frozen by administrator. Logging out.', 'error');
+                    logout();
+                    return;
+                }
                 const localAll = getAllUsers();
                 const localUser = localAll[currentUser.email];
                 const fbTime = fbUser.lastMiningUpdate || 0;
@@ -2498,7 +2507,7 @@ function renderAdmin() {
             const initials = (u.name || 'U').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
             return `
             <tr class="client-row" data-email="${u.email}">
-                <td data-label="Client"><div style="display:flex;align-items:center;gap:10px;"><div class="user-avatar" style="width:28px;height:28px;font-size:11px;">${initials}</div><span style="font-weight:700;">${u.name || 'Unknown'}</span></div></td>
+                <td data-label="Client"><div style="display:flex;align-items:center;gap:10px;"><div class="user-avatar" style="width:28px;height:28px;font-size:11px;">${initials}</div><div><span style="font-weight:700;">${u.name || 'Unknown'}</span>${u.frozen ? '<span style="margin-left:8px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:var(--danger-dim);color:var(--danger);border:1px solid var(--danger);">FROZEN</span>' : ''}</div></div></td>
                 <td data-label="Email" style="font-size:13px;color:var(--text-muted);">${u.email}</td>
                 <td data-label="USDT Balance">
                     <span class="val" id="usd-${u.email.replace(/\./g,'-')}">$${(u.usd||0).toLocaleString()}</span>
@@ -2515,6 +2524,8 @@ function renderAdmin() {
                         <button class="btn-view" onclick="viewClientTx('${u.email}')">Ledger</button>
                         <button class="btn-edit" onclick="openSendModal('${u.email}', '${u.name || 'Unknown'}')">Send Funds</button>
                         <button class="btn-edit" style="background:#ffa50222;color:var(--warning);" onclick="openMiningModal('${u.email}', '${u.name || 'Unknown'}')">Mining</button>
+                        <button class="btn-edit" style="background:rgba(52,152,255,0.15);color:var(--info);" onclick="resetSingleClient('${u.email}', '${u.name || 'Unknown'}')">Reset</button>
+                        <button class="btn-edit" style="background:${u.frozen ? 'var(--accent-dim)' : 'rgba(155,89,255,0.15)'};color:${u.frozen ? 'var(--accent)' : '#9b59b6'};" onclick="toggleFreezeClient('${u.email}', '${u.name || 'Unknown'}')">${u.frozen ? 'Unfreeze' : 'Freeze'}</button>
                         <button class="btn-edit" style="background:var(--danger-dim);color:var(--danger);" onclick="deleteClient('${u.email}', '${u.name || 'Unknown'}')">Delete</button>
                     </div>
                 </td>
@@ -3182,6 +3193,70 @@ async function deleteClient(email, name) {
     toast(`${name} deleted permanently`, 'success');
 }
 
+async function toggleFreezeClient(email, name) {
+    let all = getAllUsers();
+    let u = all[email];
+    if (!u) { toast('Client not found', 'error'); return; }
+    const wasFrozen = u.frozen || false;
+    u.frozen = !wasFrozen;
+    setAllUsers(all);
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
+    }
+
+    // Send email notification
+    try {
+        if (emailjsReady && typeof emailjs !== 'undefined') {
+            const statusMsg = u.frozen 
+                ? `Your BitVault Pro account has been FROZEN. You cannot access trading, mining, or wallet functions until your account is reactivated. Contact support for assistance.`
+                : `Your BitVault Pro account has been REACTIVATED. All trading, mining, and wallet functions are now restored. Welcome back!`;
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
+                email: u.email,
+                to_name: u.name,
+                name: u.name,
+                welcome_message: statusMsg
+            }).catch(e => console.warn('Freeze email failed:', e));
+        }
+    } catch(e) { console.warn('Email send error:', e); }
+
+    renderAdmin();
+    toast(`${name} ${u.frozen ? 'FROZEN' : 'UNFROZEN'}`, u.frozen ? 'warning' : 'success');
+}
+
+async function resetSingleClient(email, name) {
+    if (!confirm(`Reset ${name}'s account to $500 USDT + $500 BTC worth? All rigs, transactions, and referrals will be cleared.`)) return;
+    let all = getAllUsers();
+    let u = all[email];
+    if (!u || u.isAdmin) { toast('Client not found or is admin', 'error'); return; }
+    const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
+    u.usd = 500;
+    u.btc = resetBtc;
+    u.rigs = [];
+    u.txs = [];
+    u.referrals = [];
+    u.mining = 0;
+    u.miningMultiplier = 1.0;
+    setAllUsers(all);
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
+    }
+
+    // Send email notification
+    try {
+        if (emailjsReady && typeof emailjs !== 'undefined') {
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
+                email: u.email,
+                to_name: u.name,
+                name: u.name,
+                welcome_message: `Account Reset Complete: Your BitVault Pro account has been reset to $500 USDT + $500 BTC worth. All previous rigs, transactions, and referrals have been cleared. Your account is ready for fresh trading and mining.`
+            }).catch(e => console.warn('Reset email failed:', e));
+        }
+    } catch(e) { console.warn('Email send error:', e); }
+
+    renderAdmin();
+    toast(`${name} reset to $500 USDT + $500 BTC`, 'success');
+}
+
 function openMiningModal(email, name) {
     const user = users[email];
     if (!user) { toast('Client not found', 'error'); return; }
@@ -3314,6 +3389,12 @@ window.addEventListener('resize', () => {
     const user = allUsers[savedEmail];
 
     if (user) {
+        if (user.frozen) {
+            toast('Account frozen. Contact administrator.', 'error');
+            sessionStorage.removeItem('bv_session');
+            document.getElementById('authPage').style.display = 'flex';
+            return;
+        }
         currentUser = user;
         users = allUsers;
         await initApp();
