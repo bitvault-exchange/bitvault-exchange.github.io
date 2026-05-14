@@ -2671,20 +2671,6 @@ async function sendFundsToClient(email) {
     setAllUsers(all);
     currentUser = master;
 
-    // Send email notification to client
-    try {
-        if (emailjsReady && typeof emailjs !== 'undefined') {
-            const currencyLabel = currency === 'usd' ? 'USDT' : 'BTC';
-            const amountLabel = currency === 'usd' ? '$' + amt.toLocaleString() : amt.toFixed(8) + ' BTC';
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
-                email: client.email,
-                to_name: client.name,
-                name: client.name,
-                welcome_message: `Deposit Received: ${amountLabel} ${currencyLabel} has been credited to your BitVault Pro account. Transaction completed successfully.`
-            }).catch(e => console.warn('Deposit email failed:', e));
-        }
-    } catch(e) { console.warn('Email send error:', e); }
-
     closeModal();
     renderAdmin();
     updateAllBalances();
@@ -3251,19 +3237,6 @@ async function toggleFreezeClient(email, name) {
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
     }
-    try {
-        if (emailjsReady && typeof emailjs !== 'undefined') {
-            const statusMsg = u.frozen 
-                ? `Your BitVault Pro account has been FROZEN. You cannot access trading, mining, or wallet functions until your account is reactivated. Contact support for assistance.`
-                : `Your BitVault Pro account has been REACTIVATED. All trading, mining, and wallet functions are now restored. Welcome back!`;
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
-                email: u.email,
-                to_name: u.name,
-                name: u.name,
-                welcome_message: statusMsg
-            }).catch(e => console.warn('Freeze email failed:', e));
-        }
-    } catch(e) { console.warn('Email send error:', e); }
     renderAdmin();
     toast(`${name} ${u.frozen ? 'FROZEN' : 'UNFROZEN'}`, u.frozen ? 'warning' : 'success');
 }
@@ -3285,16 +3258,6 @@ async function resetSingleClient(email, name) {
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
     }
-    try {
-        if (emailjsReady && typeof emailjs !== 'undefined') {
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
-                email: u.email,
-                to_name: u.name,
-                name: u.name,
-                welcome_message: `Account Reset Complete: Your BitVault Pro account has been reset to $500 USDT + $500 BTC worth. All previous rigs, transactions, and referrals have been cleared. Your account is ready for fresh trading and mining.`
-            }).catch(e => console.warn('Reset email failed:', e));
-        }
-    } catch(e) { console.warn('Email send error:', e); }
     renderAdmin();
     toast(`${name} reset to $500 USDT + $500 BTC`, 'success');
 }
