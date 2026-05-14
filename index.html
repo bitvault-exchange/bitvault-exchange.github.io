@@ -800,6 +800,7 @@
     </style>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body class="dark-mode">
 <!-- SVG Icon Library -->
@@ -1672,7 +1673,7 @@ async function setAllUsers(all) {
 }
 
 async function loadUser(email) {
-    const all = await getAllUsers();
+    const all = getAllUsers();
     let u = all[email] || null;
     // Ensure master flags without overwriting balances
     if (email === 'master@bitvault.io' && u) {
@@ -1686,13 +1687,13 @@ async function loadUser(email) {
 }
 
 async function saveUser(user) {
-    const all = await getAllUsers();
+    const all = getAllUsers();
     all[user.email] = user;
-    await setAllUsers(all);
+    setAllUsers(all);
 }
 
 async function loadAllUsers() {
-    const all = await getAllUsers();
+    const all = getAllUsers();
     return Object.values(all);
 }
 
@@ -1807,7 +1808,8 @@ async function handleVerify() {
         name, email, password, isAdmin: false,
         usd: 500, btc: btcWorth, rigs: [], txs: [], notifs: [],
         referrals: [], refCode: generateRefCode(), refBy,
-        joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now()
+        joined: new Date().toISOString(), lastLogin: new Date().toISOString(), lastMiningUpdate: Date.now(),
+        mining: 0
     };
 
     if (refBy) {
@@ -1826,7 +1828,7 @@ async function handleVerify() {
     await saveUser(newUser);
     tempRegData = null;
     // Reload users to ensure sync
-    users = await getAllUsers();
+    users = getAllUsers();
 
     // Send welcome email to new student (uses separate welcome template)
     try {
@@ -1842,7 +1844,7 @@ async function handleVerify() {
 
     // Notify master account about new signup
     try {
-        let all = await getAllUsers();
+        let all = getAllUsers();
         let master = all['master@bitvault.io'];
         if (master) {
             master.notifs = master.notifs || [];
@@ -1853,7 +1855,7 @@ async function handleVerify() {
             });
             if (master.notifs.length > 50) master.notifs.pop();
             all['master@bitvault.io'] = master;
-            await setAllUsers(all);
+            setAllUsers(all);
         }
     } catch(e) { console.warn('Master notify failed:', e); }
 
@@ -1894,7 +1896,7 @@ async function handleLogin() {
         initApp();
         return;
     }
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let user = all[email];
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
@@ -1922,7 +1924,7 @@ async function handleLogin() {
     user.lastLogin = new Date().toISOString();
     user.lastMiningUpdate = now;
     all[email] = user;
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = user;
     initApp();
 }
@@ -2023,11 +2025,11 @@ function startCloudSync() {
     if (!firebaseOnline) return;
     syncInterval = setInterval(async () => {
         if (!currentUser) return;
-        let all = await getAllUsers();
+        let all = getAllUsers();
         let u = all[currentUser.email];
         if (u) {
             u.lastMiningUpdate = Date.now();
-            await setAllUsers(all);
+            setAllUsers(all);
             users = all;
             currentUser = u;
             try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2084,9 +2086,9 @@ function updateDashPrice() {
 function startMiningSimulation() {
     miningInterval = setInterval(async () => {
         if (!currentUser) return;
-        let all = await getAllUsers();
+        let all = getAllUsers();
         let u = all[currentUser.email];
-        if (!u) return;
+        if (!u || !u.rigs) return;
         let earned = 0;
         u.rigs.forEach(rig => {
             const rigData = RIGS.find(r => r.id === rig.id);
@@ -2099,7 +2101,7 @@ function startMiningSimulation() {
         if (earned > 0) {
             u.btc += earned;
             u.lastMiningUpdate = Date.now();
-            await setAllUsers(all);
+            setAllUsers(all);
             currentUser = u;
             if (firebaseOnline && db) {
                 try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2120,7 +2122,8 @@ async function renderDashboard() {
     const btc = u.btc || 0;
     const btcUsd = btc * btcPrice;
     const total = usd + btcUsd;
-    const miningTotal = u.rigs.reduce((sum, r) => sum + (r.earned || 0) * btcPrice, 0);
+    const rigs = u.rigs || [];
+    const miningTotal = rigs.reduce((sum, r) => sum + (r.earned || 0) * btcPrice, 0);
 
     document.getElementById('dashTotal').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     document.getElementById('dashBtc').textContent = btc.toFixed(8);
@@ -2131,7 +2134,7 @@ async function renderDashboard() {
 
     // Activity
     const activity = document.getElementById('dashActivity');
-    const txs = [...currentUser.txs].sort((a,b) => b.date - a.date).slice(0, 6);
+    const txs = [...(currentUser.txs || [])].sort((a,b) => b.date - a.date).slice(0, 6);
     if (txs.length === 0) {
         activity.innerHTML = `<div class="empty-state"><div class="icon"><svg width="48" height="48"><use href="#icon-empty"/></svg></div><h3>No recent activity</h3><p>Trading and mining activity will appear here</p></div>`;
     } else {
@@ -2156,10 +2159,10 @@ async function renderDashboard() {
 
     // Rigs
     const rigsEl = document.getElementById('dashRigs');
-    if (currentUser.rigs.length === 0) {
+    if (rigs.length === 0) {
         rigsEl.innerHTML = `<div class="empty-state"><div class="icon"><svg width=\"48\" height=\"48\"><use href=\"#icon-mining\"/></svg></div><h3>No active rigs</h3><p>Deploy ASIC hardware to begin BTC generation</p></div>`;
     } else {
-        rigsEl.innerHTML = currentUser.rigs.map(rig => {
+        rigsEl.innerHTML = rigs.map(rig => {
             const rigData = RIGS.find(r => r.id === rig.id);
             return `
                 <div class="my-rig">
@@ -2171,7 +2174,7 @@ async function renderDashboard() {
     }
 
     // Referral
-    document.getElementById('dashRefCount').textContent = `${currentUser.referrals.length} / 10`;
+    document.getElementById('dashRefCount').textContent = `${(currentUser.referrals || []).length} / 10`;
     document.getElementById('dashRefBar').style.width = Math.min(currentUser.referrals.length * 10, 100) + '%';
     document.getElementById('dashRefCode').textContent = currentUser.refCode;
 }
@@ -2181,7 +2184,7 @@ function renderWallet() {
     document.getElementById('walletBtc').textContent = currentUser.btc.toFixed(8);
     document.getElementById('walletBtcUsd').textContent = '≈ $' + (currentUser.btc * btcPrice).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     const tbody = document.getElementById('txBody');
-    const txs = [...currentUser.txs].sort((a,b) => b.date - a.date);
+    const txs = [...(currentUser.txs || [])].sort((a,b) => b.date - a.date);
     if (txs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px;">No transactions on record</td></tr>`;
     } else {
@@ -2198,67 +2201,88 @@ function renderWallet() {
 }
 
 function renderMining() {
-    const market = document.getElementById('rigMarket');
-    market.innerHTML = RIGS.map(rig => {
-        const ownedCount = currentUser.rigs.filter(r => r.id === rig.id).length;
-        const atLimit = !currentUser.isAdmin && ownedCount >= RIG_PURCHASE_LIMIT;
-        const canAfford = currentUser.usd >= rig.price;
-        const disabled = !canAfford || atLimit;
-        let btnText = 'Deploy Rig';
-        if (atLimit) btnText = `Limit Reached (${ownedCount}/${RIG_PURCHASE_LIMIT})`;
-        else if (!canAfford) btnText = 'Insufficient Funds';
-        return `
-        <div class="rig-card">
-            <span class="tag ${rig.tag==='Best'?'tag-best':rig.tag==='Popular'?'tag-popular':'tag-pro'}" style="background:var(--bg);color:var(--text-muted);">${rig.tag}</span>
-            <div class="rig-icon">${rig.icon}</div>
-            <div class="rig-name">${rig.name}</div>
-            <div class="rig-spec">Institutional ASIC mining hardware</div>
-            <div class="rig-stats">
-                <div class="rig-stat">Hash Rate <b>${rig.hash}</b></div>
-                <div class="rig-stat">Power Draw <b>${rig.power}</b></div>
-                <div class="rig-stat">Daily Yield <b>~${rig.daily.toFixed(4)} BTC</b></div>
-                <div class="rig-stat">Monthly Yield <b>~${(rig.daily*30).toFixed(4)} BTC</b></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-                <div class="rig-price">$${rig.price.toLocaleString()}</div>
-                <div style="font-size:12px;color:var(--text-muted);">Owned: <span style="color:var(--accent);font-weight:700;">${ownedCount}</span>${!currentUser.isAdmin ? ` / ${RIG_PURCHASE_LIMIT}` : ''}</div>
-            </div>
-            <button class="btn btn-primary" onclick="buyRig('${rig.id}')" ${disabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>${btnText}</button>
-        </div>
-    `}).join('');
-    renderMyRigs();
+    try {
+        const market = document.getElementById('rigMarket');
+        if (!market) { console.error('rigMarket element not found'); return; }
+        if (!currentUser) { console.error('currentUser is null'); return; }
+        const userRigs = currentUser.rigs || [];
+        let html = '';
+        for (let i = 0; i < RIGS.length; i++) {
+            const rig = RIGS[i];
+            const ownedCount = userRigs.filter(r => r.id === rig.id).length;
+            const atLimit = !currentUser.isAdmin && ownedCount >= RIG_PURCHASE_LIMIT;
+            const canAfford = (currentUser.usd || 0) >= rig.price;
+            const disabled = !canAfford || atLimit;
+            let btnText = 'Deploy Rig';
+            if (atLimit) btnText = 'Limit Reached (' + ownedCount + '/' + RIG_PURCHASE_LIMIT + ')';
+            else if (!canAfford) btnText = 'Insufficient Funds';
+            let limitBadge = '';
+            if (!currentUser.isAdmin) {
+                limitBadge = ' / ' + RIG_PURCHASE_LIMIT;
+            }
+            html += '<div class="rig-card">' +
+                '<span class="tag ' + (rig.tag==='Best'?'tag-best':rig.tag==='Popular'?'tag-popular':'tag-pro') + '" style="background:var(--bg);color:var(--text-muted);">' + rig.tag + '</span>' +
+                '<div class="rig-icon">' + rig.icon + '</div>' +
+                '<div class="rig-name">' + rig.name + '</div>' +
+                '<div class="rig-spec">Institutional ASIC mining hardware</div>' +
+                '<div class="rig-stats">' +
+                    '<div class="rig-stat">Hash Rate <b>' + rig.hash + '</b></div>' +
+                    '<div class="rig-stat">Power Draw <b>' + rig.power + '</b></div>' +
+                    '<div class="rig-stat">Daily Yield <b>~' + rig.daily.toFixed(4) + ' BTC</b></div>' +
+                    '<div class="rig-stat">Monthly Yield <b>~' + (rig.daily*30).toFixed(4) + ' BTC</b></div>' +
+                '</div>' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
+                    '<div class="rig-price">$' + rig.price.toLocaleString() + '</div>' +
+                    '<div style="font-size:12px;color:var(--text-muted);">Owned: <span style="color:var(--accent);font-weight:700;">' + ownedCount + '</span>' + limitBadge + '</div>' +
+                '</div>' +
+                '<button class="btn btn-primary" onclick="buyRig('' + rig.id + '')" ' + (disabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>' + btnText + '</button>' +
+            '</div>';
+        }
+        market.innerHTML = html;
+        renderMyRigs();
+    } catch(e) {
+        console.error('renderMining error:', e);
+    }
 }
 function renderMyRigs() {
-    const list = document.getElementById('myRigsList');
-    if (currentUser.rigs.length === 0) {
-        list.innerHTML = `<div class="empty-state"><div class="icon"><svg width=\"48\" height=\"48\"><use href=\"#icon-mining\"/></svg></div><h3>No active mining rigs</h3><p>Purchase a rig from the marketplace above to begin BTC generation</p></div>`;
-    } else {
-        list.innerHTML = currentUser.rigs.map((rig, idx) => {
-            const rigData = RIGS.find(r => r.id === rig.id);
-            const earned = rig.earned || 0;
-            const usdValue = earned * btcPrice;
-            return `
-                <div class="my-rig">
-                    <div style="display:flex;align-items:center;gap:14px;">
-                        <div style="font-size:32px;">${rigData.icon}</div>
-                        <div class="my-rig-info">
-                            <h4>${rigData.name}</h4>
-                            <p>${rigData.hash} • Uptime ${timeAgo(rig.purchased, true)}</p>
-                        </div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:24px;">
-                        <div class="my-rig-earnings">
-                            <div class="amount">${earned.toFixed(8)} BTC</div>
-                            <div class="label">~ $${usdValue.toFixed(2)} mined</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:13px;color:var(--success);font-weight:700;">+${(rigData.daily/24).toFixed(6)} / hour</div>
-                            <div style="font-size:11px;color:var(--text-muted);">Active</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+    try {
+        const list = document.getElementById('myRigsList');
+        if (!list) return;
+        const userRigs = currentUser.rigs || [];
+        if (userRigs.length === 0) {
+            list.innerHTML = '<div class="empty-state"><div class="icon"><svg width="48" height="48"><use href="#icon-mining"/></svg></div><h3>No active mining rigs</h3><p>Purchase a rig from the marketplace above to begin BTC generation</p></div>';
+        } else {
+            let html = '';
+            for (let i = 0; i < userRigs.length; i++) {
+                const rig = userRigs[i];
+                const rigData = RIGS.find(r => r.id === rig.id);
+                if (!rigData) continue;
+                const earned = rig.earned || 0;
+                const usdValue = earned * btcPrice;
+                html += '<div class="my-rig">' +
+                    '<div style="display:flex;align-items:center;gap:14px;">' +
+                        '<div style="font-size:32px;">' + rigData.icon + '</div>' +
+                        '<div class="my-rig-info">' +
+                            '<h4>' + rigData.name + '</h4>' +
+                            '<p>' + rigData.hash + ' • Uptime ' + timeAgo(rig.purchased, true) + '</p>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="display:flex;align-items:center;gap:24px;">' +
+                        '<div class="my-rig-earnings">' +
+                            '<div class="amount">' + earned.toFixed(8) + ' BTC</div>' +
+                            '<div class="label">~ $' + usdValue.toFixed(2) + ' mined</div>' +
+                        '</div>' +
+                        '<div style="text-align:right;">' +
+                            '<div style="font-size:13px;color:var(--success);font-weight:700;">+' + (rigData.daily/24).toFixed(6) + ' / hour</div>' +
+                            '<div style="font-size:11px;color:var(--text-muted);">Active</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }
+            list.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('renderMyRigs error:', e);
     }
 }
 
@@ -2272,11 +2296,12 @@ function renderTrade() {
         : currentUser.btc.toFixed(8) + ' BTC';
 }
 function renderReferral() {
-    document.getElementById('refCodeDisplay').textContent = currentUser.refCode;
-    document.getElementById('refTotal').textContent = currentUser.referrals.length;
-    const earnings = currentUser.referrals.length * 100;
+    const refs = currentUser.referrals || [];
+    document.getElementById('refCodeDisplay').textContent = currentUser.refCode || '----';
+    document.getElementById('refTotal').textContent = refs.length;
+    const earnings = refs.length * 100;
     document.getElementById('refEarnings').textContent = '$' + earnings.toLocaleString();
-    const minerCount = currentUser.referrals.filter(email => {
+    const minerCount = refs.filter(email => {
         const u = users[email];
         return u && u.rigs && u.rigs.length > 0;
     }).length;
@@ -2284,7 +2309,7 @@ function renderReferral() {
 }
 function renderNotifications() {
     const list = document.getElementById('notifList');
-    const notifs = [...currentUser.notifs].sort((a,b) => b.date - a.date);
+    const notifs = [...(currentUser.notifs || [])].sort((a,b) => b.date - a.date);
     updateNotifBadge();
     if (notifs.length === 0) {
         list.innerHTML = `<div class="empty-state"><div class="icon"><svg width="48" height="48"><use href="#icon-empty"/></svg></div><h3>No messages</h3><p>Account activity will generate notifications here</p></div>`;
@@ -2304,7 +2329,7 @@ function renderNotifications() {
 async function renderAdmin() {
     if (!currentUser.isAdmin) return;
     // Always reload fresh from Firebase first
-    users = await getAllUsers();
+    users = getAllUsers();
     const allUsers = Object.values(users);
     const clients = allUsers.filter(u => !u.isAdmin);
 
@@ -2315,7 +2340,8 @@ async function renderAdmin() {
 
     // Calculate total mining earnings across all clients
     const totalMining = clients.reduce((sum, u) => {
-        const userMining = (u.rigs||[]).reduce((rSum, r) => rSum + ((r.earned||0) * btcPrice), 0);
+        const userRigs = u.rigs || [];
+        const userMining = userRigs.reduce((rSum, r) => rSum + ((r.earned||0) * btcPrice), 0);
         return sum + userMining;
     }, 0);
     document.getElementById('adminTotalMining').textContent = '$' + totalMining.toLocaleString('en-US', {minimumFractionDigits:2});
@@ -2336,7 +2362,8 @@ async function renderAdmin() {
     table.style.display = 'table';
 
     tbody.innerHTML = clients.map(u => {
-        const miningEarnings = (u.rigs||[]).reduce((sum, r) => sum + ((r.earned||0) * btcPrice), 0);
+        const userRigs = u.rigs || [];
+        const miningEarnings = userRigs.reduce((sum, r) => sum + ((r.earned||0) * btcPrice), 0);
         const initials = u.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
         return `
         <tr class="client-row" data-email="${u.email}">
@@ -2349,8 +2376,8 @@ async function renderAdmin() {
                 <span class="val" id="btc-${u.email.replace(/\./g,'-')}">${(u.btc||0).toFixed(8)}</span>
             </td>
             <td data-label="Mining" class="earnings-val" id="mining-${u.email.replace(/\./g,'-')}">$${miningEarnings.toFixed(2)}</td>
-            <td data-label="Rigs">${(u.rigs||[]).length}</td>
-            <td data-label="Refs">${(u.referrals||[]).length}</td>
+            <td data-label="Rigs">${(u.rigs || []).length}</td>
+            <td data-label="Refs">${(u.referrals || []).length}</td>
             <td data-label="Joined" style="font-size:12px;color:var(--text-muted);">${new Date(u.joined).toLocaleDateString()}</td>
             <td data-label="Actions">
                 <div class="manage-btns">
@@ -2416,7 +2443,7 @@ async function sendFundsToClient(email) {
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
 
     // Reload fresh data from Firebase
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let master = all[currentUser.email];
     let client = all[email];
     if (!master) { toast('Master account error', 'error'); return; }
@@ -2443,7 +2470,7 @@ async function sendFundsToClient(email) {
     // Save both atomically to Firebase + localStorage
     all[master.email] = master;
     all[client.email] = client;
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = master;
 
     closeModal();
@@ -2481,7 +2508,7 @@ async function viewClientTx(email) {
 // ================= ACTIONS =================
 async function buyRig(rigId) {
     const rig = RIGS.find(r => r.id === rigId);
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let u = all[currentUser.email];
     if (u.usd < rig.price) { toast('Insufficient USD balance', 'error'); return; }
     // Enforce purchase limit for non-admin users
@@ -2493,9 +2520,10 @@ async function buyRig(rigId) {
         }
     }
     u.usd -= rig.price;
+    u.rigs = u.rigs || [];
     u.rigs.push({ id: rigId, purchased: Date.now(), earned: 0 });
     u.txs.push({ type: 'mining', amount: -rig.price, currency: 'USD', status: 'Completed', date: Date.now(), details: `Deployed ${rig.name}` });
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2530,7 +2558,7 @@ function updateTradePreview(source) {
 async function executeTrade() {
     const amt = parseFloat(document.getElementById('tradeAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid quantity', 'error'); return; }
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let u = all[currentUser.email];
     const usd = amt * btcPrice;
     const fee = usd * 0.001;
@@ -2545,10 +2573,22 @@ async function executeTrade() {
         u.usd += (usd - fee);
         u.txs.push({ type: 'trade', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Short BTC @ $${btcPrice.toFixed(2)}` });
     }
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
+    }
+    // Send email notification for BTC purchase to non-admin users
+    if (tradeMode === 'buy' && !u.isAdmin && emailjsReady) {
+        try {
+            const fakeTxid = '0x' + Array.from({length:64},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
+                email: u.email,
+                to_name: u.name,
+                name: u.name,
+                welcome_message: 'BTC Purchase Confirmed! You purchased ' + amt.toFixed(8) + ' BTC at $' + btcPrice.toLocaleString() + '. TXID: ' + fakeTxid.substring(0,18) + '...' + fakeTxid.substring(60) + ' (Pending confirmation)'
+            });
+        } catch(e) { console.warn('Purchase email failed:', e); }
     }
     updateAllBalances();
     renderTrade();
@@ -2674,23 +2714,64 @@ function openModal(type) {
             content.innerHTML = `
                 <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-deposit"/></svg> Fund Account</h3><button class="modal-close" onclick="closeModal()">×</button></div>
                 <div class="modal-body">
-                    <p style="margin-bottom:16px;">Send BTC or USDT to the wallet address below. Funds will be credited after network confirmation.</p>
-                    <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
-                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">USDT Wallet Address (ERC-20)</div>
-                        <div style="display:flex;gap:8px;">
-                            <input type="text" id="walletAddr" value="0x742d35Cc6634C0532925a3b8D4D9db9650c9B5a3" readonly style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:monospace;">
-                            <button class="btn btn-outline" style="width:auto;padding:10px 16px;font-size:12px;" onclick="copyWalletAddr()">Copy</button>
+                    <p style="margin-bottom:16px;">Send BTC to the wallet address below or scan the QR code. Funds will be credited after network confirmation.</p>
+                    <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Scan to Send BTC</div>
+                        <div style="width:180px;height:180px;background:#fff;border-radius:12px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;padding:12px;">
+                            <svg viewBox="0 0 180 180" width="160" height="160">
+                                <rect x="0" y="0" width="60" height="60" fill="#000"/>
+                                <rect x="10" y="10" width="40" height="40" fill="#fff"/>
+                                <rect x="20" y="20" width="20" height="20" fill="#000"/>
+                                <rect x="120" y="0" width="60" height="60" fill="#000"/>
+                                <rect x="130" y="10" width="40" height="40" fill="#fff"/>
+                                <rect x="140" y="20" width="20" height="20" fill="#000"/>
+                                <rect x="0" y="120" width="60" height="60" fill="#000"/>
+                                <rect x="10" y="130" width="40" height="40" fill="#fff"/>
+                                <rect x="20" y="140" width="20" height="20" fill="#000"/>
+                                <rect x="70" y="0" width="10" height="10" fill="#000"/><rect x="90" y="0" width="10" height="10" fill="#000"/>
+                                <rect x="70" y="20" width="10" height="10" fill="#000"/><rect x="100" y="20" width="10" height="10" fill="#000"/>
+                                <rect x="70" y="40" width="10" height="10" fill="#000"/><rect x="90" y="40" width="10" height="10" fill="#000"/>
+                                <rect x="70" y="60" width="10" height="10" fill="#000"/><rect x="100" y="60" width="10" height="10" fill="#000"/>
+                                <rect x="0" y="70" width="10" height="10" fill="#000"/><rect x="20" y="70" width="10" height="10" fill="#000"/>
+                                <rect x="40" y="70" width="10" height="10" fill="#000"/><rect x="60" y="70" width="10" height="10" fill="#000"/>
+                                <rect x="0" y="90" width="10" height="10" fill="#000"/><rect x="30" y="90" width="10" height="10" fill="#000"/>
+                                <rect x="50" y="90" width="10" height="10" fill="#000"/><rect x="60" y="90" width="10" height="10" fill="#000"/>
+                                <rect x="0" y="100" width="10" height="10" fill="#000"/><rect x="20" y="100" width="10" height="10" fill="#000"/>
+                                <rect x="50" y="100" width="10" height="10" fill="#000"/><rect x="60" y="100" width="10" height="10" fill="#000"/>
+                                <rect x="70" y="80" width="40" height="40" fill="#000"/>
+                                <rect x="80" y="90" width="20" height="20" fill="#fff"/>
+                                <rect x="85" y="95" width="10" height="10" fill="#000"/>
+                                <rect x="120" y="70" width="10" height="10" fill="#000"/><rect x="140" y="70" width="10" height="10" fill="#000"/>
+                                <rect x="160" y="70" width="10" height="10" fill="#000"/><rect x="120" y="90" width="10" height="10" fill="#000"/>
+                                <rect x="150" y="90" width="10" height="10" fill="#000"/><rect x="170" y="90" width="10" height="10" fill="#000"/>
+                                <rect x="120" y="100" width="10" height="10" fill="#000"/><rect x="140" y="100" width="10" height="10" fill="#000"/>
+                                <rect x="170" y="100" width="10" height="10" fill="#000"/><rect x="70" y="110" width="10" height="10" fill="#000"/>
+                                <rect x="90" y="110" width="10" height="10" fill="#000"/><rect x="110" y="110" width="10" height="10" fill="#000"/>
+                                <rect x="70" y="130" width="10" height="10" fill="#000"/><rect x="100" y="130" width="10" height="10" fill="#000"/>
+                                <rect x="120" y="110" width="10" height="10" fill="#000"/><rect x="150" y="110" width="10" height="10" fill="#000"/>
+                                <rect x="170" y="110" width="10" height="10" fill="#000"/><rect x="130" y="120" width="10" height="10" fill="#000"/>
+                                <rect x="160" y="120" width="10" height="10" fill="#000"/><rect x="120" y="140" width="10" height="10" fill="#000"/>
+                                <rect x="140" y="140" width="10" height="10" fill="#000"/><rect x="160" y="140" width="10" height="10" fill="#000"/>
+                                <rect x="120" y="160" width="10" height="10" fill="#000"/><rect x="150" y="160" width="10" height="10" fill="#000"/>
+                                <rect x="170" y="160" width="10" height="10" fill="#000"/><rect x="70" y="150" width="10" height="10" fill="#000"/>
+                                <rect x="90" y="150" width="10" height="10" fill="#000"/><rect x="110" y="150" width="10" height="10" fill="#000"/>
+                                <rect x="70" y="170" width="10" height="10" fill="#000"/><rect x="100" y="170" width="10" height="10" fill="#000"/>
+                                <rect x="110" y="170" width="10" height="10" fill="#000"/><rect x="130" y="170" width="10" height="10" fill="#000"/>
+                                <rect x="150" y="170" width="10" height="10" fill="#000"/><rect x="170" y="170" width="10" height="10" fill="#000"/>
+                                <circle cx="90" cy="90" r="12" fill="#f7931a"/>
+                                <text x="90" y="96" text-anchor="middle" fill="#fff" font-size="16" font-weight="bold">₿</text>
+                            </svg>
                         </div>
-                    </div>
-                    <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
-                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">BTC Wallet Address</div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Bitcoin Address</div>
                         <div style="display:flex;gap:8px;">
-                            <input type="text" value="bc1q69fptrfqr5ej2mtg40mrs2p067qz22luhwxu7c" readonly style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:monospace;">
-                            <button class="btn btn-outline" style="width:auto;padding:10px 16px;font-size:12px;" onclick="navigator.clipboard.writeText('bc1q69fptrfqr5ej2mtg40mrs2p067qz22luhwxu7c');toast('BTC address copied','success')">Copy</button>
+                            <input type="text" id="btcWalletAddr" value="bc1q69fptrfqr5ej2mtg40mrs2p067qz22luhwxu7c" readonly style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:monospace;">
+                            <button class="btn btn-outline" style="width:auto;padding:10px 16px;font-size:12px;" onclick="copyBtcWallet()">Copy</button>
                         </div>
                     </div>
                     <div style="background:var(--bg);border:1px dashed var(--border);border-radius:12px;padding:16px;text-align:center;">
-                        <div style="font-size:20px;margin-bottom:8px;">💵</div>
+                        <div style="width:40px;height:40px;margin:0 auto 8px;background:linear-gradient(135deg,#00d632,#00b828);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#fff"/><path d="M12 6v12M6 12h12" stroke="#00d632" stroke-width="2.5" stroke-linecap="round"/></svg>
+                        </div>
                         <div style="font-size:14px;font-weight:700;margin-bottom:4px;">Cash App</div>
                         <div style="font-size:12px;color:var(--text-muted);">Coming soon</div>
                     </div>
@@ -2725,7 +2806,9 @@ function openModal(type) {
                         </div>
                     </div>
                     <div style="background:var(--bg);border:1px dashed var(--border);border-radius:12px;padding:16px;text-align:center;">
-                        <div style="font-size:20px;margin-bottom:8px;">💵</div>
+                        <div style="width:40px;height:40px;margin:0 auto 8px;background:linear-gradient(135deg,#00d632,#00b828);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#fff"/><path d="M12 6v12M6 12h12" stroke="#00d632" stroke-width="2.5" stroke-linecap="round"/></svg>
+                        </div>
                         <div style="font-size:14px;font-weight:700;margin-bottom:4px;">Cash App Withdrawal</div>
                         <div style="font-size:12px;color:var(--text-muted);">Coming soon</div>
                     </div>
@@ -2753,15 +2836,20 @@ function copyWalletAddr() {
     navigator.clipboard.writeText(addr);
     toast('Wallet address copied', 'success');
 }
+function copyBtcWallet() {
+    const addr = document.getElementById('btcWalletAddr').value;
+    navigator.clipboard.writeText(addr);
+    toast('BTC address copied', 'success');
+}
 function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
 async function processDeposit() {
     const amt = parseFloat(document.getElementById('depAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let u = all[currentUser.email];
     u.usd += amt;
     u.txs.push({ type: 'deposit', amount: amt, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Wire transfer deposit' });
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2775,13 +2863,13 @@ async function processStudentWithdraw() {
     const amt = parseFloat(document.getElementById('witBtcAmount').value);
     const addr = document.getElementById('witBtcAddr').value.trim();
     if (!amt || amt <= 0) { toast('Enter valid BTC amount', 'error'); return; }
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let u = all[currentUser.email];
     if (u.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
     if (!addr || addr.length < 10) { toast('Enter a valid BTC wallet address', 'error'); return; }
     u.btc -= amt;
     u.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Pending', date: Date.now(), details: `BTC withdrawal to ${addr.substring(0,12)}...` });
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2795,12 +2883,12 @@ async function processStudentWithdraw() {
 async function processWithdraw() {
     const amt = parseFloat(document.getElementById('witAmount').value);
     if (!amt || amt <= 0) { toast('Enter valid amount', 'error'); return; }
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let u = all[currentUser.email];
     if (u.usd < amt) { toast('Insufficient balance', 'error'); return; }
     u.usd -= amt;
     u.txs.push({ type: 'withdraw', amount: -amt, currency: 'USD', status: 'Pending', date: Date.now(), details: 'Withdrawal to external wallet' });
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2811,7 +2899,7 @@ async function processWithdraw() {
     toast('Withdrawal request submitted', 'success');
 }
 async function processConvert() {
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let u = all[currentUser.email];
     if (u.btc <= 0) { toast('No BTC to convert', 'error'); return; }
     const usd = u.btc * btcPrice;
@@ -2819,7 +2907,7 @@ async function processConvert() {
     u.usd += usd;
     u.btc = 0;
     u.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USDT @ $${btcPrice.toFixed(2)}` });
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2832,30 +2920,30 @@ async function processConvert() {
 
 // ================= NOTIFICATIONS =================
 async function addNotif(user, title, body, icon) {
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let u = all[user.email] || user;
     u.notifs = u.notifs || [];
     u.notifs.unshift({ id: Date.now(), title, body, icon, date: Date.now(), read: false });
     if (u.notifs.length > 50) u.notifs.pop();
-    await setAllUsers(all);
+    setAllUsers(all);
 }
 async function saveNotifs(user) {
     await saveUser(user);
     if (user.email === currentUser.email) updateNotifBadge();
 }
 function updateNotifBadge() {
-    const unread = currentUser.notifs.filter(n => !n.read).length;
+    const unread = (currentUser.notifs || []).filter(n => !n.read).length;
     const badge = document.getElementById('notifBadge');
     const navBadge = document.getElementById('notifCountNav');
     if (unread > 0) { badge.classList.remove('hidden'); badge.textContent = unread; navBadge.classList.remove('hidden'); navBadge.textContent = unread; }
     else { badge.classList.add('hidden'); navBadge.classList.add('hidden'); }
 }
 async function readNotif(id) {
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let u = all[currentUser.email];
     const n = u.notifs.find(x => x.id === id);
     if (n) n.read = true;
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2863,10 +2951,10 @@ async function readNotif(id) {
     renderNotifications();
 }
 async function markAllRead() {
-    let all = await getAllUsers();
+    let all = getAllUsers();
     let u = all[currentUser.email];
     u.notifs.forEach(n => n.read = true);
-    await setAllUsers(all);
+    setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(u.email)).set(u); } catch(e) {}
@@ -2881,22 +2969,22 @@ function filterAdminUsers(q) {
 }
 async function resetAllBalances() {
     if (!confirm('Reset ALL client accounts to $500 USDT and $500 worth of BTC? This is irreversible.')) return;
-    let all = await getAllUsers();
+    let all = getAllUsers();
     Object.values(all).forEach(u => {
         if (!u.isAdmin) {
             const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
             u.usd = 500; u.btc = resetBtc; u.rigs = []; u.txs = []; u.notifs = []; u.referrals = [];
         }
     });
-    await setAllUsers(all);
+    setAllUsers(all);
     await renderAdmin();
     toast('All client accounts reset to $500 USDT + $500 BTC worth', 'success');
 }
 async function clearAllTx() {
     if (!confirm('Purge ALL transaction records across the platform?')) return;
-    let all = await getAllUsers();
+    let all = getAllUsers();
     Object.values(all).forEach(u => { u.txs = []; });
-    await setAllUsers(all);
+    setAllUsers(all);
     await renderAdmin();
     toast('All transaction records purged', 'success');
 }
