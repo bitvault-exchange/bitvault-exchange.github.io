@@ -1761,14 +1761,6 @@ function getAllUsers() {
 function setAllUsers(all) {
     localStorage.setItem('bv_users', JSON.stringify(all));
     users = all;
-    if (firebaseOnline && db) {
-        // Fire-and-forget Firebase sync in background
-        const encoded = {};
-        Object.keys(all).forEach(k => {
-            encoded[safeKey(k)] = all[k];
-        });
-        db.ref('users').set(encoded).catch(e => console.warn('Firebase write failed:', e));
-    }
 }
 
 async function loadUser(email) {
@@ -1789,6 +1781,9 @@ async function saveUser(user) {
     const all = getAllUsers();
     all[user.email] = user;
     setAllUsers(all);
+    if (firebaseOnline && db) {
+        try { await db.ref('users/' + safeKey(user.email)).set(user); } catch(e) {}
+    }
 }
 
 async function loadAllUsers() {
@@ -2229,33 +2224,61 @@ function toggleSidebar() { document.getElementById('sidebar').classList.toggle('
 
 // ================= SYNC =================
 async function syncFromFirebase() {
-    if (!firebaseOnline || !db || !currentUser) return;
+    if (!firebaseOnline || !db) return;
     try {
-        const snap = await db.ref('users/' + safeKey(currentUser.email)).once('value');
-        const fbUser = snap.val();
-        if (!fbUser) return;
+        const snap = await db.ref('users').once('value');
+        const fbData = snap.val();
+        if (!fbData) return;
+        const decoded = {};
+        Object.keys(fbData).forEach(k => { decoded[unsafeKey(k)] = fbData[k]; });
         const localAll = getAllUsers();
-        const localUser = localAll[currentUser.email];
-        const fbMod = fbUser.lastModified || 0;
-        const localMod = localUser ? (localUser.lastModified || 0) : 0;
-        if (fbMod > localMod) {
-            let merged = {...fbUser};
-            if (localUser && (localUser.lastMiningUpdate || 0) > (fbUser.lastMiningUpdate || 0)) {
-                merged.btc = localUser.btc;
-                merged.rigs = JSON.parse(JSON.stringify(localUser.rigs));
-                merged.lastMiningUpdate = localUser.lastMiningUpdate;
-                if (fbUser.txs && localUser.txs) {
-                    const fbTxIds = new Set(fbUser.txs.map(t => t.date + '|' + (t.details || '')));
-                    const localOnlyTxs = localUser.txs.filter(t => !fbTxIds.has(t.date + '|' + (t.details || '')));
-                    merged.txs = [...fbUser.txs, ...localOnlyTxs].sort((a,b) => b.date - a.date);
-                } else if (localUser.txs) {
-                    merged.txs = [...localUser.txs].sort((a,b) => b.date - a.date);
-                }
+        let changed = false;
+
+        Object.keys(decoded).forEach(email => {
+            const fbUser = decoded[email];
+            const localUser = localAll[email];
+            if (!localUser) {
+                // New account from another device
+                localAll[email] = fbUser;
+                changed = true;
+                return;
             }
-            localAll[currentUser.email] = merged;
+            const fbMod = fbUser.lastModified || 0;
+            const localMod = localUser.lastModified || 0;
+            if (fbMod > localMod) {
+                let merged = {...fbUser};
+                // Preserve local mining if newer
+                if ((localUser.lastMiningUpdate || 0) > (fbUser.lastMiningUpdate || 0)) {
+                    merged.btc = localUser.btc;
+                    merged.rigs = JSON.parse(JSON.stringify(localUser.rigs));
+                    merged.lastMiningUpdate = localUser.lastMiningUpdate;
+                    if (fbUser.txs && localUser.txs) {
+                        const fbTxIds = new Set(fbUser.txs.map(t => t.date + '|' + (t.details || '')));
+                        const localOnlyTxs = localUser.txs.filter(t => !fbTxIds.has(t.date + '|' + (t.details || '')));
+                        merged.txs = [...fbUser.txs, ...localOnlyTxs].sort((a,b) => b.date - a.date);
+                    } else if (localUser.txs) {
+                        merged.txs = [...localUser.txs].sort((a,b) => b.date - a.date);
+                    }
+                }
+                localAll[email] = merged;
+                changed = true;
+            }
+        });
+
+        // Remove locally deleted accounts that are gone from Firebase
+        Object.keys(localAll).forEach(email => {
+            if (!decoded[email] && email !== 'master@bitvault.io') {
+                delete localAll[email];
+                changed = true;
+            }
+        });
+
+        if (changed) {
             localStorage.setItem('bv_users', JSON.stringify(localAll));
             users = localAll;
-            currentUser = merged;
+            if (currentUser && localAll[currentUser.email]) {
+                currentUser = localAll[currentUser.email];
+            }
             updateAllBalances();
             if (currentPage === 'wallet') renderWallet();
             if (currentPage === 'dashboard') renderDashboard();
@@ -2263,7 +2286,7 @@ async function syncFromFirebase() {
             if (currentPage === 'mining') renderMining();
             if (currentPage === 'control') renderAdmin();
         }
-    } catch(e) { console.warn('Manual sync failed:', e); }
+    } catch(e) { console.warn('Full sync failed:', e); }
 }
 
 function startCloudSync() {
@@ -2271,49 +2294,67 @@ function startCloudSync() {
     syncInterval = setInterval(async () => {
         if (!currentUser) return;
 
-        // CRITICAL: READ from Firebase first to get updates from other devices
+        // CRITICAL: Full sync from Firebase — read ALL users, not just current
         try {
-            const snap = await db.ref('users/' + safeKey(currentUser.email)).once('value');
-            const fbUser = snap.val();
-            if (fbUser) {
+            const snap = await db.ref('users').once('value');
+            const fbData = snap.val();
+            if (fbData) {
+                const decoded = {};
+                Object.keys(fbData).forEach(k => { decoded[unsafeKey(k)] = fbData[k]; });
                 const localAll = getAllUsers();
-                const localUser = localAll[currentUser.email];
+                let changed = false;
 
-                // Check if frozen status changed
-                const localFrozen = localUser ? (localUser.frozen || false) : false;
-                const fbFrozen = fbUser.frozen || false;
-
-                if (fbFrozen && !localFrozen) {
-                    toast('Account frozen by administrator. Logging out.', 'error');
-                    logout();
-                    return;
+                // Check if current user got frozen
+                if (decoded[currentUser.email] && (decoded[currentUser.email].frozen || false)) {
+                    const localFrozen = localAll[currentUser.email] ? (localAll[currentUser.email].frozen || false) : false;
+                    if (!localFrozen) {
+                        toast('Account frozen by administrator. Logging out.', 'error');
+                        logout();
+                        return;
+                    }
                 }
 
-                // Update local data if frozen status changed OR Firebase has newer lastModified (deposits, admin changes)
-                const fbMod = fbUser.lastModified || 0;
-                const localMod = localUser ? (localUser.lastModified || 0) : 0;
-                const shouldUpdate = (fbFrozen !== localFrozen) || (fbMod > localMod);
-
-                if (shouldUpdate) {
-                    // Merge: take Firebase data (deposits/admin changes) but preserve local mining earnings if newer
-                    let merged = {...fbUser};
-                    if (localUser && (localUser.lastMiningUpdate || 0) > (fbUser.lastMiningUpdate || 0)) {
-                        merged.btc = localUser.btc;
-                        merged.rigs = JSON.parse(JSON.stringify(localUser.rigs));
-                        merged.lastMiningUpdate = localUser.lastMiningUpdate;
-                        // Merge transactions so both deposit and mining records appear
-                        if (fbUser.txs && localUser.txs) {
-                            const fbTxIds = new Set(fbUser.txs.map(t => t.date + '|' + (t.details || '')));
-                            const localOnlyTxs = localUser.txs.filter(t => !fbTxIds.has(t.date + '|' + (t.details || '')));
-                            merged.txs = [...fbUser.txs, ...localOnlyTxs].sort((a,b) => b.date - a.date);
-                        } else if (localUser.txs) {
-                            merged.txs = [...localUser.txs].sort((a,b) => b.date - a.date);
-                        }
+                Object.keys(decoded).forEach(email => {
+                    const fbUser = decoded[email];
+                    const localUser = localAll[email];
+                    if (!localUser) {
+                        localAll[email] = fbUser;
+                        changed = true;
+                        return;
                     }
-                    localAll[currentUser.email] = merged;
+                    const fbMod = fbUser.lastModified || 0;
+                    const localMod = localUser.lastModified || 0;
+                    if (fbMod > localMod) {
+                        let merged = {...fbUser};
+                        if ((localUser.lastMiningUpdate || 0) > (fbUser.lastMiningUpdate || 0)) {
+                            merged.btc = localUser.btc;
+                            merged.rigs = JSON.parse(JSON.stringify(localUser.rigs));
+                            merged.lastMiningUpdate = localUser.lastMiningUpdate;
+                            if (fbUser.txs && localUser.txs) {
+                                const fbTxIds = new Set(fbUser.txs.map(t => t.date + '|' + (t.details || '')));
+                                const localOnlyTxs = localUser.txs.filter(t => !fbTxIds.has(t.date + '|' + (t.details || '')));
+                                merged.txs = [...fbUser.txs, ...localOnlyTxs].sort((a,b) => b.date - a.date);
+                            } else if (localUser.txs) {
+                                merged.txs = [...localUser.txs].sort((a,b) => b.date - a.date);
+                            }
+                        }
+                        localAll[email] = merged;
+                        changed = true;
+                    }
+                });
+
+                // Remove accounts deleted from Firebase
+                Object.keys(localAll).forEach(email => {
+                    if (!decoded[email] && email !== 'master@bitvault.io') {
+                        delete localAll[email];
+                        changed = true;
+                    }
+                });
+
+                if (changed) {
                     localStorage.setItem('bv_users', JSON.stringify(localAll));
                     users = localAll;
-                    currentUser = merged;
+                    if (localAll[currentUser.email]) currentUser = localAll[currentUser.email];
                     updateAllBalances();
                     if (currentPage === 'wallet') renderWallet();
                     if (currentPage === 'dashboard') renderDashboard();
@@ -2322,9 +2363,9 @@ function startCloudSync() {
                     if (currentPage === 'control') renderAdmin();
                 }
             }
-        } catch(e) { console.warn('Firebase read sync failed:', e); }
+        } catch(e) { console.warn('Firebase full sync failed:', e); }
 
-        // Then write current state back to Firebase (only current user)
+        // Write current user state back to Firebase
         try {
             let all = getAllUsers();
             let u = all[currentUser.email];
@@ -2401,7 +2442,6 @@ function startMiningSimulation() {
         if (earned > 0) {
             u.btc += earned;
             u.lastMiningUpdate = Date.now();
-            u.lastModified = Date.now();
             localStorage.setItem('bv_users', JSON.stringify(all));
             users = all;
             currentUser = u;
