@@ -1740,6 +1740,7 @@ function setAllUsers(all) {
     localStorage.setItem('bv_users', JSON.stringify(all));
     users = all;
     if (firebaseOnline && db) {
+        // Fire-and-forget Firebase sync in background
         const encoded = {};
         Object.keys(all).forEach(k => {
             encoded[safeKey(k)] = all[k];
@@ -1766,10 +1767,6 @@ async function saveUser(user) {
     const all = getAllUsers();
     all[user.email] = user;
     setAllUsers(all);
-    // Also write individual user to Firebase for immediate cross-device access
-    if (firebaseOnline && db) {
-        try { await db.ref('users/' + safeKey(user.email)).set(user); } catch(e) {}
-    }
 }
 
 async function loadAllUsers() {
@@ -1905,7 +1902,6 @@ async function handleVerify() {
         }
     }
 
-    newUser.lastModified = Date.now();
     await saveUser(newUser);
     tempRegData = null;
     // Reload users to ensure sync
@@ -1978,7 +1974,7 @@ async function handleLogin() {
     let user = all[email];
 
     // CRITICAL: If user not found locally, check Firebase (account created on another device)
-    if (!user && db) {
+    if (!user && firebaseOnline && db) {
         try {
             const snap = await db.ref('users/' + safeKey(email)).once('value');
             const fbUser = snap.val();
@@ -1986,32 +1982,8 @@ async function handleLogin() {
                 all[email] = fbUser;
                 setAllUsers(all);
                 user = fbUser;
-                console.log('Account loaded from Firebase:', email);
-            } else {
-                console.warn('Firebase lookup: user not found or password mismatch');
             }
         } catch(e) { console.warn('Firebase login lookup failed:', e); }
-    }
-
-    // Fallback: if still not found, try loading ALL users from Firebase
-    if (!user && db) {
-        try {
-            const snap = await db.ref('users').once('value');
-            const fbData = snap.val();
-            if (fbData) {
-                const decoded = {};
-                Object.keys(fbData).forEach(k => {
-                    decoded[unsafeKey(k)] = fbData[k];
-                });
-                const fbUser = decoded[email];
-                if (fbUser && fbUser.password === password) {
-                    all[email] = fbUser;
-                    setAllUsers(all);
-                    user = fbUser;
-                    console.log('Account loaded from Firebase (full scan):', email);
-                }
-            }
-        } catch(e) { console.warn('Firebase full scan failed:', e); }
     }
 
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
@@ -2043,7 +2015,6 @@ async function handleLogin() {
 
     user.lastLogin = new Date().toISOString();
     user.lastMiningUpdate = now;
-    user.lastModified = Date.now();
     all[email] = user;
     setAllUsers(all);
     currentUser = user;
@@ -2088,8 +2059,8 @@ async function initApp() {
                         const localUser = localAll[email];
                         const fbUser = decoded[email];
                         if (localUser && fbUser) {
-                            const localTime = localUser.lastModified || localUser.lastMiningUpdate || 0;
-                            const fbTime = fbUser.lastModified || fbUser.lastMiningUpdate || 0;
+                            const localTime = localUser.lastMiningUpdate || 0;
+                            const fbTime = fbUser.lastMiningUpdate || 0;
                             if (fbTime > localTime) { localAll[email] = fbUser; }
                         }
                     } else { localAll[email] = decoded[email]; }
@@ -2174,7 +2145,7 @@ function startCloudSync() {
     syncInterval = setInterval(async () => {
         if (!currentUser) return;
 
-        // CRITICAL: READ from Firebase first to get updates from other devices (e.g. master sent funds)
+        // CRITICAL: READ from Firebase first to get updates from other devices
         try {
             const snap = await db.ref('users/' + safeKey(currentUser.email)).once('value');
             const fbUser = snap.val();
@@ -2187,8 +2158,8 @@ function startCloudSync() {
                 }
                 const localAll = getAllUsers();
                 const localUser = localAll[currentUser.email];
-                const fbTime = fbUser.lastModified || fbUser.lastMiningUpdate || 0;
-                const localTime = localUser ? (localUser.lastModified || localUser.lastMiningUpdate || 0) : 0;
+                const fbTime = fbUser.lastMiningUpdate || 0;
+                const localTime = localUser ? (localUser.lastMiningUpdate || 0) : 0;
                 if (fbTime > localTime) {
                     localAll[currentUser.email] = fbUser;
                     setAllUsers(localAll);
@@ -2268,7 +2239,7 @@ function startMiningSimulation() {
         let u = all[currentUser.email];
         if (!u || !u.rigs) return;
         const mult = u.miningMultiplier || 1.0;
-        if (mult <= 0) return; // paused
+        if (mult <= 0) return;
         let earned = 0;
         u.rigs.forEach(rig => {
             const rigData = RIGS.find(r => r.id === rig.id);
@@ -2665,8 +2636,6 @@ async function sendFundsToClient(email) {
     }
 
     // Save both atomically to Firebase + localStorage
-    master.lastModified = Date.now();
-    client.lastModified = Date.now();
     all[master.email] = master;
     all[client.email] = client;
     setAllUsers(all);
@@ -3045,10 +3014,6 @@ async function processDeposit() {
     let u = all[currentUser.email];
     u.usd += amt;
     u.txs.push({ type: 'deposit', amount: amt, currency: 'USD', status: 'Completed', date: Date.now(), details: 'Wire transfer deposit' });
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
@@ -3069,10 +3034,6 @@ async function processStudentWithdraw() {
     if (!addr || addr.length < 10) { toast('Enter a valid BTC wallet address', 'error'); return; }
     u.btc -= amt;
     u.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Pending', date: Date.now(), details: `BTC withdrawal to ${addr.substring(0,12)}...` });
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
@@ -3092,10 +3053,6 @@ async function processWithdraw() {
     if (u.usd < amt) { toast('Insufficient balance', 'error'); return; }
     u.usd -= amt;
     u.txs.push({ type: 'withdraw', amount: -amt, currency: 'USD', status: 'Pending', date: Date.now(), details: 'Withdrawal to external wallet' });
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
@@ -3137,10 +3094,6 @@ async function processConvertCustom() {
     u.usd += usd;
     u.txs = u.txs || [];
     u.txs.push({ type: 'trade', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted ${amt.toFixed(8)} BTC to USD @ $${btcPrice.toFixed(2)}` });
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
@@ -3160,10 +3113,6 @@ async function processConvert() {
     u.usd += usd;
     u.btc = 0;
     u.txs.push({ type: 'trade', amount: -btc, currency: 'BTC', status: 'Completed', date: Date.now(), details: `Converted to USDT @ $${btcPrice.toFixed(2)}` });
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
@@ -3200,10 +3149,6 @@ async function readNotif(id) {
     let u = all[currentUser.email];
     const n = u.notifs.find(x => x.id === id);
     if (n) n.read = true;
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
@@ -3215,10 +3160,6 @@ async function markAllRead() {
     let all = getAllUsers();
     let u = all[currentUser.email];
     u.notifs.forEach(n => n.read = true);
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     currentUser = u;
     if (firebaseOnline && db) {
@@ -3241,7 +3182,6 @@ async function resetAllBalances() {
             u.usd = 500; u.btc = resetBtc; u.rigs = []; u.txs = []; u.notifs = []; u.referrals = [];
         }
     });
-    Object.keys(all).forEach(k => { if (all[k]) all[k].lastModified = Date.now(); });
     setAllUsers(all);
     renderAdmin();
     toast('All client accounts reset to $500 USDT + $500 BTC worth', 'success');
@@ -3250,7 +3190,6 @@ async function clearAllTx() {
     if (!confirm('Purge ALL transaction records across the platform?')) return;
     let all = getAllUsers();
     Object.values(all).forEach(u => { u.txs = []; });
-    Object.keys(all).forEach(k => { if (all[k]) all[k].lastModified = Date.now(); });
     setAllUsers(all);
     renderAdmin();
     toast('All transaction records purged', 'success');
@@ -3274,15 +3213,10 @@ async function toggleFreezeClient(email, name) {
     if (!u) { toast('Client not found', 'error'); return; }
     const wasFrozen = u.frozen || false;
     u.frozen = !wasFrozen;
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
     }
-
-    // Send email notification
     try {
         if (emailjsReady && typeof emailjs !== 'undefined') {
             const statusMsg = u.frozen 
@@ -3296,7 +3230,6 @@ async function toggleFreezeClient(email, name) {
             }).catch(e => console.warn('Freeze email failed:', e));
         }
     } catch(e) { console.warn('Email send error:', e); }
-
     renderAdmin();
     toast(`${name} ${u.frozen ? 'FROZEN' : 'UNFROZEN'}`, u.frozen ? 'warning' : 'success');
 }
@@ -3314,15 +3247,10 @@ async function resetSingleClient(email, name) {
     u.referrals = [];
     u.mining = 0;
     u.miningMultiplier = 1.0;
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
     }
-
-    // Send email notification
     try {
         if (emailjsReady && typeof emailjs !== 'undefined') {
             emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
@@ -3333,7 +3261,6 @@ async function resetSingleClient(email, name) {
             }).catch(e => console.warn('Reset email failed:', e));
         }
     } catch(e) { console.warn('Email send error:', e); }
-
     renderAdmin();
     toast(`${name} reset to $500 USDT + $500 BTC`, 'success');
 }
@@ -3379,9 +3306,6 @@ async function adjustMiningMultiplier(email) {
     if (!u) { toast('Client not found', 'error'); return; }
     const oldMult = u.miningMultiplier || 1.0;
     u.miningMultiplier = mult;
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
-    u.lastModified = Date.now();
     setAllUsers(all);
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
