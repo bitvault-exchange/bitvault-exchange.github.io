@@ -1972,6 +1972,20 @@ async function handleLogin() {
     }
     let all = getAllUsers();
     let user = all[email];
+
+    // CRITICAL: If user not found locally, check Firebase (account created on another device)
+    if (!user && firebaseOnline && db) {
+        try {
+            const snap = await db.ref('users/' + safeKey(email)).once('value');
+            const fbUser = snap.val();
+            if (fbUser && fbUser.password === password) {
+                all[email] = fbUser;
+                setAllUsers(all);
+                user = fbUser;
+            }
+        } catch(e) { console.warn('Firebase login lookup failed:', e); }
+    }
+
     if (!user || user.password !== password) { toast('Invalid credentials', 'error'); return; }
 
     // Check if account is frozen
