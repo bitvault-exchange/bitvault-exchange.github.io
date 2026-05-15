@@ -784,7 +784,43 @@
             .profile-dropdown { width: 220px; right: -6px; }
         }
 
-        /* Prevent all zoom behaviors */
+        
+        /* Floating UI fixes for mobile */
+        @media (max-width: 768px) {
+            .profile-dropdown {
+                position: fixed !important;
+                top: 60px !important;
+                right: 10px !important;
+                left: 10px !important;
+                width: auto !important;
+                max-height: 70vh;
+                overflow-y: auto;
+                z-index: 300 !important;
+            }
+            .modal-overlay {
+                align-items: flex-start !important;
+                padding-top: 20px !important;
+                overflow-y: auto;
+            }
+            .modal {
+                margin: 0 auto 20px !important;
+                max-height: none !important;
+            }
+            .toast-container {
+                top: 70px;
+                right: 12px;
+                left: 12px;
+                z-index: 400 !important;
+            }
+            .sidebar {
+                z-index: 500 !important;
+            }
+            .user-menu {
+                position: relative;
+            }
+        }
+
+/* Prevent all zoom behaviors */
         html, body {
             touch-action: manipulation;
             -webkit-text-size-adjust: 100%;
@@ -1566,6 +1602,25 @@
                         </div>
                         <button class="btn btn-primary" type="button" onclick="submitContactForm()">Send Message</button>
                         <div id="contactStatus" style="margin-top:16px;text-align:center;font-size:14px;display:none;"></div>
+                    </div>
+                </div>
+                <!-- Student Conversation Thread -->
+                <div class="card" style="margin-top:20px;">
+                    <div class="card-header"><span class="card-title">Your Messages</span><span class="icon-3d icon-3d-sm blue"><svg width="18" height="18"><use href="#icon-mail"/></svg></span></div>
+                    <div id="studentMessages" style="max-height:500px;overflow-y:auto;">
+                        <div class="empty-state" style="padding:30px;">
+                            <div class="icon"><svg width="40" height="40"><use href="#icon-empty"/></svg></div>
+                            <h3 style="font-size:16px;">No messages yet</h3>
+                            <p style="font-size:13px;">Send a message above and our team will respond</p>
+                        </div>
+                    </div>
+                    <!-- Student Reply Box -->
+                    <div id="studentReplyBox" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:none;">
+                        <div class="form-group" style="margin-bottom:12px;">
+                            <label>Reply to BitVault Support</label>
+                            <textarea id="studentReplyBody" rows="3" placeholder="Type your response..." style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+                        </div>
+                        <button class="btn btn-primary" type="button" id="studentReplyBtn" onclick="sendStudentReply()">Send Reply</button>
                     </div>
                 </div>
                 <div class="card" style="margin-top:20px;">
@@ -2374,6 +2429,39 @@ async function loadStudentMessages() {
     } catch(e) { console.warn('Load student messages failed:', e); }
 }
 
+
+async function sendStudentReply() {
+    const body = document.getElementById('studentReplyBody').value.trim();
+    const btn = document.getElementById('studentReplyBtn');
+    if (!body) { toast('Please type a reply', 'error'); return; }
+    if (!window.currentStudentMsgId) { toast('No message to reply to', 'error'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    if (firebaseOnline && db) {
+        try {
+            const replyId = 'reply_' + Date.now();
+            await db.ref('messages/' + window.currentStudentMsgId + '/replies/' + replyId).set({
+                id: replyId,
+                from: currentUser.email,
+                name: currentUser.name,
+                body: body,
+                date: Date.now()
+            });
+            document.getElementById('studentReplyBody').value = '';
+            await loadStudentMessages();
+            toast('Reply sent to BitVault Support', 'success');
+        } catch(e) {
+            console.error('Student reply failed:', e);
+            toast('Failed to send reply', 'error');
+        }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Send Reply';
+}
+
 function generateRefCode() {
     return 'BV' + Math.random().toString(36).substring(2, 8).toUpperCase();
 }
@@ -2953,7 +3041,7 @@ async function renderContact() {
     document.getElementById('contactEmail').value = currentUser.email || '';
     document.getElementById('contactStatus').style.display = 'none';
 
-    // Load and display admin replies
+    // Load conversation thread and admin replies
     await loadStudentMessages();
 }
 function renderNotifications() {
