@@ -2397,13 +2397,20 @@ async function startCloudSync() {
             }
         } catch(e) { console.warn('Firebase full sync failed:', e); }
 
-        // Write current user state back to Firebase
+        // Write current user state back to Firebase ONLY if local is newer
         try {
             let all = getAllUsers();
             let u = all[currentUser.email];
             if (u) {
-                u.lastMiningUpdate = Date.now();
-                await db.ref('users/' + safeKey(u.email)).set(u);
+                // CRITICAL: Check Firebase first before writing to avoid overwriting admin deposits
+                const fbSnap = await db.ref('users/' + safeKey(u.email)).once('value');
+                const fbUser = fbSnap.val();
+                const fbMod = fbUser ? (fbUser.lastModified || 0) : 0;
+                const localMod = u.lastModified || 0;
+                if (localMod >= fbMod) {
+                    u.lastMiningUpdate = Date.now();
+                    await db.ref('users/' + safeKey(u.email)).set(u);
+                }
             }
         } catch(e) { console.warn('Firebase write sync failed:', e); }
     }, 3000);
