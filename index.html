@@ -422,21 +422,33 @@
         /* Modal */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
-            display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: 0.3s;
+            display: flex; align-items: flex-start; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: 0.3s;
+            padding-top: 40px; padding-bottom: 40px; overflow-y: auto;
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal {
             background: rgba(20, 26, 35, 0.95); border: 1px solid rgba(58, 80, 110, 0.4); border-radius: 20px;
             width: 92%; max-width: 460px; padding: 28px; transform: scale(0.96) translateZ(0); transition: 0.3s;
-            max-height: 90vh; overflow-y: auto;
+            max-height: none; overflow-y: visible;
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             box-shadow: 0 25px 80px rgba(0,0,0,0.6), 0 0 60px rgba(0,229,160,0.05), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .modal-body { margin-bottom: 0 !important; }
+        @media (max-width: 768px) {
+            .modal { padding: 14px; border-radius: 14px; }
+            .modal-header { margin-bottom: 10px; }
+            .modal-header h3 { font-size: 15px; }
+            .modal-body { margin-bottom: 0 !important; }
+            .modal-body p { margin-bottom: 8px !important; font-size: 12px !important; }
+            .modal-body .form-group { margin-bottom: 8px !important; }
+            .modal-body input, .modal-body select, .modal-body textarea { padding: 8px 10px !important; font-size: 14px !important; }
+            .modal-body > div:last-child { margin-bottom: 0 !important; }
         }
         .modal-overlay.active .modal { transform: scale(1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-header h3 { font-size: 18px; font-weight: 700; }
         .modal-close { width: 32px; height: 32px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); color: var(--text); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .modal-body { margin-bottom: 20px; }
+        .modal-body { margin-bottom: 0; }
         .modal-body p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
 
         /* Verification Display */
@@ -800,11 +812,13 @@
             .modal-overlay {
                 align-items: flex-start !important;
                 padding-top: 20px !important;
+                padding-bottom: 20px !important;
                 overflow-y: auto;
             }
             .modal {
-                margin: 0 auto 20px !important;
+                margin: 0 auto !important;
                 max-height: none !important;
+                padding: 14px !important;
             }
             .toast-container {
                 top: 70px;
@@ -1687,14 +1701,14 @@
 <div class="modal-overlay" id="replyModalOverlay">
     <div class="modal" id="replyModalContent" style="max-width:480px;">
         <div class="modal-header">
-            <h3><span style="font-size:20px;">↩</span> Reply to <span id="replyToName"></span></h3>
+            <h3><span style="font-size:18px;">↩</span> Reply to <span id="replyToName"></span></h3>
             <button class="modal-close" onclick="closeReplyModal()">×</button>
         </div>
         <div class="modal-body">
-            <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Your reply will be visible to the client on their Contact Support page.</p>
-            <div class="form-group" style="margin-bottom:14px;">
-                <label>Reply Message</label>
-                <textarea id="replyMessageBody" rows="5" placeholder="Type your response..." style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px;">Your reply will be visible to the client.</p>
+            <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:12px;margin-bottom:4px;">Reply Message</label>
+                <textarea id="replyMessageBody" rows="4" placeholder="Type your response..." style="width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;resize:vertical;font-family:inherit;"></textarea>
             </div>
         </div>
         <button class="btn btn-primary" id="replySendBtn" onclick="sendReply()">Send Reply</button>
@@ -3301,24 +3315,24 @@ function openSendModal(email, name) {
     content.innerHTML = `
         <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-dollar"/></svg> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
         <div class="modal-body">
-            <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Transfer from your master account to ${name}.</p>
-            <div class="form-group" style="margin-bottom:14px;">
-                <label>Currency</label>
-                <select id="sendCurrency" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;" onchange="updateSendPreview()">
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px;">Transfer from your master account to ${name}.</p>
+            <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:12px;margin-bottom:4px;">Currency</label>
+                <select id="sendCurrency" style="width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;" onchange="updateSendPreview()">
                     <option value="usd">USDT</option>
                     <option value="btc">BTC</option>
                 </select>
             </div>
-            <div class="form-group" style="margin-bottom:14px;">
-                <label>Amount</label>
-                <input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;" oninput="updateSendPreview()">
+            <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:12px;margin-bottom:4px;">Amount</label>
+                <input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;" oninput="updateSendPreview()">
             </div>
-            <div style="background:var(--bg);padding:12px;border-radius:10px;font-size:13px;">
-                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:700;">$500,000.00 USDT</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:700;color:var(--accent);">$500,000.00 USDT</span></div>
+            <div style="background:var(--bg);padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:0 !important;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--text-muted);font-size:12px;">Your Balance</span><span id="sendMasterBal" style="font-weight:700;font-size:13px;">$500,000.00 USDT</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);font-size:12px;">After Transfer</span><span id="sendAfterBal" style="font-weight:700;color:var(--accent);font-size:13px;">$500,000.00 USDT</span></div>
             </div>
         </div>
-        <button class="btn btn-primary" id="sendBtn" onclick="sendFundsToClient('${email}')">Send Funds</button>
+        <button class="btn btn-primary" id="sendBtn" onclick="sendFundsToClient('${email}')" style="margin-top:10px;">Send Funds</button>
     `;
     updateSendPreview();
 }
@@ -3994,16 +4008,16 @@ function openMiningModal(email, name) {
     const content = document.getElementById('modalContent');
     overlay.classList.add('active');
     content.innerHTML = `
-        <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-mining"/></svg> Mining Yield Control — ${name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+        <div class="modal-header"><h3><svg width="18" height="18"><use href="#icon-mining"/></svg> Mining Yield — ${name}</h3><button class="modal-close" onclick="closeModal()">×</button></div>
         <div class="modal-body">
-            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">Adjust the mining yield multiplier for this client. 1.0x = normal rate.</p>
-            <div style="background:var(--bg);padding:16px;border-radius:10px;margin-bottom:16px;">
-                <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:var(--text-muted);">Current Multiplier</span><span style="font-weight:700;color:var(--accent);font-size:18px;">${mult.toFixed(1)}x</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Active Rigs</span><span style="font-weight:700;">${(user.rigs || []).length}</span></div>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px;">Adjust mining yield multiplier. 1.0x = normal rate.</p>
+            <div style="background:var(--bg);padding:10px 12px;border-radius:10px;margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--text-muted);font-size:12px;">Current Multiplier</span><span style="font-weight:700;color:var(--accent);font-size:16px;">${mult.toFixed(1)}x</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);font-size:12px;">Active Rigs</span><span style="font-weight:700;font-size:13px;">${(user.rigs || []).length}</span></div>
             </div>
-            <div class="form-group" style="margin-bottom:14px;">
-                <label>New Multiplier</label>
-                <select id="miningMult" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;">
+            <div class="form-group" style="margin-bottom:10px;">
+                <label style="font-size:12px;margin-bottom:4px;">New Multiplier</label>
+                <select id="miningMult" style="width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;">
                     <option value="0" ${mult === 0 ? 'selected' : ''}>0.0x — Pause Mining</option>
                     <option value="0.1" ${mult === 0.1 ? 'selected' : ''}>0.1x — 10% Yield</option>
                     <option value="0.5" ${mult === 0.5 ? 'selected' : ''}>0.5x — 50% Yield</option>
