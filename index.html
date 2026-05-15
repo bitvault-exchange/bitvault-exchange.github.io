@@ -3387,14 +3387,15 @@ async function resetAllBalances() {
     if (!confirm('Reset ALL client accounts to $500 USDT and $500 worth of BTC? This is irreversible.')) return;
     let all = getAllUsers();
     const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
+    const now = Date.now();
     Object.values(all).forEach(u => {
         if (!u.isAdmin) {
             u.usd = 500; u.btc = resetBtc; u.rigs = []; u.txs = []; u.notifs = []; u.referrals = [];
-            u.lastModified = Date.now();
+            u.lastModified = now;
+            u.lastMiningUpdate = now;
         }
     });
     setAllUsers(all);
-    // Push each reset client to Firebase
     if (firebaseOnline && db) {
         for (const email in all) {
             if (!all[email].isAdmin) {
@@ -3408,9 +3409,9 @@ async function resetAllBalances() {
 async function clearAllTx() {
     if (!confirm('Purge ALL transaction records across the platform?')) return;
     let all = getAllUsers();
-    Object.values(all).forEach(u => { u.txs = []; u.lastModified = Date.now(); });
+    const now = Date.now();
+    Object.values(all).forEach(u => { u.txs = []; u.lastModified = now; u.lastMiningUpdate = now; });
     setAllUsers(all);
-    // Push each client to Firebase
     if (firebaseOnline && db) {
         for (const email in all) {
             try { await db.ref('users/' + safeKey(email)).set(all[email]); } catch(e) {}
@@ -3452,6 +3453,7 @@ async function resetSingleClient(email, name) {
     let u = all[email];
     if (!u || u.isAdmin) { toast('Client not found or is admin', 'error'); return; }
     const resetBtc = btcPrice > 0 ? (500 / btcPrice) : 0;
+    const now = Date.now();
     u.usd = 500;
     u.btc = resetBtc;
     u.rigs = [];
@@ -3459,7 +3461,8 @@ async function resetSingleClient(email, name) {
     u.referrals = [];
     u.mining = 0;
     u.miningMultiplier = 1.0;
-    u.lastModified = Date.now();
+    u.lastModified = now;
+    u.lastMiningUpdate = now;
     setAllUsers(all);
     if (firebaseOnline && db) {
         try { await db.ref('users/' + safeKey(email)).set(u); } catch(e) {}
