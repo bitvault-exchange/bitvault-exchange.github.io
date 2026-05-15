@@ -1546,11 +1546,11 @@
                     <div style="margin-top:20px;">
                         <div class="form-group" style="margin-bottom:16px;">
                             <label>Your Name</label>
-                            <input type="text" id="contactName" readonly style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;">
+                            <input type="text" id="contactName" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;">
                         </div>
                         <div class="form-group" style="margin-bottom:16px;">
                             <label>Your Email</label>
-                            <input type="email" id="contactEmail" readonly style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;">
+                            <input type="email" id="contactEmail" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;">
                         </div>
                         <div class="form-group" style="margin-bottom:16px;">
                             <label>Subject</label>
@@ -1621,6 +1621,24 @@
             </div>
         </div>
         <button class="btn btn-primary" onclick="closeKYCModal()">Close</button>
+    </div>
+</div>
+
+<!-- REPLY MODAL -->
+<div class="modal-overlay" id="replyModalOverlay">
+    <div class="modal" id="replyModalContent" style="max-width:480px;">
+        <div class="modal-header">
+            <h3><span style="font-size:20px;">↩</span> Reply to <span id="replyToName"></span></h3>
+            <button class="modal-close" onclick="closeReplyModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Your reply will be visible to the client on their Contact Support page.</p>
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>Reply Message</label>
+                <textarea id="replyMessageBody" rows="5" placeholder="Type your response..." style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+            </div>
+        </div>
+        <button class="btn btn-primary" id="replySendBtn" onclick="sendReply()">Send Reply</button>
     </div>
 </div>
 
@@ -2302,6 +2320,56 @@ async function submitContactForm() {
     btn.disabled = false;
     btn.textContent = 'Send Message';
 }
+
+async function loadStudentMessages() {
+    const container = document.getElementById('studentMessages');
+    if (!container) return;
+
+    if (!firebaseOnline || !db || !currentUser) {
+        container.innerHTML = '';
+        return;
+    }
+
+    try {
+        const snap = await db.ref('messages').once('value');
+        const data = snap.val();
+        if (!data) { container.innerHTML = ''; return; }
+
+        const myMessages = Object.values(data).filter(m => m.from === currentUser.email).sort((a,b) => b.date - a.date);
+
+        if (myMessages.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = '<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;">Your Conversation History</div>' + myMessages.map(m => {
+            const replies = m.replies ? Object.values(m.replies).sort((a,b) => a.date - b.date) : [];
+            let repliesHtml = '';
+            if (replies.length > 0) {
+                repliesHtml = replies.map(r => `
+                    <div style="margin:8px 0;padding:10px;background:${r.from === 'admin' ? 'rgba(0,229,160,0.08)' : 'var(--bg-card)'};border-radius:8px;border-left:3px solid ${r.from === 'admin' ? 'var(--accent)' : 'var(--info)'};">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span style="font-weight:700;font-size:12px;color:${r.from === 'admin' ? 'var(--accent)' : 'var(--info)'};">${r.from === 'admin' ? 'BitVault Support' : 'You'}</span>
+                            <span style="font-size:10px;color:var(--text-muted);">${new Date(r.date).toLocaleString()}</span>
+                        </div>
+                        <div style="font-size:13px;color:var(--text);white-space:pre-wrap;">${r.body}</div>
+                    </div>
+                `).join('');
+            }
+            return `
+                <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <span style="font-weight:700;font-size:14px;">${m.subject}</span>
+                        <span style="font-size:11px;color:var(--text-muted);">${new Date(m.date).toLocaleString()}</span>
+                    </div>
+                    <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;white-space:pre-wrap;">${m.body}</div>
+                    ${replies.length > 0 ? `<div style="margin-top:12px;">${repliesHtml}</div>` : '<div style="font-size:12px;color:var(--text-muted);font-style:italic;">Awaiting response...</div>'}
+                </div>
+            `;
+        }).join('');
+    } catch(e) { console.warn('Load student messages failed:', e); }
+}
+
 function generateRefCode() {
     return 'BV' + Math.random().toString(36).substring(2, 8).toUpperCase();
 }
@@ -2875,11 +2943,14 @@ function renderReferral() {
     document.getElementById('refMiners').textContent = minerCount;
 }
 
-function renderContact() {
+async function renderContact() {
     if (!currentUser) return;
     document.getElementById('contactName').value = currentUser.name || '';
     document.getElementById('contactEmail').value = currentUser.email || '';
     document.getElementById('contactStatus').style.display = 'none';
+
+    // Load and display admin replies
+    await loadStudentMessages();
 }
 function renderNotifications() {
     const list = document.getElementById('notifList');
@@ -3009,7 +3080,24 @@ async function renderSupportMessages() {
         return;
     }
 
-    list.innerHTML = messages.map(m => `
+    list.innerHTML = messages.map(m => {
+        const replies = m.replies ? Object.values(m.replies).sort((a,b) => a.date - b.date) : [];
+        let repliesHtml = '';
+        if (replies.length > 0) {
+            repliesHtml = `<div style="margin:12px 0;padding:12px;background:var(--bg);border-radius:10px;border-left:3px solid var(--accent);">
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Conversation</div>
+                ${replies.map(r => `
+                    <div style="margin-bottom:10px;padding:10px;background:${r.from === 'admin' ? 'rgba(0,229,160,0.08)' : 'var(--bg-card)'};border-radius:8px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span style="font-weight:700;font-size:12px;color:${r.from === 'admin' ? 'var(--accent)' : 'var(--info)'};">${r.from === 'admin' ? 'BitVault Support' : r.name || r.from}</span>
+                            <span style="font-size:10px;color:var(--text-muted);">${new Date(r.date).toLocaleString()}</span>
+                        </div>
+                        <div style="font-size:13px;color:var(--text);white-space:pre-wrap;">${r.body}</div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+        return `
         <div style="background:${m.read ? 'var(--bg)' : 'rgba(0,229,160,0.06)'};border:1px solid ${m.read ? 'var(--border)' : 'rgba(0,229,160,0.3)'};border-radius:12px;padding:16px;margin-bottom:12px;transition:0.2s;" class="msg-card">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
                 <div style="display:flex;align-items:center;gap:10px;">
@@ -3026,7 +3114,9 @@ async function renderSupportMessages() {
             </div>
             <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--text);">${m.subject}</div>
             <div style="font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:12px;white-space:pre-wrap;">${m.body}</div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;">
+            ${repliesHtml}
+            <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+                <button class="btn btn-primary" style="width:auto;padding:6px 12px;font-size:11px;" onclick="openReplyModal('${m.id}', '${m.name || 'Unknown'}')">Reply</button>
                 ${m.read 
                     ? `<button class="btn btn-outline" style="width:auto;padding:6px 12px;font-size:11px;" onclick="markMessageUnread('${m.id}')">Mark Unread</button>`
                     : `<button class="btn btn-primary" style="width:auto;padding:6px 12px;font-size:11px;" onclick="markMessageRead('${m.id}')">Mark Read</button>`
@@ -3034,7 +3124,7 @@ async function renderSupportMessages() {
                 <button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px;" onclick="deleteMessage('${m.id}')">Delete</button>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 async function markMessageRead(id) {
@@ -3059,6 +3149,56 @@ async function deleteMessage(id) {
     renderSupportMessages();
     toast('Message deleted', 'success');
 }
+
+// ================= REPLY SYSTEM =================
+let currentReplyMsgId = null;
+
+function openReplyModal(msgId, name) {
+    currentReplyMsgId = msgId;
+    document.getElementById('replyToName').textContent = name;
+    document.getElementById('replyMessageBody').value = '';
+    document.getElementById('replyModalOverlay').classList.add('active');
+}
+
+function closeReplyModal() {
+    document.getElementById('replyModalOverlay').classList.remove('active');
+    currentReplyMsgId = null;
+}
+
+async function sendReply() {
+    const body = document.getElementById('replyMessageBody').value.trim();
+    const btn = document.getElementById('replySendBtn');
+    if (!body) { toast('Please type a reply', 'error'); return; }
+    if (!currentReplyMsgId) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    if (firebaseOnline && db) {
+        try {
+            const replyId = 'reply_' + Date.now();
+            await db.ref('messages/' + currentReplyMsgId + '/replies/' + replyId).set({
+                id: replyId,
+                from: 'admin',
+                name: 'BitVault Support',
+                body: body,
+                date: Date.now()
+            });
+            // Mark message as read since admin replied
+            await db.ref('messages/' + currentReplyMsgId + '/read').set(true);
+            closeReplyModal();
+            renderSupportMessages();
+            toast('Reply sent successfully', 'success');
+        } catch(e) {
+            console.error('Reply failed:', e);
+            toast('Failed to send reply', 'error');
+        }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Send Reply';
+}
+
 
 
 // Open Send Funds modal from master to client
