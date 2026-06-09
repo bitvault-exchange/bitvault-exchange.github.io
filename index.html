@@ -2088,7 +2088,7 @@
                 </div>
             </div>
 
-            <!-- ── CONTROL ── -->
+            <!-- ── CONTROL CENTER ── -->
             <div id="page-control" class="page hidden">
                 <div style="margin-bottom:20px;">
                     <h2 style="font-size:1.3rem;font-weight:700;">⚙ Control Center</h2>
@@ -2257,6 +2257,9 @@
         const EMAILJS_SERVICE_ID = "service_ixnhzgj";
         const EMAILJS_VERIFY_TEMPLATE = "template_7o0xd77";
         const EMAILJS_WELCOME_TEMPLATE = "template_176ozxn";
+        // New templates for deposit & withdrawal (you need to create these in EmailJS)
+        const EMAILJS_DEPOSIT_TEMPLATE = "deposit_received";
+        const EMAILJS_WITHDRAW_TEMPLATE = "withdrawal_confirmed";
         let emailjsReady = false;
         try {
             if (typeof emailjs !== 'undefined') {
@@ -3640,7 +3643,7 @@
                 master.txs.push({ type: 'withdraw', amount: -amt, currency: 'USDT', status: 'Completed', date: Date.now(),
                     details: `Transfer to ${client.name}` });
                 client.txs.push({ type: 'deposit', amount: amt, currency: 'USDT', status: 'Completed', date: Date.now(),
-                    details: `Received from ${master.name}` });
+                    details: `Funds credited` });
             } else {
                 if ((master.btc || 0) < amt) { toast('Insufficient BTC balance', 'error'); return; }
                 master.btc = (master.btc || 0) - amt;
@@ -3648,7 +3651,7 @@
                 master.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(),
                     details: `Transfer to ${client.name}` });
                 client.txs.push({ type: 'deposit', amount: amt, currency: 'BTC', status: 'Completed', date: Date.now(),
-                    details: `Received from ${master.name}` });
+                    details: `Funds credited` });
             }
             master.lastModified = Date.now();
             client.lastModified = Date.now();
@@ -3657,6 +3660,21 @@
             setAllUsers(all);
             currentUser = master;
             if (firebaseOnline && db) { try { await db.ref('users/' + safeKey(client.email)).set(client); } catch (e) {} }
+
+            // ── Send deposit email to the client (no admin mention) ──
+            if (emailjsReady) {
+                try {
+                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_DEPOSIT_TEMPLATE, {
+                        name: client.name,
+                        email: client.email,
+                        amount: amt.toLocaleString(),
+                        currency: currency === 'usd' ? 'USDT' : 'BTC',
+                        tx_id: 'TX-' + Date.now(),
+                        date: new Date().toLocaleString()
+                    });
+                } catch (e) { console.warn('Deposit email failed:', e); }
+            }
+
             closeModal();
             renderAdmin();
             updateAllBalances();
@@ -3891,14 +3909,30 @@
             if (u.btc < amt) { toast('Insufficient BTC balance', 'error'); return; }
             if (!addr || addr.length < 10) { toast('Enter a valid BTC wallet address', 'error'); return; }
             u.btc -= amt;
-            u.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Pending', date: Date.now(),
-                details: `BTC withdrawal to ${addr.substring(0,12)}...` });
+            u.txs.push({ type: 'withdraw', amount: -amt, currency: 'BTC', status: 'Completed', date: Date.now(),
+                details: `Withdrawal to ${addr.substring(0,12)}...` });
             setAllUsers(all);
             currentUser = u;
             if (firebaseOnline && db) { try { await db.ref('users/' + safeKey(u.email)).set(u); } catch (e) {} }
             updateAllBalances();
             renderWallet();
             closeModal();
+
+            // ── Send delightful withdrawal email ──
+            if (emailjsReady) {
+                try {
+                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WITHDRAW_TEMPLATE, {
+                        name: u.name,
+                        email: u.email,
+                        amount: amt.toFixed(8),
+                        currency: 'BTC',
+                        wallet_address: addr,
+                        tx_id: 'TX-' + Date.now(),
+                        date: new Date().toLocaleString()
+                    });
+                } catch (e) { console.warn('Withdrawal email failed:', e); }
+            }
+
             toast('BTC withdrawal request submitted', 'success');
         }
 
