@@ -7,36 +7,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* ── RESET & BASE ── */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: #050a14;
             color: #e8edf5;
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
             min-height: 100vh;
         }
-
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a1020;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1a3050;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #2a4a7a;
-        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #0a1020; }
+        ::-webkit-scrollbar-thumb { background: #1a3050; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2a4a7a; }
 
         :root {
             --bg-primary: #050a14;
@@ -57,14 +40,12 @@
             --danger: #ff4757;
             --warning: #ffa502;
             --info: #3498ff;
-            --glass: rgba(255, 255, 255, 0.02);
             --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.03);
             --shadow-glow: 0 8px 40px rgba(0, 212, 255, 0.06);
         }
 
         .hidden { display: none !important; }
 
-        /* ── TOAST ── */
         .toast-container {
             position: fixed;
             top: 80px;
@@ -96,86 +77,91 @@
         .toast.success { border-left-color: var(--success); }
         .toast.error { border-left-color: var(--danger); }
         .toast.warning { border-left-color: var(--warning); }
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateX(60px) scale(0.96); }
-            to { opacity: 1; transform: translateX(0) scale(1); }
-        }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(60px) scale(0.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
 
         /* ── LANDING PAGE ── */
         .landing-wrapper {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 24px 32px 60px;
+            padding: 20px 32px 60px;
         }
 
-        .landing-header {
+        /* TOP BAR */
+        .top-bar {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 16px 0 24px;
+            justify-content: space-between;
+            padding: 12px 0;
             border-bottom: 1px solid rgba(64,128,255,0.08);
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
         }
-        .landing-header .logo {
-            font-size: 1.8rem;
+        .top-bar .logo {
+            font-size: 1.6rem;
             font-weight: 800;
-            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .landing-header .logo span {
+        .top-bar .logo span {
             background: linear-gradient(135deg, #00d4ff, #ffd700);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .landing-header .logo small {
-            font-size: 0.7rem;
+        .top-bar .logo small {
+            font-size: 0.6rem;
             color: #6a8aae;
             font-weight: 400;
             letter-spacing: 1px;
-            margin-left: 6px;
         }
-        .landing-header .actions {
+        .top-bar .ticker {
             display: flex;
-            gap: 12px;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
         }
-        .landing-header .actions a {
-            padding: 10px 28px;
+        .top-bar .ticker .price { font-weight: 700; }
+        .top-bar .ticker .up { color: var(--success); }
+        .top-bar .ticker .down { color: var(--danger); }
+        .top-bar .ticker .hash { color: var(--electric-blue); }
+        .top-bar .actions { display: flex; gap: 10px; }
+        .top-bar .actions a {
+            padding: 8px 22px;
             border-radius: 30px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-decoration: none;
             transition: 0.25s;
             cursor: pointer;
         }
-        .landing-header .actions .btn-signin {
+        .top-bar .actions .btn-signin {
             border: 1px solid rgba(64,128,255,0.20);
             color: #e8edf5;
         }
-        .landing-header .actions .btn-signin:hover {
-            border-color: #00d4ff;
-            background: rgba(0,212,255,0.04);
-        }
-        .landing-header .actions .btn-signup {
+        .top-bar .actions .btn-signin:hover { border-color: #00d4ff; background: rgba(0,212,255,0.04); }
+        .top-bar .actions .btn-signup {
             background: linear-gradient(135deg, #00d4ff, #0088ff);
             color: #050a14;
             box-shadow: 0 4px 20px rgba(0,212,255,0.20);
         }
-        .landing-header .actions .btn-signup:hover {
+        .top-bar .actions .btn-signup:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 32px rgba(0,212,255,0.30);
         }
 
+        /* HERO */
         .hero {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 48px 0 40px;
+            padding: 40px 0 30px;
             flex-wrap: wrap;
             gap: 40px;
         }
         .hero-text { flex: 1 1 400px; }
         .hero-text h1 {
-            font-size: 2.8rem;
+            font-size: 3rem;
             font-weight: 800;
             letter-spacing: -0.02em;
             line-height: 1.2;
@@ -224,39 +210,208 @@
             background: rgba(0,212,255,0.04);
         }
 
-        .hero-stats {
+        .hero-visual {
             flex: 1 1 300px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            background: rgba(10,16,32,0.60);
-            border: 1px solid rgba(64,128,255,0.06);
-            border-radius: 20px;
-            padding: 24px 28px;
-            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 8rem;
+            position: relative;
         }
-        .hero-stats .stat .value {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #e8edf5;
+        .hero-visual i {
+            background: linear-gradient(135deg, #00d4ff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: float 6s ease-in-out infinite;
         }
-        .hero-stats .stat .value.green { color: #00e5a0; }
-        .hero-stats .stat .value.blue { color: #00d4ff; }
-        .hero-stats .stat .value.gold { color: #ffd700; }
-        .hero-stats .stat .label {
-            font-size: 0.7rem;
-            color: #6a8aae;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
+        @keyframes float {
+            0%,100%{ transform: translateY(0); }
+            50%{ transform: translateY(-20px); }
         }
 
-        .features-section { margin: 48px 0 32px; }
+        /* LIVE STATS BAR */
+        .stats-bar {
+            background: rgba(10,16,32,0.80);
+            border: 1px solid rgba(64,128,255,0.06);
+            border-radius: 16px;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(12px);
+        }
+        .stats-bar .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        .stats-bar .stat .num {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .stats-bar .stat .num.green { color: var(--success); }
+        .stats-bar .stat .num.blue { color: var(--electric-blue); }
+        .stats-bar .stat .num.gold { color: var(--gold); }
+
+        /* LIVE TRANSACTION FEED */
+        .live-feed-section {
+            background: rgba(10,16,32,0.50);
+            border: 1px solid rgba(64,128,255,0.06);
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin: 20px 0 30px;
+        }
+        .live-feed-section h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .live-feed-section h2 i {
+            color: var(--electric-blue);
+            margin-right: 10px;
+        }
+        .live-feed-section .sub {
+            color: #9aabbf;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+        .live-feed {
+            background: rgba(5,10,20,0.40);
+            border-radius: 16px;
+            padding: 12px 16px;
+            max-height: 240px;
+            overflow-y: auto;
+            border: 1px solid rgba(64,128,255,0.04);
+        }
+        .live-feed .feed-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 4px;
+            border-bottom: 1px solid rgba(64,128,255,0.04);
+            font-size: 0.85rem;
+        }
+        .live-feed .feed-item:last-child { border-bottom: none; }
+        .live-feed .feed-item .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #0088ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.6rem;
+            color: #050a14;
+            flex-shrink: 0;
+        }
+        .live-feed .feed-item .name { font-weight: 600; }
+        .live-feed .feed-item .action { color: var(--text-muted); }
+        .live-feed .feed-item .amount { font-weight: 700; }
+        .live-feed .feed-item .amount.green { color: var(--success); }
+        .live-feed .feed-item .amount.red { color: var(--danger); }
+        .live-feed .feed-item .time { color: var(--text-dim); font-size: 0.75rem; margin-left: auto; }
+        .live-feed::-webkit-scrollbar { width: 3px; }
+        .live-feed::-webkit-scrollbar-thumb { background: #1a3050; border-radius: 3px; }
+
+        /* MINING CALCULATOR */
+        .calc-section {
+            background: rgba(10,16,32,0.50);
+            border: 1px solid rgba(64,128,255,0.06);
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin: 20px 0 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .calc-section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
+        .calc-section .sub { color: #9aabbf; font-size: 0.9rem; margin-bottom: 16px; }
+        .calc-inputs { display: flex; flex-direction: column; gap: 12px; }
+        .calc-inputs input, .calc-inputs select {
+            padding: 10px 12px;
+            background: rgba(5,10,20,0.60);
+            border: 1px solid rgba(64,128,255,0.08);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .calc-inputs input:focus { border-color: var(--electric-blue); }
+        .calc-results {
+            background: rgba(5,10,20,0.40);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .calc-results .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(64,128,255,0.04);
+        }
+        .calc-results .row:last-child { border-bottom: none; }
+        .calc-results .row .label { color: var(--text-muted); }
+        .calc-results .row .value { font-weight: 700; color: var(--electric-blue); }
+
+        /* TRUST BADGES */
+        .trust-section {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            padding: 20px 0;
+            margin: 20px 0;
+        }
+        .trust-section .badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .trust-section .badge i {
+            font-size: 1.4rem;
+            color: var(--electric-blue);
+        }
+        .trust-section .badge i.gold { color: var(--gold); }
+
+        /* PARTNER LOGOS */
+        .partners {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            padding: 16px 0;
+            border-top: 1px solid rgba(64,128,255,0.06);
+            border-bottom: 1px solid rgba(64,128,255,0.06);
+            margin: 20px 0;
+        }
+        .partners span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .partners .logo {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ── FEATURES ── */
+        .features-section { margin: 40px 0 20px; }
         .features-section h2 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
         .features-grid {
             display: grid;
@@ -279,94 +434,18 @@
         .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
         .feature-card p { font-size: 0.85rem; color: #9aabbf; }
 
-        /* ── LIVE TRANSACTION FEED ── */
-        .sim-section {
-            background: rgba(10,16,32,0.50);
-            border: 1px solid rgba(64,128,255,0.06);
-            border-radius: 20px;
-            padding: 32px 36px;
-            margin: 40px 0 32px;
+        /* ── FOOTER ── */
+        .footer {
+            border-top: 1px solid rgba(64,128,255,0.06);
+            padding: 20px 0 8px;
+            margin-top: 30px;
+            font-size: 0.75rem;
+            color: #6a8aae;
             text-align: center;
         }
-        .sim-section h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .sim-section p {
-            color: #9aabbf;
-            font-size: 0.95rem;
-        }
-        .sim-box {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        .sim-box .sim-item {
-            background: rgba(5,10,20,0.60);
-            border-radius: 12px;
-            padding: 16px 24px;
-            border: 1px solid rgba(64,128,255,0.06);
-            min-width: 160px;
-        }
-        .sim-box .sim-item .label {
-            font-size: 0.7rem;
-            color: #6a8aae;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .sim-box .sim-item .value {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-top: 4px;
-        }
-        .sim-box .sim-item .value.green { color: #00e5a0; }
-        .sim-box .sim-item .value.blue { color: #00d4ff; }
-        .sim-box .sim-item .value.gold { color: #ffd700; }
-
-        .live-feed {
-            margin-top: 24px;
-            background: rgba(5,10,20,0.40);
-            border-radius: 16px;
-            padding: 16px 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            text-align: left;
-            border: 1px solid rgba(64,128,255,0.04);
-        }
-        .live-feed .feed-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 4px;
-            border-bottom: 1px solid rgba(64,128,255,0.04);
-            font-size: 0.85rem;
-        }
-        .live-feed .feed-item:last-child { border-bottom: none; }
-        .live-feed .feed-item .type { font-weight: 600; }
-        .live-feed .feed-item .type.deposit { color: var(--success); }
-        .live-feed .feed-item .type.withdraw { color: var(--danger); }
-        .live-feed .feed-item .time { color: var(--text-dim); font-size: 0.75rem; }
-        .live-feed .feed-item .amount { font-weight: 700; }
-        .live-feed .feed-item .amount.green { color: var(--success); }
-        .live-feed .feed-item .amount.red { color: var(--danger); }
-        .live-feed::-webkit-scrollbar { width: 3px; }
-        .live-feed::-webkit-scrollbar-thumb { background: #1a3050; border-radius: 3px; }
-
-        .sim-ticker {
-            margin-top: 16px;
-            font-size: 0.8rem;
-            color: #6a8aae;
-            font-weight: 500;
-        }
-        .sim-ticker .live {
-            color: #00e5a0;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%,100%{opacity:1} 50%{opacity:0.4}
-        }
+        .footer .links { display: flex; justify-content: center; gap: 20px; margin-bottom: 8px; }
+        .footer .links a { color: #6a8aae; text-decoration: none; transition: 0.2s; }
+        .footer .links a:hover { color: var(--electric-blue); }
 
         /* ── AUTH ── */
         .auth-container {
@@ -404,10 +483,6 @@
             border-radius: 50%;
             animation: float 16s ease-in-out infinite reverse;
             pointer-events: none;
-        }
-        @keyframes float {
-            0%,100%{ transform: translate(0,0); }
-            50%{ transform: translate(40px,-40px); }
         }
 
         .auth-box {
@@ -965,10 +1040,7 @@
             margin: 0 auto;
             animation: pageIn 0.4s cubic-bezier(0.22,1,0.36,1);
         }
-        @keyframes pageIn {
-            from { opacity: 0; transform: translateY(12px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
+        @keyframes pageIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .page-title {
             font-size: 1.5rem;
             font-weight: 700;
@@ -978,9 +1050,7 @@
             gap: 10px;
             letter-spacing: -0.01em;
         }
-        .page-title .accent {
-            color: var(--electric-blue);
-        }
+        .page-title .accent { color: var(--electric-blue); }
 
         .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
@@ -1549,6 +1619,7 @@
         @media (max-width: 1024px) {
             .grid-4 { grid-template-columns: repeat(2,1fr); }
             .trade-layout { grid-template-columns: 1fr; }
+            .calc-section { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
@@ -1630,33 +1701,130 @@
     <!-- ── LANDING PAGE ── -->
     <div id="landingPage">
         <div class="landing-wrapper">
-            <header class="landing-header">
+            <!-- TOP BAR -->
+            <div class="top-bar">
                 <div class="logo">⚡ <span>BitVault</span><small>PRO</small></div>
+                <div class="ticker">
+                    <span>BTC/USD <span class="price" id="topPrice">$81,234.50</span> <span class="up" id="topPriceChange">+2.4%</span></span>
+                    <span><i class="fas fa-bolt" style="color:var(--electric-blue);"></i> Hashrate: <span class="hash" id="topHashrate">2.4 EH/s</span></span>
+                    <span><i class="fas fa-users" style="color:var(--gold);"></i> Miners: <span class="gold" id="topMiners">1,247</span></span>
+                </div>
                 <div class="actions">
                     <a class="btn-signin" onclick="showAuth('login')">Sign In</a>
                     <a class="btn-signup" onclick="showAuth('register')">Create Account</a>
                 </div>
-            </header>
+            </div>
 
+            <!-- HERO -->
             <section class="hero">
                 <div class="hero-text">
-                    <h1>Trade. Mine. <span class="highlight">Earn.</span></h1>
-                    <p>Institutional‑grade BTC trading &amp; mining infrastructure — all in one platform.</p>
+                    <h1>HASH. MINE. <span class="highlight">EARN.</span></h1>
+                    <p>Join the largest institutional mining pool in 2026. Real-time BTC rewards, professional-grade infrastructure.</p>
                     <div class="cta-row">
-                        <a class="btn-hero-primary" onclick="showAuth('register')">Start Trading</a>
-                        <a class="btn-hero-secondary" onclick="document.getElementById('landingPage').scrollIntoView({behavior:'smooth'})">Explore</a>
+                        <a class="btn-hero-primary" onclick="showAuth('register')">Start Mining</a>
+                        <a class="btn-hero-secondary" onclick="document.getElementById('statsBar').scrollIntoView({behavior:'smooth'})">Live Stats</a>
                     </div>
                 </div>
-                <div class="hero-stats">
-                    <div class="stat"><div class="value green" id="fakeVolume">$142M+</div><div class="label">24h Volume</div></div>
-                    <div class="stat"><div class="value blue" id="fakeRigs">21.7k</div><div class="label">Active Rigs</div></div>
-                    <div class="stat"><div class="value gold" id="fakeClients">183k</div><div class="label">Registered Clients</div></div>
-                    <div class="stat"><div class="value">99.9%</div><div class="label">Uptime</div></div>
+                <div class="hero-visual">
+                    <i class="fas fa-microchip"></i>
                 </div>
             </section>
 
+            <!-- LIVE STATS BAR -->
+            <div class="stats-bar" id="statsBar">
+                <div class="stat"><i class="fas fa-hammer" style="color:var(--electric-blue);"></i> <span class="num blue" id="statRigs">21,743</span> Active Rigs</div>
+                <div class="stat"><i class="fas fa-bolt" style="color:var(--gold);"></i> <span class="num gold" id="statHash">2.4 EH/s</span> Hashrate</div>
+                <div class="stat"><i class="fas fa-cubes" style="color:var(--success);"></i> <span class="num green" id="statBlock">#845,212</span> Current Block</div>
+                <div class="stat"><i class="fas fa-chart-line" style="color:var(--info);"></i> <span class="num blue" id="statDiff">87.5T</span> Difficulty</div>
+                <div class="stat"><i class="fas fa-users" style="color:var(--gold);"></i> <span class="num gold" id="statClients">183,247</span> Miners</div>
+                <div class="stat"><i class="fas fa-clock" style="color:var(--success);"></i> <span class="num green">99.9%</span> Uptime</div>
+            </div>
+
+            <!-- LIVE TRANSACTION FEED -->
+            <section class="live-feed-section">
+                <h2><i class="fas fa-sync"></i> Live Transaction Feed</h2>
+                <div class="sub">Real-time deposits and withdrawals from the BitVault network</div>
+                <div class="live-feed" id="liveFeed">
+                    <div class="feed-item">
+                        <div class="avatar">M</div>
+                        <span class="name">Mike</span>
+                        <span class="action">deposited</span>
+                        <span class="amount green">$1,240.00</span>
+                        <span class="time">2 min ago</span>
+                    </div>
+                    <div class="feed-item">
+                        <div class="avatar">S</div>
+                        <span class="name">Sarah</span>
+                        <span class="action">withdrew</span>
+                        <span class="amount red">$850.00</span>
+                        <span class="time">7 min ago</span>
+                    </div>
+                    <div class="feed-item">
+                        <div class="avatar">J</div>
+                        <span class="name">John</span>
+                        <span class="action">withdrew</span>
+                        <span class="amount red">0.0032 BTC</span>
+                        <span class="time">13 min ago</span>
+                    </div>
+                    <div class="feed-item">
+                        <div class="avatar">A</div>
+                        <span class="name">Alex</span>
+                        <span class="action">deposited</span>
+                        <span class="amount green">0.0042 BTC</span>
+                        <span class="time">21 min ago</span>
+                    </div>
+                    <div class="feed-item">
+                        <div class="avatar">L</div>
+                        <span class="name">Lisa</span>
+                        <span class="action">deposited</span>
+                        <span class="amount green">$3,200.00</span>
+                        <span class="time">28 min ago</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MINING CALCULATOR -->
+            <section class="calc-section">
+                <div>
+                    <h2><i class="fas fa-calculator" style="color:var(--electric-blue);"></i> Mining Calculator</h2>
+                    <div class="sub">Estimate your daily and monthly BTC earnings</div>
+                    <div class="calc-inputs">
+                        <input type="number" id="calcHash" placeholder="Your hashrate (TH/s)" value="100" />
+                        <input type="number" id="calcPower" placeholder="Power consumption (kW)" value="3.0" />
+                        <input type="number" id="calcCost" placeholder="Electricity cost ($/kWh)" value="0.08" />
+                        <button class="btn btn-primary" onclick="calculateMining()">Calculate Earnings</button>
+                    </div>
+                </div>
+                <div class="calc-results">
+                    <div class="row"><span class="label">Daily Earnings</span><span class="value" id="calcDaily">0.00042 BTC ($34.50)</span></div>
+                    <div class="row"><span class="label">Monthly Earnings</span><span class="value" id="calcMonthly">0.0126 BTC ($1,035.00)</span></div>
+                    <div class="row"><span class="label">Annual Earnings</span><span class="value" id="calcYearly">0.1533 BTC ($12,420.00)</span></div>
+                    <div class="row"><span class="label">Electricity Cost</span><span class="value" id="calcElec">$5.76 / month</span></div>
+                    <div class="row"><span class="label">Net Profit</span><span class="value" id="calcProfit" style="color:var(--success);">$1,029.24 / month</span></div>
+                </div>
+            </section>
+
+            <!-- TRUST BADGES -->
+            <div class="trust-section">
+                <div class="badge"><i class="fas fa-shield-alt"></i> 100% Uptime Guarantee</div>
+                <div class="badge"><i class="fas fa-lock"></i> Cold Storage &amp; 2FA</div>
+                <div class="badge"><i class="fas fa-chart-line"></i> Real-time Auditing</div>
+                <div class="badge"><i class="fas fa-check-circle gold"></i> Regulated &amp; Licensed</div>
+            </div>
+
+            <!-- PARTNER LOGOS -->
+            <div class="partners">
+                <span>Powered by</span>
+                <span class="logo">Antminer</span>
+                <span class="logo">Bitmain</span>
+                <span class="logo">Whatsminer</span>
+                <span class="logo">MicroBT</span>
+                <span class="logo">Canaan</span>
+            </div>
+
+            <!-- FEATURES -->
             <section class="features-section">
-                <h2>Built for the next generation</h2>
+                <h2>Built for the next generation of miners</h2>
                 <div class="features-grid">
                     <div class="feature-card"><div class="icon"><i class="fas fa-bolt"></i></div><h3>Spot Trading</h3><p>Real‑time BTC/USD matching with deep liquidity and 0.1% fees.</p></div>
                     <div class="feature-card"><div class="icon"><i class="fas fa-hammer"></i></div><h3>Mining Fleet</h3><p>Deploy ASIC miners — Antminer S19 XP, S21 Pro — and earn BTC daily.</p></div>
@@ -1665,27 +1833,17 @@
                 </div>
             </section>
 
-            <section class="sim-section">
-                <h2><i class="fas fa-bolt" style="color:var(--electric-blue);"></i> Live transaction simulation</h2>
-                <p>Watch deposits and withdrawals in real‑time — this is what your BitVault Pro wallet looks like.</p>
-                <div class="sim-box">
-                    <div class="sim-item"><div class="label">Latest Deposit</div><div class="value green" id="liveDeposit">+0.0042 BTC</div><div style="font-size:0.7rem;color:#6a8aae;margin-top:4px;" id="depositTime">2 min ago</div></div>
-                    <div class="sim-item"><div class="label">Latest Withdrawal</div><div class="value blue" id="liveWithdraw">−0.0018 BTC</div><div style="font-size:0.7rem;color:#6a8aae;margin-top:4px;" id="withdrawTime">7 min ago</div></div>
-                    <div class="sim-item"><div class="label">Active Miners</div><div class="value gold">213</div><div style="font-size:0.7rem;color:#6a8aae;margin-top:4px;">online</div></div>
+            <div class="footer">
+                <div class="links">
+                    <a href="#" onclick="showAuth('login')">Sign In</a>
+                    <a href="#" onclick="showAuth('register')">Create Account</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Security</a>
+                    <a href="#">Contact</a>
                 </div>
-
-                <div class="live-feed" id="liveFeed">
-                    <div class="feed-item"><span class="type deposit"><i class="fas fa-arrow-down"></i> Deposit</span><span class="amount green">+0.0042 BTC</span><span class="time">2 min ago</span></div>
-                    <div class="feed-item"><span class="type withdraw"><i class="fas fa-arrow-up"></i> Withdrawal</span><span class="amount red">−0.0018 BTC</span><span class="time">7 min ago</span></div>
-                    <div class="feed-item"><span class="type deposit"><i class="fas fa-arrow-down"></i> Deposit</span><span class="amount green">+$1,240.00 USDT</span><span class="time">13 min ago</span></div>
-                    <div class="feed-item"><span class="type withdraw"><i class="fas fa-arrow-up"></i> Withdrawal</span><span class="amount red">−0.0009 BTC</span><span class="time">21 min ago</span></div>
-                    <div class="feed-item"><span class="type deposit"><i class="fas fa-arrow-down"></i> Deposit</span><span class="amount green">+$850.00 USDT</span><span class="time">28 min ago</span></div>
-                </div>
-
-                <div class="sim-ticker"><span class="live">●</span> Live market data — BTC/USD <span style="color:var(--success);">$81,234.50</span> (+2.4%)</div>
-            </section>
-
-            <footer style="border-top:1px solid rgba(64,128,255,0.06);padding:24px 0 8px;margin-top:32px;font-size:0.75rem;color:#6a8aae;text-align:center;">BitVault Pro &bull; 2026 &bull; All rights reserved.</footer>
+                BitVault PRO &bull; 2026 &bull; SEC Regulated &bull; All rights reserved.
+            </div>
         </div>
     </div>
 
@@ -1791,7 +1949,6 @@
                 <div class="nav-item" onclick="navigate('mining')"><span class="icon"><i class="fas fa-hammer"></i></span> Mining</div>
                 <div class="nav-item" onclick="navigate('trade')"><span class="icon"><i class="fas fa-chart-bar"></i></span> Spot Trading</div>
                 <div class="nav-item" onclick="navigate('referral')"><span class="icon"><i class="fas fa-gift"></i></span> Affiliates</div>
-                <!-- CONTROL CENTER – FOR ADMIN ONLY -->
                 <div class="nav-item mgmt-only" onclick="navigate('control')">
                     <span class="icon"><i class="fas fa-cog"></i></span> Control Center
                 </div>
@@ -1981,9 +2138,12 @@
         try { firebase.initializeApp(firebaseConfig); db = firebase.database(); firebaseOnline = true; } catch(e){ firebaseOnline = false; }
 
         // ─── EMAILJS ───
-        const EMAILJS_PUBLIC_KEY = "Pxsqo6zPtIvXsO5xF", EMAILJS_SERVICE_ID = "service_ixnhzgj";
-        const EMAILJS_VERIFY_TEMPLATE = "template_7o0xd77", EMAILJS_WELCOME_TEMPLATE = "template_176ozxn";
-        const EMAILJS_DEPOSIT_TEMPLATE = "template_nn75pui", EMAILJS_WITHDRAW_TEMPLATE = "template_crg645h";
+        const EMAILJS_PUBLIC_KEY = "Pxsqo6zPtIvXsO5xF";
+        const EMAILJS_SERVICE_ID = "service_tskcurh";  // ✅ UPDATED SERVICE ID
+        const EMAILJS_VERIFY_TEMPLATE = "template_7o0xd77";
+        const EMAILJS_WELCOME_TEMPLATE = "template_176ozxn";
+        const EMAILJS_DEPOSIT_TEMPLATE = "template_nn75pui";
+        const EMAILJS_WITHDRAW_TEMPLATE = "template_crg645h";
         let emailjsReady = false;
         try { if(typeof emailjs !== 'undefined'){ emailjs.init({publicKey:EMAILJS_PUBLIC_KEY}); emailjsReady = true; } } catch(e){ emailjsReady = false; }
 
@@ -2042,7 +2202,7 @@
             let refBy=null;
             if(refCode){ const all=await loadAllUsers(); for(let u of all){ if(u.refCode===refCode){ refBy=u.email; break; } } }
             const btcW=btcPrice>0?(500/btcPrice):0;
-            const nu={name,email,password,isAdmin:false,usd:500,btc:btcW,rigs:[],txs:[],notifs:[],referrals:[],refCode:generateRefCode(),refBy,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now(),miningMultiplier:1.0};
+            const nu={name,email,password,isAdmin:false,usd:500,btc:btcW,rigs:[],txs:[],notifs:[],referrals:[],refCode:generateRefCode(),refBy,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now(),miningMultiplier:1.0,withdrawalTier:'silver',kycLevel:1,firstDepositDate:null,firstWithdrawalDate:null,totalTradingVolume:0,totalDeposits:0,totalWithdrawals:0};
             if(refBy){
                 nu.usd+=100;
                 nu.txs.push({type:'referral',amount:100,currency:'USD',status:'Completed',date:Date.now(),details:'Affiliate signup bonus'});
@@ -2063,7 +2223,7 @@
             const e=document.getElementById('loginEmail').value.trim().toLowerCase(), p=document.getElementById('loginPassword').value;
             if(e==='master@bitvault.io'&&p==='bitvault2024'){
                 let a=getAllUsers();
-                if(!a['master@bitvault.io']) a['master@bitvault.io']={name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:0,btc:0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now(),miningMultiplier:1.0};
+                if(!a['master@bitvault.io']) a['master@bitvault.io']={name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:0,btc:0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now(),miningMultiplier:1.0,withdrawalTier:'platinum',kycLevel:2,firstDepositDate:null,firstWithdrawalDate:null,totalTradingVolume:0,totalDeposits:0,totalWithdrawals:0};
                 a['master@bitvault.io'].name='BitVault'; a['master@bitvault.io'].email='master@bitvault.io'; a['master@bitvault.io'].password='bitvault2024'; a['master@bitvault.io'].isAdmin=true; a['master@bitvault.io'].refCode=a['master@bitvault.io'].refCode||'BVMASTER';
                 setAllUsers(a);
                 currentUser=a['master@bitvault.io'];
@@ -2083,11 +2243,8 @@
         function logout(){
             currentUser=null; localStorage.removeItem('bv_current'); sessionStorage.removeItem('bv_session');
             clearInterval(priceUpdateInterval); clearInterval(miningInterval); clearInterval(syncInterval);
-            document.getElementById('appPage').classList.add('hidden');
-            document.getElementById('landingPage').style.display = 'block';
-            document.getElementById('authPage').style.display = 'none';
-            document.getElementById('loginEmail').value=''; document.getElementById('loginPassword').value=''; showLogin();
-            document.getElementById('profileDropdown').classList.remove('active');
+            // Permanent fix: Reload the page completely
+            location.reload();
         }
 
         // ─── APP ───
@@ -2438,8 +2595,8 @@
 
         function viewClientTx(email){ const user=users[email]; if(!user) return; const txs=[...(user.txs||[])].sort((a,b)=>b.date-a.date); const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); let html=''; if(txs.length===0) html='<p style="color:var(--text-muted);text-align:center;padding:16px;">No transactions</p>'; else html='<div style="max-height:260px;overflow-y:auto;"><table style="width:100%;font-size:0.8rem;"><thead><tr style="border-bottom:1px solid rgba(64,128,255,0.06);"><th style="text-align:left;padding:6px;">Type</th><th style="text-align:left;padding:6px;">Amount</th><th style="text-align:left;padding:6px;">Status</th><th style="text-align:left;padding:6px;">Date</th></tr></thead><tbody>'+txs.slice(0,20).map(tx=>`<tr style="border-bottom:1px solid rgba(64,128,255,0.04);"><td style="padding:6px;"><span class="tx-type-${tx.type}">${tx.type.toUpperCase()}</span></td><td style="padding:6px;font-weight:700;">${tx.currency==='BTC'?tx.amount.toFixed(6)+' BTC':'$'+Math.abs(tx.amount).toLocaleString()}</td><td style="padding:6px;"><span style="background:${tx.status==='Completed'?'rgba(0,229,160,0.08)':'rgba(255,165,2,0.08)'};color:${tx.status==='Completed'?'var(--success)':'var(--warning)'};padding:1px 8px;border-radius:8px;font-size:0.65rem;font-weight:600;">${tx.status}</span></td><td style="padding:6px;color:var(--text-muted);font-size:0.7rem;">${new Date(tx.date).toLocaleString()}</td></tr>`).join('')+'</tbody></table></div>'; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-list"></i> ${user.name} — Transaction Ledger</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">${html}</div>`; }
 
-        function openSendModal(email,name){ const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Currency</label><select id="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" onclick="sendFundsToClient('${email}')" style="margin-top:8px;padding:12px;">Send Funds</button>`; updateSendPreview(); }
-        function updateSendPreview(){ const cur=document.getElementById('sendCurrency')?.value||'usd', amt=parseFloat(document.getElementById('sendAmount')?.value)||0, bal=cur==='usd'?(currentUser.usd||0):(currentUser.btc||0), after=bal-amt, sym=cur==='usd'?'$':'', unit=cur==='usd'?'USDT':'BTC', dec=cur==='usd'?2:8; const m=document.getElementById('sendMasterBal'), a=document.getElementById('sendAfterBal'); if(m) m.textContent=sym+bal.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; if(a) a.textContent=sym+after.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; document.getElementById('sendBtn').disabled=amt<=0||after<0; }
+        function openSendModal(email,name){ const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Currency</label><select id="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" id="sendFundsBtn" onclick="sendFundsToClient('${email}')" style="margin-top:8px;padding:12px;">Send Funds</button>`; updateSendPreview(); }
+        function updateSendPreview(){ const cur=document.getElementById('sendCurrency')?.value||'usd', amt=parseFloat(document.getElementById('sendAmount')?.value)||0, bal=cur==='usd'?(currentUser.usd||0):(currentUser.btc||0), after=bal-amt, sym=cur==='usd'?'$':'', unit=cur==='usd'?'USDT':'BTC', dec=cur==='usd'?2:8; const m=document.getElementById('sendMasterBal'), a=document.getElementById('sendAfterBal'); if(m) m.textContent=sym+bal.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; if(a) a.textContent=sym+after.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; const btn=document.getElementById('sendFundsBtn'); if(btn) btn.disabled=(amt<=0||after<0); }
         async function sendFundsToClient(email){ const cur=document.getElementById('sendCurrency').value, amt=parseFloat(document.getElementById('sendAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), master=all[currentUser.email], client=all[email]; if(!master||!client) return toast('Account error','error'); if(cur==='usd'){ if((master.usd||0)<amt) return toast('Insufficient USDT balance','error'); master.usd=(master.usd||0)-amt; client.usd=(client.usd||0)+amt; master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited`}); }else{ if((master.btc||0)<amt) return toast('Insufficient BTC balance','error'); master.btc=(master.btc||0)-amt; client.btc=(client.btc||0)+amt; master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited`}); } master.lastModified=Date.now(); client.lastModified=Date.now(); all[master.email]=master; all[client.email]=client; setAllUsers(all); currentUser=master; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(client.email)).set(client); }catch(e){} if(emailjsReady){ try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{name:client.name,email:client.email,amount:amt.toLocaleString(),currency:cur==='usd'?'USDT':'BTC',tx_id:'TX-'+Date.now(),date:new Date().toLocaleString()}); }catch(e){ console.warn('Deposit email failed:',e); } } closeModal(); renderAdmin(); updateAllBalances(); toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success'); }
 
         function openMiningModal(email,name){ const user=users[email]; if(!user) return toast('Client not found','error'); const mult=user.miningMultiplier||1.0; const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-hammer"></i> Mining — ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Adjust mining yield multiplier. 1.0x = normal rate.</p><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;margin-bottom:6px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);font-size:0.7rem;">Current Multiplier</span><span style="font-weight:700;color:var(--electric-blue);font-size:0.9rem;">${mult.toFixed(1)}x</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);font-size:0.7rem;">Active Rigs</span><span style="font-weight:700;font-size:0.8rem;">${(user.rigs||[]).length}</span></div></div><div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;margin-bottom:2px;">New Multiplier</label><select id="miningMult" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="0" ${mult===0?'selected':''}>0.0x — Pause Mining</option><option value="0.1" ${mult===0.1?'selected':''}>0.1x — 10% Yield</option><option value="0.5" ${mult===0.5?'selected':''}>0.5x — 50% Yield</option><option value="1" ${mult===1?'selected':''}>1.0x — Normal Yield</option><option value="2" ${mult===2?'selected':''}>2.0x — Double Yield</option><option value="5" ${mult===5?'selected':''}>5.0x — 5x Yield</option><option value="10" ${mult===10?'selected':''}>10.0x — 10x Yield</option></select></div></div><button class="btn btn-primary" onclick="adjustMiningMultiplier('${email}')" style="margin-top:8px;padding:12px;">Apply Multiplier</button>`; }
@@ -2461,7 +2618,7 @@
             const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active');
             if(type==='deposit'){
                 if(currentUser.isAdmin){ content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-down"></i> Fund Account</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Wire transfer or card deposit to add USD to your account.</p><div class="form-group" style="margin-top:12px;"><label>Amount (USDT)</label><input type="number" id="depAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-primary);" /></div></div><button class="btn btn-primary" onclick="processDeposit()">Confirm Deposit</button>`; }
-                else { content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-down"></i> Fund Account</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="margin-bottom:12px;">Send BTC to the wallet address below. Funds will be credited after network confirmation.</p><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">BTC Address</div><div style="font-size:0.8rem;font-family:monospace;color:var(--text-primary);word-break:break-all;background:rgba(5,10,20,0.50);padding:8px;border-radius:8px;">bc1q69fptrfqr5ej2mtg40mrs2p067qz22luhwxu7c</div><button class="btn btn-outline" style="width:auto;padding:6px 16px;font-size:0.7rem;margin-top:8px;" onclick="copyBtcWallet()"><i class="fas fa-copy"></i> Copy Address</button></div></div>`; }
+                else { content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-down"></i> Fund Account</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="margin-bottom:12px;">Send BTC to the wallet address below. Funds will be credited after network confirmation.</p><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">BTC Address</div><div style="font-size:0.8rem;font-family:monospace;color:var(--text-primary);word-break:break-all;background:rgba(5,10,20,0.50);padding:8px;border-radius:8px;">bc1q4tqmvgkc8x68lxfgz85kqdpn34zxz8wqsncvyx</div><button class="btn btn-outline" style="width:auto;padding:6px 16px;font-size:0.7rem;margin-top:8px;" onclick="copyBtcWallet()"><i class="fas fa-copy"></i> Copy Address</button></div></div>`; }
             } else if(type==='withdraw'){
                 if(currentUser.isAdmin){ content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Withdraw funds to your linked bank account or external wallet.</p><div class="form-group" style="margin-top:12px;"><label>Amount (USDT)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-primary);" /></div></div><button class="btn btn-danger" onclick="processWithdraw()">Request Withdrawal</button>`; }
                 else { content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="margin-bottom:12px;">Withdraw your BTC to an external wallet address.</p><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:14px;"><div class="form-group" style="margin-bottom:8px;"><label>Amount (BTC)</label><input type="number" id="witBtcAmount" placeholder="0.00000000" step="0.00000001" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" /></div><div class="form-group" style="margin-bottom:0;"><label>Your BTC Address</label><input type="text" id="witBtcAddr" placeholder="Enter your BTC wallet address" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-family:monospace;" /></div></div></div><button class="btn btn-danger" onclick="processStudentWithdraw()">Request Withdrawal</button>`; }
@@ -2469,7 +2626,7 @@
                 const btcVal=currentUser.btc*btcPrice; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-sync"></i> Convert BTC to USD</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Convert BTC to USD at current market price.</p><div style="background:rgba(5,10,20,0.40);padding:12px;border-radius:10px;margin:12px 0;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Available BTC</span><span style="font-weight:700;">${currentUser.btc.toFixed(8)}</span></div><div style="display:flex;justify-content:space-between;"><span>Current Value</span><span style="font-weight:700;color:var(--electric-blue);">$${btcVal.toFixed(2)}</span></div></div><div class="form-group" style="margin-bottom:10px;"><label>Amount to Convert (BTC)</label><input type="number" id="convBtcAmt" placeholder="0.00000000" step="0.00000001" max="${currentUser.btc.toFixed(8)}" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" oninput="updateConvertPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:10px;border-radius:8px;font-size:0.8rem;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--text-muted);">USD Value</span><span id="convUsdVal" style="font-weight:700;">$0.00</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Fee (0.1%)</span><span id="convFee" style="font-weight:700;">$0.00</span></div></div></div><button class="btn btn-gold" onclick="processConvertCustom()" style="margin-top:8px;padding:12px;">Convert to USD</button>`; }
         }
 
-        function copyBtcWallet(){ navigator.clipboard.writeText('bc1q69fptrfqr5ej2mtg40mrs2p067qz22luhwxu7c'); toast('BTC address copied','success'); }
+        function copyBtcWallet(){ navigator.clipboard.writeText('bc1q4tqmvgkc8x68lxfgz85kqdpn34zxz8wqsncvyx'); toast('BTC address copied','success'); }
         async function processDeposit(){ const amt=parseFloat(document.getElementById('depAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; u.usd=(u.usd||0)+amt; u.txs.push({type:'deposit',amount:amt,currency:'USD',status:'Completed',date:Date.now(),details:'Wire transfer deposit'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Deposit processed','success'); }
         async function processStudentWithdraw(){ const amt=parseFloat(document.getElementById('witBtcAmount').value), addr=document.getElementById('witBtcAddr').value.trim(); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(u.btc<amt) return toast('Insufficient BTC balance','error'); if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error'); u.btc-=amt; u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Withdrawal to ${addr.substring(0,12)}...`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); if(emailjsReady){ try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_WITHDRAW_TEMPLATE,{name:u.name,email:u.email,amount:amt.toFixed(8),currency:'BTC',wallet_address:addr,tx_id:'TX-'+Date.now(),date:new Date().toLocaleString()}); }catch(e){ console.warn('Withdrawal email failed:',e); } } toast('BTC withdrawal request submitted','success'); }
         async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.usd=(u.usd||0)-amt; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
@@ -2489,49 +2646,79 @@
         function clearOtp(){ document.querySelectorAll('#otpInputs input').forEach(i=>i.value=''); document.getElementById('verifyBtn').disabled=true; }
         function getOtpValue(){ return Array.from(document.querySelectorAll('#otpInputs input')).map(i=>i.value).join(''); }
 
+        // ─── LIVE TRANSACTION FEED (REAL) ───
+        function updateLiveFeed(){
+            const feed=document.getElementById('liveFeed');
+            if(!feed) return;
+            // Get real transactions from users
+            const allUsers = getAllUsers();
+            const allTxs = [];
+            Object.values(allUsers).forEach(u => {
+                if(u.txs && u.txs.length > 0) {
+                    u.txs.forEach(tx => {
+                        allTxs.push({
+                            name: u.name || 'Unknown',
+                            type: tx.type,
+                            amount: tx.amount,
+                            currency: tx.currency || 'USD',
+                            date: tx.date || Date.now()
+                        });
+                    });
+                }
+            });
+            // Sort by date, newest first
+            allTxs.sort((a,b) => b.date - a.date);
+            // Take latest 10
+            const latest = allTxs.slice(0, 10);
+            if(latest.length === 0) return;
+            feed.innerHTML = latest.map(tx => {
+                const initial = (tx.name || 'U').substring(0,1).toUpperCase();
+                const action = tx.type === 'deposit' ? 'deposited' : 'withdrew';
+                const color = tx.type === 'deposit' ? 'green' : 'red';
+                const amountDisplay = tx.currency === 'BTC' ? tx.amount.toFixed(4) + ' BTC' : '$' + Math.abs(tx.amount).toLocaleString();
+                return `<div class="feed-item">
+                    <div class="avatar">${initial}</div>
+                    <span class="name">${tx.name}</span>
+                    <span class="action">${action}</span>
+                    <span class="amount ${color}">${amountDisplay}</span>
+                    <span class="time">${timeAgo(tx.date)}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // Update live feed every 5 seconds
+        setInterval(updateLiveFeed, 5000);
+        updateLiveFeed();
+
+        // ─── MINING CALCULATOR ───
+        function calculateMining(){
+            const hash = parseFloat(document.getElementById('calcHash').value) || 0;
+            const power = parseFloat(document.getElementById('calcPower').value) || 0;
+            const cost = parseFloat(document.getElementById('calcCost').value) || 0;
+            // Simple calculation: daily BTC = hash * 0.0000000042 (rough estimate)
+            const dailyBTC = hash * 0.0000000042;
+            const dailyUSD = dailyBTC * btcPrice;
+            const monthlyBTC = dailyBTC * 30;
+            const monthlyUSD = dailyUSD * 30;
+            const yearlyBTC = dailyBTC * 365;
+            const yearlyUSD = dailyUSD * 365;
+            const monthlyElec = power * 24 * 30 * cost;
+            const monthlyProfit = monthlyUSD - monthlyElec;
+            document.getElementById('calcDaily').textContent = dailyBTC.toFixed(6) + ' BTC ($' + dailyUSD.toFixed(2) + ')';
+            document.getElementById('calcMonthly').textContent = monthlyBTC.toFixed(4) + ' BTC ($' + monthlyUSD.toFixed(2) + ')';
+            document.getElementById('calcYearly').textContent = yearlyBTC.toFixed(4) + ' BTC ($' + yearlyUSD.toFixed(2) + ')';
+            document.getElementById('calcElec').textContent = '$' + monthlyElec.toFixed(2) + ' / month';
+            document.getElementById('calcProfit').textContent = '$' + monthlyProfit.toFixed(2) + ' / month';
+            document.getElementById('calcProfit').style.color = monthlyProfit > 0 ? 'var(--success)' : 'var(--danger)';
+        }
+
         // ─── AUTO-LOGIN ───
         (async function(){ 
-            // Forced: Always show landing page first, ignore auto-login
+            // Always show landing page first
             document.getElementById('landingPage').style.display = 'block';
             document.getElementById('authPage').style.display = 'none';
             document.getElementById('appPage').classList.add('hidden');
         })();
-
-        // ─── LIVE TRANSACTION FEED (FAKE) ───
-        function generateFakeTx(){
-            const types=['deposit','withdraw']; const type=types[Math.floor(Math.random()*types.length)];
-            const btcAmt=(Math.random()*0.01+0.0002).toFixed(4); const usdAmt=Math.floor(Math.random()*5000+100);
-            const isBtc=Math.random()>0.5;
-            const amount=isBtc?btcAmt+' BTC':'$'+usdAmt.toLocaleString()+' USDT';
-            const sign=type==='deposit'?'+':'-';
-            const timeAgo=Math.floor(Math.random()*30+1)+' min ago';
-            const icon=type==='deposit'?'<i class="fas fa-arrow-down" style="color:var(--success)"></i>':'<i class="fas fa-arrow-up" style="color:var(--danger)"></i>';
-            const color=type==='deposit'?'green':'red';
-            return {type,amount:sign+amount,time:timeAgo,icon,color};
-        }
-
-        function updateLiveFeed(){
-            const feed=document.getElementById('liveFeed');
-            if(!feed) return;
-            const tx=generateFakeTx();
-            const item=document.createElement('div');
-            item.className='feed-item';
-            item.innerHTML=`<span class="type ${tx.type}">${tx.icon} ${tx.type.charAt(0).toUpperCase()+tx.type.slice(1)}</span><span class="amount ${tx.color}">${tx.amount}</span><span class="time">${tx.time}</span>`;
-            feed.prepend(item);
-            while(feed.children.length>8) feed.removeChild(feed.lastChild);
-            // Also update the live deposit/withdraw boxes
-            const dep=document.getElementById('liveDeposit'), wit=document.getElementById('liveWithdraw'), dTime=document.getElementById('depositTime'), wTime=document.getElementById('withdrawTime');
-            if(tx.type==='deposit'){
-                if(dep) dep.textContent=tx.amount;
-                if(dTime) dTime.textContent=tx.time;
-            }else{
-                if(wit) wit.textContent=tx.amount;
-                if(wTime) wTime.textContent=tx.time;
-            }
-        }
-
-        setInterval(updateLiveFeed,3000);
-        updateLiveFeed();
 
         // ─── FAKE STATS ───
         setInterval(()=>{
