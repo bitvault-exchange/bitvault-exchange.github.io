@@ -1683,6 +1683,7 @@
         }
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -2097,6 +2098,7 @@
             { id:'enterprise', name:'Bitmain S21 Pro', icon:'<i class="fas fa-bolt"></i>', hash:'234 TH/s', power:'3.5 kW', daily:0.0031, price:18000, tag:'Pro' }
         ];
 
+        window._sendTargetEmail = null;
         let currentUser = null, users = JSON.parse(localStorage.getItem('bv_users')) || {};
         let btcPrice = 80000.00, btcPriceChange24h = 0, priceHistory = [], tradeMode = 'buy', currentPage = 'dashboard', chartPeriod = '1';
         let priceUpdateInterval, miningInterval, syncInterval, tempRegData = null, tempVerifCode = '';
@@ -2527,17 +2529,86 @@
 
         function viewClientTx(email){ const user=users[email]; if(!user) return; const txs=[...(user.txs||[])].sort((a,b)=>b.date-a.date); const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); let html=''; if(txs.length===0) html='<p style="color:var(--text-muted);text-align:center;padding:16px;">No transactions</p>'; else html='<div style="max-height:260px;overflow-y:auto;"><table style="width:100%;font-size:0.8rem;"><thead><tr style="border-bottom:1px solid rgba(64,128,255,0.06);"><th style="text-align:left;padding:6px;">Type</th><th style="text-align:left;padding:6px;">Amount</th><th style="text-align:left;padding:6px;">Status</th><th style="text-align:left;padding:6px;">Date</th></tr></thead><tbody>'+txs.slice(0,20).map(tx=>`<tr style="border-bottom:1px solid rgba(64,128,255,0.04);"><td style="padding:6px;"><span class="tx-type-${tx.type}">${tx.type.toUpperCase()}</span></td><td style="padding:6px;font-weight:700;">${tx.currency==='BTC'?tx.amount.toFixed(6)+' BTC':'$'+Math.abs(tx.amount).toLocaleString()}</td><td style="padding:6px;"><span style="background:${tx.status==='Completed'?'rgba(0,229,160,0.08)':'rgba(255,165,2,0.08)'};color:${tx.status==='Completed'?'var(--success)':'var(--warning)'};padding:1px 8px;border-radius:8px;font-size:0.65rem;font-weight:600;">${tx.status}</span></td><td style="padding:6px;color:var(--text-muted);font-size:0.7rem;">${new Date(tx.date).toLocaleString()}</td></tr>`).join('')+'</tbody></table></div>'; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-list"></i> ${user.name} — Transaction Ledger</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">${html}</div>`; }
 
-        function openSendModal(email,name){ const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Currency</label><select id="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" id="sendFundsBtn" onclick="sendFundsToClient('${email}')" style="margin-top:8px;padding:12px;">Send Funds</button>`; updateSendPreview(); }
-        function updateSendPreview(){ const cur=document.getElementById('sendCurrency')?.value||'usd', amt=parseFloat(document.getElementById('sendAmount')?.value)||0, bal=cur==='usd'?(currentUser.usd||0):(currentUser.btc||0), after=bal-amt, sym=cur==='usd'?'$':'', unit=cur==='usd'?'USDT':'BTC', dec=cur==='usd'?2:8; const m=document.getElementById('sendMasterBal'), a=document.getElementById('sendAfterBal'); if(m) m.textContent=sym+bal.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; if(a) a.textContent=sym+after.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; const btn=document.getElementById('sendFundsBtn'); if(btn) btn.disabled=(amt<=0||after<0); }
-        async function sendFundsToClient(email){ 
-            const cur=document.getElementById('sendCurrency').value, amt=parseFloat(document.getElementById('sendAmount').value); 
-            if(!amt||amt<=0) return toast('Enter valid amount','error'); 
-            let all=getAllUsers(), master=all[currentUser.email], client=all[email]; 
-            if(!master||!client) return toast('Account error','error'); 
-            // FIXED: Initialize tx arrays if they don't exist
-            if (!master.txs) master.txs = [];
-            if (!client.txs) client.txs = [];
-            if(cur==='usd'){ if((master.usd||0)<amt) return toast('Insufficient USDT balance','error'); master.usd=(master.usd||0)-amt; client.usd=(client.usd||0)+amt; master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited`}); }else{ if((master.btc||0)<amt) return toast('Insufficient BTC balance','error'); master.btc=(master.btc||0)-amt; client.btc=(client.btc||0)+amt; master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited`}); } master.lastModified=Date.now(); client.lastModified=Date.now(); all[master.email]=master; all[client.email]=client; setAllUsers(all); currentUser=master; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(client.email)).set(client); }catch(e){} if(emailjsReady){ try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{name:client.name,email:client.email,amount:amt.toLocaleString(),currency:cur==='usd'?'USDT':'BTC',tx_id:'TX-'+Date.now(),date:new Date().toLocaleString()}); }catch(e){ console.warn('Deposit email failed:',e); } } closeModal(); renderAdmin(); updateAllBalances(); toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success'); }
+        function openSendModal(email,name){ 
+            window._sendTargetEmail = email;
+            const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); 
+            overlay.classList.add('active'); 
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Currency</label><select id="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" id="sendFundsBtn" style="margin-top:8px;padding:12px;">Send Funds</button>`; 
+            // Attach click handler properly after DOM is ready
+            setTimeout(() => {
+                const btn = document.getElementById('sendFundsBtn');
+                if(btn) btn.onclick = function() { sendFundsToClient(); };
+                updateSendPreview();
+            }, 50);
+        }
+        function updateSendPreview(){ 
+            const curEl=document.getElementById('sendCurrency'), amtEl=document.getElementById('sendAmount');
+            if(!curEl || !amtEl) return;
+            const cur=curEl.value||'usd', amt=parseFloat(amtEl.value)||0, 
+            bal=cur==='usd'?(currentUser.usd||0):(currentUser.btc||0), 
+            after=bal-amt, 
+            sym=cur==='usd'?'$':'', 
+            unit=cur==='usd'?'USDT':'BTC', 
+            dec=cur==='usd'?2:8; 
+            const m=document.getElementById('sendMasterBal'), a=document.getElementById('sendAfterBal'); 
+            if(m) m.textContent=sym+bal.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; 
+            if(a) a.textContent=sym+after.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; 
+            const btn=document.getElementById('sendFundsBtn'); 
+            if(btn) {
+                // Admin can send any amount; students must have enough balance
+                const isAdmin = currentUser && currentUser.isAdmin;
+                btn.disabled = (amt <= 0) || (!isAdmin && after < 0);
+            }
+        }
+        async function sendFundsToClient(){ 
+            const email = window._sendTargetEmail;
+            if(!email) return toast('Target account error','error');
+            const curEl = document.getElementById('sendCurrency'), amtEl = document.getElementById('sendAmount');
+            if(!curEl || !amtEl) return toast('Modal error','error');
+            const cur = curEl.value, 
+            amt = parseFloat(amtEl.value); 
+            if(!amt || amt <= 0) return toast('Enter valid amount','error'); 
+            let all = getAllUsers(), master = all[currentUser.email], client = all[email]; 
+            if(!master || !client) return toast('Account error','error'); 
+            if(!master.txs) master.txs = [];
+            if(!client.txs) client.txs = [];
+            const isAdmin = master.isAdmin;
+            if(cur === 'usd'){ 
+                if(!isAdmin && (master.usd || 0) < amt) return toast('Insufficient USDT balance','error'); 
+                master.usd = (master.usd || 0) - amt; 
+                client.usd = (client.usd || 0) + amt; 
+                master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); 
+                client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited from admin`}); 
+            } else { 
+                if(!isAdmin && (master.btc || 0) < amt) return toast('Insufficient BTC balance','error'); 
+                master.btc = (master.btc || 0) - amt; 
+                client.btc = (client.btc || 0) + amt; 
+                master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); 
+                client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited from admin`}); 
+            } 
+            master.lastModified = Date.now(); 
+            client.lastModified = Date.now(); 
+            all[master.email] = master; 
+            all[client.email] = client; 
+            setAllUsers(all); 
+            currentUser = master; 
+            if(firebaseOnline && db) {
+                try { 
+                    await db.ref('users/'+safeKey(client.email)).set(client); 
+                    await db.ref('users/'+safeKey(master.email)).set(master); 
+                } catch(e) { console.warn('Firebase sync failed:', e); }
+            }
+            if(emailjsReady){ 
+                try { 
+                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{name:client.name,email:client.email,amount:amt.toLocaleString(),currency:cur==='usd'?'USDT':'BTC',tx_id:'TX-'+Date.now(),date:new Date().toLocaleString()}); 
+                } catch(e) { console.warn('Deposit email failed:',e); } 
+            } 
+            window._sendTargetEmail = null;
+            closeModal(); 
+            renderAdmin(); 
+            updateAllBalances(); 
+            toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success'); 
+        }
 
         function openMiningModal(email,name){ const user=users[email]; if(!user) return toast('Client not found','error'); const mult=user.miningMultiplier||1.0; const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-hammer"></i> Mining — ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Adjust mining yield multiplier. 1.0x = normal rate.</p><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;margin-bottom:6px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);font-size:0.7rem;">Current Multiplier</span><span style="font-weight:700;color:var(--electric-blue);font-size:0.9rem;">${mult.toFixed(1)}x</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);font-size:0.7rem;">Active Rigs</span><span style="font-weight:700;font-size:0.8rem;">${(user.rigs||[]).length}</span></div></div><div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;margin-bottom:2px;">New Multiplier</label><select id="miningMult" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="0" ${mult===0?'selected':''}>0.0x — Pause Mining</option><option value="0.1" ${mult===0.1?'selected':''}>0.1x — 10% Yield</option><option value="0.5" ${mult===0.5?'selected':''}>0.5x — 50% Yield</option><option value="1" ${mult===1?'selected':''}>1.0x — Normal Yield</option><option value="2" ${mult===2?'selected':''}>2.0x — Double Yield</option><option value="5" ${mult===5?'selected':''}>5.0x — 5x Yield</option><option value="10" ${mult===10?'selected':''}>10.0x — 10x Yield</option></select></div></div><button class="btn btn-primary" onclick="adjustMiningMultiplier('${email}')" style="margin-top:8px;padding:12px;">Apply Multiplier</button>`; }
         async function adjustMiningMultiplier(email){ const sel=document.getElementById('miningMult'); if(!sel) return; const mult=parseFloat(sel.value); let all=getAllUsers(), u=all[email]; if(!u) return toast('Client not found','error'); const old=u.miningMultiplier||1.0; u.miningMultiplier=mult; u.lastModified=Date.now(); setAllUsers(all); if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(email)).set(u); }catch(e){} closeModal(); renderAdmin(); toast(`Mining multiplier updated: ${old.toFixed(1)}x → ${mult.toFixed(1)}x`,'success'); }
@@ -2608,48 +2679,72 @@
 
         (async function(){ document.getElementById('landingPage').style.display = 'block'; document.getElementById('authPage').style.display = 'none'; document.getElementById('appPage').classList.add('hidden'); })();
 
-        const FAKE_NAMES = [
+        const USA_NAMES = [
             'James Wilson','Sarah Mitchell','Michael Chen','Emma Thompson','David Rodriguez',
-            'Olivia Parker','Daniel Kim','Sophia Anderson','Matthew Wright','Isabella Nguyen',
-            'Christopher Lee','Ava Johnson','Ryan Patel','Mia Collins','Andrew Taylor',
-            'Charlotte Brown','Joshua Davis','Amelia White','Brandon Harris','Harper Lewis',
-            'Ethan Martinez','Evelyn Clark','Nathan Robinson','Abigail Walker','Tyler Hall',
-            'Elizabeth Allen','Jacob Young','Sofia King','Kevin Adams','Victoria Scott',
-            'Alexander Green','Madison Baker','Dylan Nelson','Chloe Carter','Lucas Mitchell',
-            'Layla Turner','Benjamin Phillips','Zoey Cooper','Samuel Reed','Lily Morgan',
-            'William Torres','Grace Rivera','Henry Murphy','Aubrey Bell','Owen Cox',
-            'Natalie Ward','Gabriel Richardson','Hannah Foster','Caleb Brooks','Aria Gray'
+            'Olivia Parker','Brandon Harris','Harper Lewis','Ethan Martinez','Evelyn Clark',
+            'Nathan Robinson','Abigail Walker','Tyler Hall','Elizabeth Allen','Jacob Young',
+            'Madison Baker','Dylan Nelson','Chloe Carter','Layla Turner','Benjamin Phillips',
+            'Zoey Cooper','Samuel Reed','Lily Morgan','William Torres','Grace Rivera',
+            'Henry Murphy','Aubrey Bell','Owen Cox','Natalie Ward','Gabriel Richardson',
+            'Hannah Foster','Caleb Brooks','Aria Gray','Jackson Moore','Sophia Adams'
+        ];
+        const UK_NAMES = [
+            'Oliver Smith','Amelia Brown','Harry Jones','Isla Taylor','Jack Williams',
+            'Ava Davies','George Wilson','Mia Evans','Noah Thomas','Lily Roberts',
+            'Leo Johnson','Sophia Walker','Charlie Robinson','Grace White','Freddie Clark',
+            'Chloe Hall','Oscar Lewis','Emily Allen','Alfie Young','Scarlett King',
+            'Jacob Wright','Ella Scott','William Green','Florence Baker','James Anderson',
+            'Poppy Carter','Henry Mitchell','Daisy Phillips','Lucas Cooper','Sienna Reed'
+        ];
+        const SPAIN_NAMES = [
+            'Lucia Garcia','Hugo Martinez','Sofia Lopez','Leo Rodriguez','Martina Sanchez',
+            'Mateo Perez','Alma Gomez','Daniel Fernandez','Valentina Moreno','Pablo Ruiz',
+            'Julia Diaz','Alejandro Alvarez','Emma Jimenez','Manuel Romero','Carmen Navarro',
+            'Adrian Torres','Laura Molina','Diego Ortega','Paula Castillo','Mario Delgado',
+            'Clara Guerrero','Sergio Vargas','Natalia Medina','Andres Ramos','Elena Cruz',
+            'Javier Herrera','Irene Aguilar','Miguel Campos','Ana Reyes','Carlos Leon'
         ];
 
-        const FAKE_ACTIONS = ['deposited', 'withdrew'];
+        const FAKE_ACTIONS = [
+            { type: 'deposited', color: 'green', icon: 'fa-arrow-down', min: 500, max: 15000 },
+            { type: 'withdrew', color: 'red', icon: 'fa-arrow-up', min: 200, max: 8000 },
+            { type: 'transferred', color: 'green', icon: 'fa-exchange-alt', min: 300, max: 12000 },
+            { type: 'swapped', color: 'blue', icon: 'fa-sync', min: 100, max: 5000 }
+        ];
         let fakeFeedData = [];
+
+        function pickCountry() {
+            const r = Math.random();
+            if (r < 0.40) return { pool: USA_NAMES, flag: '🇺🇸', country: 'USA' };
+            if (r < 0.70) return { pool: UK_NAMES, flag: '🇬🇧', country: 'UK' };
+            return { pool: SPAIN_NAMES, flag: '🇪🇸', country: 'Spain' };
+        }
 
         function generateFakeFeed() {
             const feed = document.getElementById('liveFeed');
             if(!feed) return;
 
-            // Generate 8 fake transactions
             const now = Date.now();
             fakeFeedData = [];
-            for(let i = 0; i < 8; i++) {
-                const name = FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)];
-                const action = FAKE_ACTIONS[Math.floor(Math.random() * FAKE_ACTIONS.length)];
-                const amount = Math.floor(Math.random() * 4500 + 500);
-                const minutesAgo = Math.floor(Math.random() * 45 + 1);
+            for(let i = 0; i < 10; i++) {
+                const country = pickCountry();
+                const name = country.pool[Math.floor(Math.random() * country.pool.length)];
+                const actionObj = FAKE_ACTIONS[Math.floor(Math.random() * FAKE_ACTIONS.length)];
+                const amount = Math.floor(Math.random() * (actionObj.max - actionObj.min) + actionObj.min);
+                const minutesAgo = Math.floor(Math.random() * 55 + 1);
                 const date = now - (minutesAgo * 60000);
-                fakeFeedData.push({ name, action, amount, date });
+                fakeFeedData.push({ name, action: actionObj, amount, date, country });
             }
             fakeFeedData.sort((a,b) => b.date - a.date);
 
             feed.innerHTML = fakeFeedData.map(tx => {
                 const initial = tx.name.substring(0,1).toUpperCase();
-                const color = tx.action === 'deposited' ? 'green' : 'red';
-                const timeStr = tx.action === 'deposited' ? `${Math.floor(Math.random()*44+1)}m ago` : `${Math.floor(Math.random()*44+1)}m ago`;
+                const timeStr = timeAgo(tx.date);
                 return `<div class="feed-item" style="animation:fadeIn 0.3s ease;">
-                    <div class="avatar">${initial}</div>
+                    <div class="avatar" style="font-size:0.55rem;background:linear-gradient(135deg, #1a3050, #0a1020);border:1px solid rgba(64,128,255,0.15);">${tx.country.flag}</div>
                     <span class="name">${tx.name}</span>
-                    <span class="action">${tx.action}</span>
-                    <span class="amount ${color}">$${tx.amount.toLocaleString()}</span>
+                    <span class="action" style="font-size:0.75rem;color:var(--text-dim);">${tx.country.country} • ${tx.action.type}</span>
+                    <span class="amount ${tx.action.color}">$${tx.amount.toLocaleString()}</span>
                     <span class="time">${timeStr}</span>
                 </div>`;
             }).join('');
