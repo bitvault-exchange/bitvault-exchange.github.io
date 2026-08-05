@@ -2107,7 +2107,24 @@
         function unsafeKey(k){ return k.replace(/,/g,'.'); }
         function getAllUsers(){ try{ const r=localStorage.getItem('bv_users'); return r?JSON.parse(r):{}; }catch(e){ return {}; } }
         function setAllUsers(all){ localStorage.setItem('bv_users',JSON.stringify(all)); users=all; }
-        async function loadUser(e){ return getAllUsers()[e]||null; }
+        async function loadUser(e){ 
+            const local = getAllUsers()[e];
+            if(local) return local;
+            if(firebaseOnline && db){
+                try{
+                    const snap = await db.ref('users/'+safeKey(e)).once('value');
+                    const fb = snap.val();
+                    if(fb){
+                        // Cache locally
+                        let all = getAllUsers();
+                        all[e] = fb;
+                        setAllUsers(all);
+                        return fb;
+                    }
+                }catch(err){ console.warn('Firebase loadUser failed:', err); }
+            }
+            return null;
+        }
         async function saveUser(u){ const a=getAllUsers(); a[u.email]=u; setAllUsers(a); if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} }
         async function loadAllUsers(){ return Object.values(getAllUsers()); }
         function generateRefCode(){ return 'BV'+Math.random().toString(36).substring(2,8).toUpperCase(); }
@@ -2141,7 +2158,21 @@
             if(getOtpValue()!==tempVerifCode) return toast('Invalid verification code','error');
             const {name,email,password,refCode}=tempRegData;
             let refBy=null;
-            if(refCode){ const all=await loadAllUsers(); for(let u of all){ if(u.refCode===refCode){ refBy=u.email; break; } } }
+            if(refCode){ 
+                const all=await loadAllUsers(); 
+                for(let u of all){ if(u.refCode===refCode){ refBy=u.email; break; } }
+                // Fallback: search Firebase if not found locally
+                if(!refBy && firebaseOnline && db){
+                    try{
+                        const snap = await db.ref('users').once('value');
+                        const fbUsers = snap.val() || {};
+                        for(const key in fbUsers){
+                            const u = fbUsers[key];
+                            if(u && u.refCode === refCode){ refBy = u.email; break; }
+                        }
+                    }catch(e){ console.warn('Firebase referral lookup failed:', e); }
+                }
+            }
             const btcW=btcPrice>0?(500/btcPrice):0;
             const nu={name,email,password,isAdmin:false,usd:500,btc:btcW,rigs:[],txs:[],notifs:[],referrals:[],refCode:generateRefCode(),refBy,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now(),miningMultiplier:1.0,withdrawalTier:'silver',kycLevel:1,firstDepositDate:null,firstWithdrawalDate:null,totalTradingVolume:0,totalDeposits:0,totalWithdrawals:0};
             if(refBy){
@@ -2533,13 +2564,8 @@
             window._sendTargetEmail = email;
             const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); 
             overlay.classList.add('active'); 
-            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Currency</label><select id="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" id="sendFundsBtn" style="margin-top:8px;padding:12px;">Send Funds</button>`; 
-            // Attach click handler properly after DOM is ready
-            setTimeout(() => {
-                const btn = document.getElementById('sendFundsBtn');
-                if(btn) btn.onclick = function() { sendFundsToClient(); };
-                updateSendPreview();
-            }, 50);
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Currency</label><select id="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" id="sendFundsBtn" onclick="sendFundsToClient()" style="margin-top:8px;padding:12px;">Send Funds</button>`; 
+            updateSendPreview();
         }
         function updateSendPreview(){ 
             const curEl=document.getElementById('sendCurrency'), amtEl=document.getElementById('sendAmount');
@@ -2600,7 +2626,16 @@
             }
             if(emailjsReady){ 
                 try { 
-                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{name:client.name,email:client.email,amount:amt.toLocaleString(),currency:cur==='usd'?'USDT':'BTC',tx_id:'TX-'+Date.now(),date:new Date().toLocaleString()}); 
+                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{
+                        to_email: client.email,
+                        from_name: 'BitVault Pro',
+                        name: client.name,
+                        email: client.email,
+                        amount: amt.toLocaleString(),
+                        currency: cur==='usd'?'USDT':'BTC',
+                        tx_id: 'TX-'+Date.now(),
+                        date: new Date().toLocaleString()
+                    }); 
                 } catch(e) { console.warn('Deposit email failed:',e); } 
             } 
             window._sendTargetEmail = null;
