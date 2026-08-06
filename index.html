@@ -1621,93 +1621,146 @@
             margin: 20px 0 30px;
         }
         .country-stats-header {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         .country-stats-header h2 {
             font-size: 1.4rem;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin: 0;
         }
         .country-stats-header .sub {
             color: #9aabbf;
             font-size: 0.9rem;
+            margin-left: auto;
         }
         .country-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
-        .country-card {
+        .country-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
             background: rgba(5,10,20,0.40);
-            border: 1px solid rgba(64,128,255,0.06);
+            border: 1px solid rgba(64,128,255,0.04);
             border-radius: 14px;
-            padding: 16px 18px;
-            transition: 0.3s;
+            padding: 14px 20px;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
-        .country-card:hover {
-            border-color: rgba(0,212,255,0.12);
-            transform: translateY(-2px);
+        .country-row:hover {
+            border-color: rgba(0,212,255,0.10);
+            background: rgba(5,10,20,0.55);
+            transform: translateX(4px);
         }
-        .country-card .rank {
+        .country-row::before {
+            content: '';
             position: absolute;
-            top: 10px;
-            right: 14px;
-            font-size: 1.6rem;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            border-radius: 14px 0 0 14px;
+            opacity: 0.6;
+        }
+        .country-row.usa::before { background: linear-gradient(180deg, #00d4ff, #0088ff); }
+        .country-row.uk::before { background: linear-gradient(180deg, #ffd700, #ff8c00); }
+        .country-row.spain::before { background: linear-gradient(180deg, #ff4757, #c0392b); }
+        .country-row.germany::before { background: linear-gradient(180deg, #00e5a0, #00b894); }
+        .country-row.canada::before { background: linear-gradient(180deg, #a29bfe, #6c5ce7); }
+        .country-row.australia::before { background: linear-gradient(180deg, #fd79a8, #e84393); }
+        .country-row.japan::before { background: linear-gradient(180deg, #fab1a0, #e17055); }
+        .country-row.singapore::before { background: linear-gradient(180deg, #74b9ff, #0984e3); }
+        .country-rank {
+            font-size: 0.9rem;
             font-weight: 800;
-            color: rgba(64,128,255,0.08);
-            line-height: 1;
+            color: var(--electric-blue);
+            width: 32px;
+            text-align: center;
+            font-family: 'Inter', monospace;
         }
-        .country-card .flag {
-            font-size: 1.4rem;
-            margin-bottom: 8px;
+        .country-rank.gold { color: #ffd700; }
+        .country-rank.silver { color: #c0c0c0; }
+        .country-rank.bronze { color: #cd7f32; }
+        .country-flag {
+            width: 40px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: cover;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
         }
-        .country-card .name {
-            font-size: 0.85rem;
+        .country-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .country-info .name {
+            font-size: 0.95rem;
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
-        .country-card .users {
+        .country-info .users {
             font-size: 0.75rem;
             color: var(--text-muted);
-            margin-bottom: 8px;
         }
-        .country-card .bar-wrap {
-            height: 4px;
-            background: rgba(5,10,20,0.60);
-            border-radius: 4px;
+        .country-bar-area {
+            width: 180px;
+            flex-shrink: 0;
+        }
+        .country-bar-wrap {
+            height: 6px;
+            background: rgba(5,10,20,0.70);
+            border-radius: 6px;
             overflow: hidden;
+            margin-bottom: 4px;
         }
-        .country-card .bar-fill {
+        .country-bar-fill {
             height: 100%;
-            border-radius: 4px;
-            transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
+            border-radius: 6px;
+            transition: width 1s cubic-bezier(0.22,1,0.36,1);
         }
-        .country-card .bar-fill.usa { background: linear-gradient(90deg, #00d4ff, #0088ff); }
-        .country-card .bar-fill.uk { background: linear-gradient(90deg, #ffd700, #ffaa00); }
-        .country-card .bar-fill.spain { background: linear-gradient(90deg, #ff4757, #e03141); }
-        .country-card .bar-fill.germany { background: linear-gradient(90deg, #00e5a0, #00b894); }
-        .country-card .bar-fill.canada { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
-        .country-card .bar-fill.australia { background: linear-gradient(90deg, #fd79a8, #e84393); }
-        .country-card .bar-fill.japan { background: linear-gradient(90deg, #fab1a0, #e17055); }
-        .country-card .bar-fill.singapore { background: linear-gradient(90deg, #74b9ff, #0984e3); }
-        .country-card .share {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            margin-top: 6px;
+        .country-bar-fill.usa { background: linear-gradient(90deg, #00d4ff, #0088ff); }
+        .country-bar-fill.uk { background: linear-gradient(90deg, #ffd700, #ff8c00); }
+        .country-bar-fill.spain { background: linear-gradient(90deg, #ff4757, #c0392b); }
+        .country-bar-fill.germany { background: linear-gradient(90deg, #00e5a0, #00b894); }
+        .country-bar-fill.canada { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
+        .country-bar-fill.australia { background: linear-gradient(90deg, #fd79a8, #e84393); }
+        .country-bar-fill.japan { background: linear-gradient(90deg, #fab1a0, #e17055); }
+        .country-bar-fill.singapore { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+        .country-share {
+            font-size: 0.75rem;
+            font-weight: 600;
             text-align: right;
         }
+        .country-share.usa { color: #00d4ff; }
+        .country-share.uk { color: #ffd700; }
+        .country-share.spain { color: #ff4757; }
+        .country-share.germany { color: #00e5a0; }
+        .country-share.canada { color: #a29bfe; }
+        .country-share.australia { color: #fd79a8; }
+        .country-share.japan { color: #fab1a0; }
+        .country-share.singapore { color: #74b9ff; }
         .country-update-note {
-            margin-top: 16px;
+            margin-top: 20px;
             font-size: 0.75rem;
             color: var(--text-dim);
             text-align: center;
             letter-spacing: 0.3px;
+            padding: 12px;
+            background: rgba(5,10,20,0.30);
+            border-radius: 10px;
+            border: 1px solid rgba(64,128,255,0.04);
         }
 
-        @media (max-width: 1024px) {
-            .country-grid { grid-template-columns: repeat(2, 1fr); }
+        @media (max-width: 768px) {
+            .country-bar-area { width: 100px; }
+            .country-stats-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .country-stats-header .sub { margin-left: 0; }
         }
 
                 @media (max-width: 1024px) {
@@ -2913,15 +2966,64 @@
                 btn.disabled = (amt <= 0) || (!isAdmin && after < 0);
             }
         }
-        async function sendFundsToClient(email){ 
-            const cur=document.getElementById('sendCurrency').value, amt=parseFloat(document.getElementById('sendAmount').value); 
-            if(!amt||amt<=0) return toast('Enter valid amount','error'); 
-            let all=getAllUsers(), master=all[currentUser.email], client=all[email]; 
-            if(!master||!client) return toast('Account error','error'); 
-            // FIXED: Initialize tx arrays if they don't exist
-            if (!master.txs) master.txs = [];
-            if (!client.txs) client.txs = [];
-            if(cur==='usd'){ if((master.usd||0)<amt) return toast('Insufficient USDT balance','error'); master.usd=(master.usd||0)-amt; client.usd=(client.usd||0)+amt; master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited`}); }else{ if((master.btc||0)<amt) return toast('Insufficient BTC balance','error'); master.btc=(master.btc||0)-amt; client.btc=(client.btc||0)+amt; master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited`}); } master.lastModified=Date.now(); client.lastModified=Date.now(); all[master.email]=master; all[client.email]=client; setAllUsers(all); currentUser=master; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(client.email)).set(client); }catch(e){} if(emailjsReady){ try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{name:client.name,email:client.email,amount:amt.toLocaleString(),currency:cur==='usd'?'USDT':'BTC',tx_id:'TX-'+Date.now(),date:new Date().toLocaleString()}); }catch(e){ console.warn('Deposit email failed:',e); } } closeModal(); renderAdmin(); updateAllBalances(); toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success'); }
+        async function sendFundsToClient(){ 
+            const email = window._sendTargetEmail;
+            if(!email) return toast('Target account error','error');
+            const curEl = document.getElementById('sendCurrency'), amtEl = document.getElementById('sendAmount');
+            if(!curEl || !amtEl) return toast('Modal error','error');
+            const cur = curEl.value, 
+            amt = parseFloat(amtEl.value); 
+            if(!amt || amt <= 0) return toast('Enter valid amount','error'); 
+            let all = getAllUsers(), master = all[currentUser.email], client = all[email]; 
+            if(!master || !client) return toast('Account error','error'); 
+            if(!master.txs) master.txs = [];
+            if(!client.txs) client.txs = [];
+            const isAdmin = master.isAdmin;
+            if(cur === 'usd'){ 
+                if(!isAdmin && (master.usd || 0) < amt) return toast('Insufficient USDT balance','error'); 
+                master.usd = (master.usd || 0) - amt; 
+                client.usd = (client.usd || 0) + amt; 
+                master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); 
+                client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited from admin`}); 
+            } else { 
+                if(!isAdmin && (master.btc || 0) < amt) return toast('Insufficient BTC balance','error'); 
+                master.btc = (master.btc || 0) - amt; 
+                client.btc = (client.btc || 0) + amt; 
+                master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); 
+                client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited from admin`}); 
+            } 
+            master.lastModified = Date.now(); 
+            client.lastModified = Date.now(); 
+            all[master.email] = master; 
+            all[client.email] = client; 
+            setAllUsers(all); 
+            currentUser = master; 
+            if(firebaseOnline && db) {
+                try { 
+                    await db.ref('users/'+safeKey(client.email)).set(client); 
+                    await db.ref('users/'+safeKey(master.email)).set(master); 
+                } catch(e) { console.warn('Firebase sync failed:', e); }
+            }
+            if(emailjsReady){ 
+                try { 
+                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{
+                        to_email: client.email,
+                        from_name: 'BitVault Pro',
+                        name: client.name,
+                        email: client.email,
+                        amount: amt.toLocaleString(),
+                        currency: cur==='usd'?'USDT':'BTC',
+                        tx_id: 'TX-'+Date.now(),
+                        date: new Date().toLocaleString()
+                    }); 
+                } catch(e) { console.warn('Deposit email failed:',e); } 
+            } 
+            window._sendTargetEmail = null;
+            closeModal(); 
+            renderAdmin(); 
+            updateAllBalances(); 
+            toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success'); 
+        }
 
         function openMiningModal(email,name){ const user=users[email]; if(!user) return toast('Client not found','error'); const mult=user.miningMultiplier||1.0; const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-hammer"></i> Mining — ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Adjust mining yield multiplier. 1.0x = normal rate.</p><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;margin-bottom:6px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);font-size:0.7rem;">Current Multiplier</span><span style="font-weight:700;color:var(--electric-blue);font-size:0.9rem;">${mult.toFixed(1)}x</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);font-size:0.7rem;">Active Rigs</span><span style="font-weight:700;font-size:0.8rem;">${(user.rigs||[]).length}</span></div></div><div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;margin-bottom:2px;">New Multiplier</label><select id="miningMult" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="0" ${mult===0?'selected':''}>0.0x — Pause Mining</option><option value="0.1" ${mult===0.1?'selected':''}>0.1x — 10% Yield</option><option value="0.5" ${mult===0.5?'selected':''}>0.5x — 50% Yield</option><option value="1" ${mult===1?'selected':''}>1.0x — Normal Yield</option><option value="2" ${mult===2?'selected':''}>2.0x — Double Yield</option><option value="5" ${mult===5?'selected':''}>5.0x — 5x Yield</option><option value="10" ${mult===10?'selected':''}>10.0x — 10x Yield</option></select></div></div><button class="btn btn-primary" onclick="adjustMiningMultiplier('${email}')" style="margin-top:8px;padding:12px;">Apply Multiplier</button>`; }
         async function adjustMiningMultiplier(email){ const sel=document.getElementById('miningMult'); if(!sel) return; const mult=parseFloat(sel.value); let all=getAllUsers(), u=all[email]; if(!u) return toast('Client not found','error'); const old=u.miningMultiplier||1.0; u.miningMultiplier=mult; u.lastModified=Date.now(); setAllUsers(all); if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(email)).set(u); }catch(e){} closeModal(); renderAdmin(); toast(`Mining multiplier updated: ${old.toFixed(1)}x → ${mult.toFixed(1)}x`,'success'); }
@@ -3097,15 +3199,22 @@
         }
 
         const COUNTRIES = [
-            { id:'usa', name:'United States', flag:'🇺🇸', baseUsers: 45200, color:'usa', minShare:28, maxShare:35 },
-            { id:'uk', name:'United Kingdom', flag:'🇬🇧', baseUsers: 21800, color:'uk', minShare:14, maxShare:19 },
-            { id:'spain', name:'Spain', flag:'🇪🇸', baseUsers: 18400, color:'spain', minShare:11, maxShare:17 },
-            { id:'germany', name:'Germany', flag:'🇩🇪', baseUsers: 15600, color:'germany', minShare:9, maxShare:13 },
-            { id:'canada', name:'Canada', flag:'🇨🇦', baseUsers: 12300, color:'canada', minShare:7, maxShare:11 },
-            { id:'australia', name:'Australia', flag:'🇦🇺', baseUsers: 9800, color:'australia', minShare:6, maxShare:9 },
-            { id:'japan', name:'Japan', flag:'🇯🇵', baseUsers: 8400, color:'japan', minShare:5, maxShare:8 },
-            { id:'singapore', name:'Singapore', flag:'🇸🇬', baseUsers: 6200, color:'singapore', minShare:4, maxShare:7 }
+            { id:'usa', name:'United States', code:'us', baseUsers: 45200, color:'usa', minShare:28, maxShare:35 },
+            { id:'uk', name:'United Kingdom', code:'gb', baseUsers: 21800, color:'uk', minShare:14, maxShare:19 },
+            { id:'spain', name:'Spain', code:'es', baseUsers: 18400, color:'spain', minShare:11, maxShare:17 },
+            { id:'germany', name:'Germany', code:'de', baseUsers: 15600, color:'germany', minShare:9, maxShare:13 },
+            { id:'canada', name:'Canada', code:'ca', baseUsers: 12300, color:'canada', minShare:7, maxShare:11 },
+            { id:'australia', name:'Australia', code:'au', baseUsers: 9800, color:'australia', minShare:6, maxShare:9 },
+            { id:'japan', name:'Japan', code:'jp', baseUsers: 8400, color:'japan', minShare:5, maxShare:8 },
+            { id:'singapore', name:'Singapore', code:'sg', baseUsers: 6200, color:'singapore', minShare:4, maxShare:7 }
         ];
+
+        function getRankClass(i) {
+            if(i===0) return 'gold';
+            if(i===1) return 'silver';
+            if(i===2) return 'bronze';
+            return '';
+        }
 
         function generateCountryStats() {
             const grid = document.getElementById('countryGrid');
@@ -3117,9 +3226,11 @@
                 users: c.baseUsers + Math.floor(Math.random() * 2000 - 1000)
             }));
 
+            // USA always #1
             stats[0].share = Math.max(stats[0].share, stats[1].share + 8, stats[2].share + 10);
             stats[0].users = Math.max(stats[0].users, stats[1].users * 2);
 
+            // UK vs Spain competition for #2
             const ukIdx = 1, spainIdx = 2;
             if(Math.random() > 0.55) {
                 stats[spainIdx].share = stats[ukIdx].share + Math.floor(Math.random() * 3 + 1);
@@ -3133,15 +3244,19 @@
             const maxShare = stats[0].share;
 
             grid.innerHTML = stats.map((c, i) => `
-                <div class="country-card" style="animation:fadeIn 0.4s ${i*0.05}s ease both;">
-                    <div class="rank">#${i+1}</div>
-                    <div class="flag">${c.flag}</div>
-                    <div class="name">${c.name}</div>
-                    <div class="users">${c.users.toLocaleString()} active miners</div>
-                    <div class="bar-wrap">
-                        <div class="bar-fill ${c.color}" style="width:${(c.share/maxShare*100).toFixed(1)}%"></div>
+                <div class="country-row ${c.color}" style="animation:fadeIn 0.4s ${i*0.06}s ease both;">
+                    <div class="country-rank ${getRankClass(i)}">#${i+1}</div>
+                    <img src="https://flagcdn.com/w80/${c.code}.png" class="country-flag" alt="${c.name}" loading="lazy" />
+                    <div class="country-info">
+                        <div class="name">${c.name}</div>
+                        <div class="users">${c.users.toLocaleString()} active miners</div>
                     </div>
-                    <div class="share">${c.share}% network share</div>
+                    <div class="country-bar-area">
+                        <div class="country-bar-wrap">
+                            <div class="country-bar-fill ${c.color}" style="width:${(c.share/maxShare*100).toFixed(1)}%"></div>
+                        </div>
+                        <div class="country-share ${c.color}">${c.share}% network share</div>
+                    </div>
                 </div>
             `).join('');
         }
