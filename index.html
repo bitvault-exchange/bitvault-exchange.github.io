@@ -2791,8 +2791,9 @@
             if(txs.length===0) act.innerHTML='<div class="empty-state"><div class="icon"><i class="fas fa-inbox"></i></div><h3>No recent activity</h3><p>Trading and mining activity will appear here</p></div>';
             else act.innerHTML=txs.map(tx=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(64,128,255,0.04);"><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:1rem;">${tx.type==='deposit'?'<i class="fas fa-arrow-down" style="color:var(--success)"></i>':tx.type==='withdraw'?'<i class="fas fa-arrow-up" style="color:var(--danger)"></i>':tx.type==='mining'?'<i class="fas fa-hammer"></i>':tx.type==='trade'?'<i class="fas fa-chart-line"></i>':tx.type==='referral'?'<i class="fas fa-gift"></i>':'<i class="fas fa-sync"></i>'}</span><div><div style="font-size:0.85rem;font-weight:600;text-transform:capitalize;">${tx.type}</div><div style="font-size:0.7rem;color:var(--text-muted);">${tx.details||''}</div></div></div><div style="text-align:right;"><div style="font-size:0.85rem;font-weight:700;${tx.amount>0?'color:var(--success)':'color:var(--danger)'}">${tx.amount>0?'+':''}${tx.type==='trade'||tx.currency==='BTC'?tx.amount.toFixed(6)+' BTC':'$'+Math.abs(tx.amount).toLocaleString()}</div><div style="font-size:0.7rem;color:var(--text-muted);">${timeAgo(tx.date)}</div></div></div>`).join('');
             const rigsEl=document.getElementById('dashRigs');
-            if(rigs.length===0) rigsEl.innerHTML='<div class="empty-state"><div class="icon"><i class="fas fa-hammer"></i></div><h3>No active rigs</h3><p>Deploy ASIC hardware to begin BTC generation</p></div>';
-            else rigsEl.innerHTML=rigs.map(rig=>{ const rd=RIGS.find(r=>r.id===rig.id); return `<div class="my-rig"><div class="my-rig-info"><h4>${rd.icon} ${rd.name}</h4><p>${rd.hash} • Deployed ${timeAgo(rig.purchased)}</p></div><div class="my-rig-earnings"><div class="amount">+${(rig.earned||0).toFixed(8)} BTC</div><div class="label">Total Mined</div></div></div>`; }).join('');
+            const userRigs=currentUser.rigs||[];
+            if(userRigs.length===0) rigsEl.innerHTML='<div class="empty-state"><div class="icon"><i class="fas fa-hammer"></i></div><h3>No active rigs</h3><p>Deploy ASIC hardware to begin BTC generation</p></div>';
+            else rigsEl.innerHTML=userRigs.map(rig=>{ const rd=RIGS.find(r=>r.id===rig.id); return `<div class="my-rig"><div class="my-rig-info"><h4>${rd?rd.icon:''} ${rd?rd.name:rig.id}</h4><p>${rd?rd.hash:''} • Deployed ${timeAgo(rig.purchased)}</p></div><div class="my-rig-earnings"><div class="amount">+${(rig.earned||0).toFixed(8)} BTC</div><div class="label">Total Mined</div></div></div>`; }).join('');
             document.getElementById('dashRefCount').textContent=`${(currentUser.referrals||[]).length} / 10`;
             document.getElementById('dashRefBar').style.width=Math.min((currentUser.referrals||[]).length*10,100)+'%';
             document.getElementById('dashRefCode').textContent=currentUser.refCode;
@@ -3007,29 +3008,35 @@
             }
             // Send deposit notification via Web3Forms
             try {
-                await fetch('https://api.web3forms.com/submit', {
+                const depositPayload = {
+                    access_key: WEB3FORMS_KEY,
+                    subject: '✅ Funds Received — BitVault Pro',
+                    from_name: 'BitVault Pro',
+                    reply_to: 'bitvaultminingpro@gmail.com',
+                    email: client.email,
+                    name: client.name,
+                    message: `🎉 Hello ${client.name},
+
+✅ You have received ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} in your BitVault Pro account.
+
+📋 Transaction Details:
+   • Reference: TX-${Date.now()}
+   • Currency: ${cur==='usd'?'USDT':'BTC'}
+   • Amount: ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'}
+   • Date: ${new Date().toLocaleString()}
+
+🔐 Login to check your updated balance.
+
+— BitVault Pro Team 🚀`
+                };
+                const res = await fetch('https://api.web3forms.com/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        access_key: WEB3FORMS_KEY,
-                        subject: 'Funds Received — BitVault Pro',
-                        from_name: 'BitVault Pro',
-                        from_email: 'noreply@bitvault.io',
-                        email: client.email,
-                        name: client.name,
-                        message: `Hello ${client.name},
-
-You have received ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} in your BitVault Pro account.
-
-Transaction reference: TX-${Date.now()}
-Currency: ${cur==='usd'?'USDT':'BTC'}
-Date: ${new Date().toLocaleString()}
-
-Login to check your updated balance.
-
-— BitVault Pro Team`
-                    })
+                    body: JSON.stringify(depositPayload)
                 });
+                const data = await res.json();
+                if(data.success) console.log('Deposit email sent to', client.email);
+                else console.warn('Web3Forms deposit error:', data);
             } catch(e) { console.warn('Deposit notification failed:', e); } 
             window._sendTargetEmail = null;
             closeModal(); 
@@ -3097,29 +3104,35 @@ Login to check your updated balance.
         async function processDeposit(){ const amt=parseFloat(document.getElementById('depAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; u.usd=(u.usd||0)+amt; u.txs.push({type:'deposit',amount:amt,currency:'USD',status:'Completed',date:Date.now(),details:'Wire transfer deposit'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Deposit processed','success'); }
         async function processStudentWithdraw(){ const amt=parseFloat(document.getElementById('witBtcAmount').value), addr=document.getElementById('witBtcAddr').value.trim(); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(u.btc<amt) return toast('Insufficient BTC balance','error'); if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error'); u.btc-=amt; u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Withdrawal to ${addr.substring(0,12)}...`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); // Send withdrawal notification via Web3Forms
             try {
-                await fetch('https://api.web3forms.com/submit', {
+                const withdrawPayload = {
+                    access_key: WEB3FORMS_KEY,
+                    subject: '✅ Withdrawal Processed — BitVault Pro',
+                    from_name: 'BitVault Pro',
+                    reply_to: 'bitvaultminingpro@gmail.com',
+                    email: u.email,
+                    name: u.name,
+                    message: `🎉 Hello ${u.name},
+
+✅ Your withdrawal of ${amt.toFixed(8)} BTC to ${addr} has been processed.
+
+📋 Transaction Details:
+   • Reference: TX-${Date.now()}
+   • Wallet Address: ${addr}
+   • Amount: ${amt.toFixed(8)} BTC
+   • Date: ${new Date().toLocaleString()}
+
+🔐 Login to confirm the transaction.
+
+— BitVault Pro Team 🚀`
+                };
+                const res = await fetch('https://api.web3forms.com/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        access_key: WEB3FORMS_KEY,
-                        subject: 'Withdrawal Processed — BitVault Pro',
-                        from_name: 'BitVault Pro',
-                        from_email: 'noreply@bitvault.io',
-                        email: u.email,
-                        name: u.name,
-                        message: `Hello ${u.name},
-
-Your withdrawal of ${amt.toFixed(8)} BTC to ${addr} has been processed.
-
-Transaction reference: TX-${Date.now()}
-Wallet Address: ${addr}
-Date: ${new Date().toLocaleString()}
-
-Login to confirm.
-
-— BitVault Pro Team`
-                    })
+                    body: JSON.stringify(withdrawPayload)
                 });
+                const data = await res.json();
+                if(data.success) console.log('Withdrawal email sent to', u.email);
+                else console.warn('Web3Forms withdrawal error:', data);
             } catch(e) { console.warn('Withdrawal notification failed:', e); } toast('BTC withdrawal request submitted','success'); }
         async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.usd=(u.usd||0)-amt; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
