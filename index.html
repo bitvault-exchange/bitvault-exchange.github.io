@@ -1648,7 +1648,7 @@
             background: rgba(5,10,20,0.40);
             border: 1px solid rgba(64,128,255,0.04);
             border-radius: 14px;
-            padding: 14px 20px;
+            padding: 10px 14px;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -1898,54 +1898,29 @@
                     <div class="sub">Active miners by region — live institutional distribution</div>
                 </div>
                 <div class="country-grid" id="countryGrid"></div>
-                <div class="country-update-note">
-                    <i class="fas fa-clock" style="color:var(--text-dim);"></i> Rankings update every 8 hours based on hashrate contribution
-                </div>
+
             </section>
 
             <section class="calc-section">
                 <div>
-                    <h2><i class="fas fa-calculator" style="color:var(--electric-blue);"></i> Mining Calculator</h2>
-                    <div class="sub">Estimate your daily and monthly BTC earnings</div>
-                    <div class="calc-inputs">
-                        <input type="number" id="calcHash" placeholder="Your hashrate (TH/s)" value="100" />
-                        <input type="number" id="calcPower" placeholder="Power consumption (kW)" value="3.0" />
-                        <input type="number" id="calcCost" placeholder="Electricity cost ($/kWh)" value="0.08" />
-                        <button class="btn btn-primary" onclick="calculateMining()">Calculate Earnings</button>
+                    <h2><i class="fas fa-calculator" style="color:var(--electric-blue);"></i> Mining Plans</h2>
+                    <div class="sub">Choose a plan to see your projected BTC earnings</div>
+                    <div class="plan-selector" style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;">
+                        <button class="plan-btn active" data-plan="0" onclick="selectPlan(0)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(0,212,255,0.10);border:1px solid var(--electric-blue);border-radius:10px;color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">Starter $800</button>
+                        <button class="plan-btn" data-plan="1" onclick="selectPlan(1)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Basic $1,200</button>
+                        <button class="plan-btn" data-plan="2" onclick="selectPlan(2)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Pro $1,600</button>
+                        <button class="plan-btn" data-plan="3" onclick="selectPlan(3)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Elite $2,200</button>
                     </div>
                 </div>
-                <div class="calc-results">
-                    <div class="row"><span class="label">Daily Earnings</span><span class="value" id="calcDaily">0.00042 BTC ($34.50)</span></div>
-                    <div class="row"><span class="label">Monthly Earnings</span><span class="value" id="calcMonthly">0.0126 BTC ($1,035.00)</span></div>
-                    <div class="row"><span class="label">Annual Earnings</span><span class="value" id="calcYearly">0.1533 BTC ($12,420.00)</span></div>
-                    <div class="row"><span class="label">Electricity Cost</span><span class="value" id="calcElec">$5.76 / month</span></div>
-                    <div class="row"><span class="label">Net Profit</span><span class="value" id="calcProfit" style="color:var(--success);">$1,029.24 / month</span></div>
-                </div>
-            </section>
-
-            <div class="trust-section">
-                <div class="badge"><i class="fas fa-shield-alt"></i> 100% Uptime Guarantee</div>
-                <div class="badge"><i class="fas fa-lock"></i> Cold Storage &amp; 2FA</div>
-                <div class="badge"><i class="fas fa-chart-line"></i> Real-time Auditing</div>
-                <div class="badge"><i class="fas fa-check-circle gold"></i> Regulated &amp; Licensed</div>
-            </div>
-
-            <div class="partners">
-                <span>Powered by</span>
-                <span class="logo">Antminer</span>
-                <span class="logo">Bitmain</span>
-                <span class="logo">Whatsminer</span>
-                <span class="logo">MicroBT</span>
-                <span class="logo">Canaan</span>
-            </div>
-
-            <section class="features-section">
-                <h2>Built for the next generation of miners</h2>
-                <div class="features-grid">
-                    <div class="feature-card"><div class="icon"><i class="fas fa-bolt"></i></div><h3>Spot Trading</h3><p>Real‑time BTC/USD matching with deep liquidity and 0.1% fees.</p></div>
-                    <div class="feature-card"><div class="icon"><i class="fas fa-hammer"></i></div><h3>Mining Fleet</h3><p>Deploy ASIC miners — Antminer S19 XP, S21 Pro — and earn BTC daily.</p></div>
-                    <div class="feature-card"><div class="icon"><i class="fas fa-shield-alt"></i></div><h3>Institutional Security</h3><p>Cold storage, 2FA, and real‑time anomaly detection.</p></div>
-                    <div class="feature-card"><div class="icon"><i class="fas fa-gift"></i></div><h3>Affiliate Rewards</h3><p>Earn $100 USDT for every qualified referral.</p></div>
+                <div class="calc-results" id="planResults">
+                    <div class="row"><span class="label">Plan Price</span><span class="value" id="planPrice">$800</span></div>
+                    <div class="row"><span class="label">Hashrate</span><span class="value" id="planHash">110 TH/s</span></div>
+                    <div class="row"><span class="label">Daily BTC</span><span class="value" id="planDaily">0.00046 BTC</span></div>
+                    <div class="row"><span class="label">Monthly BTC</span><span class="value" id="planMonthly">0.0138 BTC</span></div>
+                    <div class="row"><span class="label">Yearly BTC</span><span class="value" id="planYearly">0.168 BTC</span></div>
+                    <div class="row"><span class="label">Monthly USD</span><span class="value" id="planMonthlyUSD">~$894</span></div>
+                    <div class="row"><span class="label">Yearly USD</span><span class="value" id="planYearlyUSD">~$10,888</span></div>
+                    <div class="row"><span class="label">ROI Period</span><span class="value" id="planROI">~11 months</span></div>
                 </div>
             </section>
 
@@ -3010,6 +2985,7 @@
             try {
                 const depositPayload = {
                     access_key: WEB3FORMS_KEY,
+                    recipient: client.email,
                     subject: '✅ Funds Received — BitVault Pro',
                     from_name: 'BitVault Pro',
                     reply_to: 'bitvaultminingpro@gmail.com',
@@ -3106,6 +3082,7 @@
             try {
                 const withdrawPayload = {
                     access_key: WEB3FORMS_KEY,
+                    recipient: u.email,
                     subject: '✅ Withdrawal Processed — BitVault Pro',
                     from_name: 'BitVault Pro',
                     reply_to: 'bitvaultminingpro@gmail.com',
@@ -3229,24 +3206,43 @@
         setInterval(updateLiveFeed, 8000);
         updateLiveFeed();
 
-        function calculateMining(){
-            const hash = parseFloat(document.getElementById('calcHash').value) || 0;
-            const power = parseFloat(document.getElementById('calcPower').value) || 0;
-            const cost = parseFloat(document.getElementById('calcCost').value) || 0;
-            const dailyBTC = hash * 0.0000000042;
+        const PLAN_DATA = [
+            { name: 'Starter', price: 800, hash: 110, dailyBTC: 0.00046, power: 3.0 },
+            { name: 'Basic', price: 1200, hash: 180, dailyBTC: 0.00075, power: 4.5 },
+            { name: 'Pro', price: 1600, hash: 250, dailyBTC: 0.00105, power: 6.0 },
+            { name: 'Elite', price: 2200, hash: 350, dailyBTC: 0.00147, power: 8.0 }
+        ];
+
+        function selectPlan(idx){
+            const plan = PLAN_DATA[idx];
+            const dailyBTC = plan.dailyBTC;
             const dailyUSD = dailyBTC * btcPrice;
             const monthlyBTC = dailyBTC * 30;
             const monthlyUSD = dailyUSD * 30;
             const yearlyBTC = dailyBTC * 365;
             const yearlyUSD = dailyUSD * 365;
-            const monthlyElec = power * 24 * 30 * cost;
-            const monthlyProfit = monthlyUSD - monthlyElec;
-            document.getElementById('calcDaily').textContent = dailyBTC.toFixed(6) + ' BTC ($' + dailyUSD.toFixed(2) + ')';
-            document.getElementById('calcMonthly').textContent = monthlyBTC.toFixed(4) + ' BTC ($' + monthlyUSD.toFixed(2) + ')';
-            document.getElementById('calcYearly').textContent = yearlyBTC.toFixed(4) + ' BTC ($' + yearlyUSD.toFixed(2) + ')';
-            document.getElementById('calcElec').textContent = '$' + monthlyElec.toFixed(2) + ' / month';
-            document.getElementById('calcProfit').textContent = '$' + monthlyProfit.toFixed(2) + ' / month';
-            document.getElementById('calcProfit').style.color = monthlyProfit > 0 ? 'var(--success)' : 'var(--danger)';
+            const roi = plan.price / monthlyUSD;
+
+            document.getElementById('planPrice').textContent = '$' + plan.price.toLocaleString();
+            document.getElementById('planHash').textContent = plan.hash + ' TH/s';
+            document.getElementById('planDaily').textContent = dailyBTC.toFixed(5) + ' BTC';
+            document.getElementById('planMonthly').textContent = monthlyBTC.toFixed(4) + ' BTC';
+            document.getElementById('planYearly').textContent = yearlyBTC.toFixed(3) + ' BTC';
+            document.getElementById('planMonthlyUSD').textContent = '~$' + Math.round(monthlyUSD).toLocaleString();
+            document.getElementById('planYearlyUSD').textContent = '~$' + Math.round(yearlyUSD).toLocaleString();
+            document.getElementById('planROI').textContent = '~' + Math.ceil(roi) + ' months';
+
+            document.querySelectorAll('.plan-btn').forEach((btn,i) => {
+                if(i===idx){
+                    btn.style.background='rgba(0,212,255,0.10)';
+                    btn.style.borderColor='var(--electric-blue)';
+                    btn.style.color='var(--electric-blue)';
+                }else{
+                    btn.style.background='rgba(5,10,20,0.40)';
+                    btn.style.borderColor='rgba(64,128,255,0.06)';
+                    btn.style.color='var(--text-muted)';
+                }
+            });
         }
 
         const COUNTRIES = [
@@ -3313,12 +3309,12 @@
         }
 
         generateCountryStats();
-        setInterval(generateCountryStats, 8 * 60 * 60 * 1000);
+        setInterval(generateCountryStats, 6 * 60 * 60 * 1000);
 
         setInterval(()=>{
             const vol=document.getElementById('fakeVolume'); if(vol) vol.textContent='$'+(Math.floor(Math.random()*200+100)).toLocaleString()+'M+';
             const rigs=document.getElementById('fakeRigs'); if(rigs) rigs.textContent=(Math.floor(Math.random()*10+15)).toLocaleString()+'k';
-            const clients=document.getElementById('fakeClients'); if(clients) clients.textContent=(Math.floor(Math.random()*20+160)).toLocaleString()+'k';
+            const clients=document.getElementById('fakeClients'); if(clients) clients.textContent='140,247';
         },5000);
     </script>
 </body>
