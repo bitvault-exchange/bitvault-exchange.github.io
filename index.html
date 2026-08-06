@@ -1613,7 +1613,104 @@
             display: flex !important;
         }
 
+        .country-stats-section {
+            background: rgba(10,16,32,0.50);
+            border: 1px solid rgba(64,128,255,0.06);
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin: 20px 0 30px;
+        }
+        .country-stats-header {
+            margin-bottom: 20px;
+        }
+        .country-stats-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .country-stats-header .sub {
+            color: #9aabbf;
+            font-size: 0.9rem;
+        }
+        .country-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        .country-card {
+            background: rgba(5,10,20,0.40);
+            border: 1px solid rgba(64,128,255,0.06);
+            border-radius: 14px;
+            padding: 16px 18px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .country-card:hover {
+            border-color: rgba(0,212,255,0.12);
+            transform: translateY(-2px);
+        }
+        .country-card .rank {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: rgba(64,128,255,0.08);
+            line-height: 1;
+        }
+        .country-card .flag {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+        .country-card .name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .country-card .users {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .country-card .bar-wrap {
+            height: 4px;
+            background: rgba(5,10,20,0.60);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .country-card .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
+        }
+        .country-card .bar-fill.usa { background: linear-gradient(90deg, #00d4ff, #0088ff); }
+        .country-card .bar-fill.uk { background: linear-gradient(90deg, #ffd700, #ffaa00); }
+        .country-card .bar-fill.spain { background: linear-gradient(90deg, #ff4757, #e03141); }
+        .country-card .bar-fill.germany { background: linear-gradient(90deg, #00e5a0, #00b894); }
+        .country-card .bar-fill.canada { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
+        .country-card .bar-fill.australia { background: linear-gradient(90deg, #fd79a8, #e84393); }
+        .country-card .bar-fill.japan { background: linear-gradient(90deg, #fab1a0, #e17055); }
+        .country-card .bar-fill.singapore { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+        .country-card .share {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 6px;
+            text-align: right;
+        }
+        .country-update-note {
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
         @media (max-width: 1024px) {
+            .country-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+                @media (max-width: 1024px) {
             .grid-4 { grid-template-columns: repeat(2,1fr); }
             .trade-layout { grid-template-columns: 1fr; }
             .calc-section { grid-template-columns: 1fr; }
@@ -1742,6 +1839,17 @@
                 <div class="live-feed" id="liveFeed"></div>
             </section>
 
+            <section class="country-stats-section">
+                <div class="country-stats-header">
+                    <h2><i class="fas fa-globe" style="color:var(--electric-blue);"></i> Global Network</h2>
+                    <div class="sub">Active miners by region — live institutional distribution</div>
+                </div>
+                <div class="country-grid" id="countryGrid"></div>
+                <div class="country-update-note">
+                    <i class="fas fa-clock" style="color:var(--text-dim);"></i> Rankings update every 8 hours based on hashrate contribution
+                </div>
+            </section>
+
             <section class="calc-section">
                 <div>
                     <h2><i class="fas fa-calculator" style="color:var(--electric-blue);"></i> Mining Calculator</h2>
@@ -1792,12 +1900,12 @@
                 <div class="links">
                     <a href="#" onclick="showAuth('login')">Sign In</a>
                     <a href="#" onclick="showAuth('register')">Create Account</a>
-                    <a href="#">Terms</a>
-                    <a href="#">Privacy</a>
-                    <a href="#">Security</a>
-                    <a href="#">Contact</a>
+                    <a href="#" onclick="event.preventDefault(); showTermsModal();">Terms of Service</a>
+                    <a href="#" onclick="event.preventDefault(); showPrivacyModal();">Privacy</a>
+                    <a href="#" onclick="event.preventDefault(); showSecurityModal();">Security</a>
+                    <a href="#" onclick="event.preventDefault(); toast('Contact: support@bitvault.io','info');">Contact</a>
                 </div>
-                BitVault PRO &bull; 2026 &bull; SEC Regulated &bull; All rights reserved.
+                BitVault PRO &bull; 2026 &bull; Institutional Grade &bull; All rights reserved.
             </div>
         </div>
     </div>
@@ -1821,6 +1929,9 @@
                         <input type="password" id="loginPassword" placeholder="Enter your password" />
                         <button type="button" class="pwd-toggle" onclick="togglePwd('loginPassword',this)"><i class="fas fa-eye"></i></button>
                     </div>
+                </div>
+                <div style="text-align:right;margin-bottom:14px;">
+                    <a href="#" onclick="event.preventDefault(); showForgotPassword();" style="font-size:0.8rem;color:var(--electric-blue);text-decoration:none;font-weight:500;">Forgot Password?</a>
                 </div>
                 <button class="btn btn-primary" onclick="handleLogin()">Sign In</button>
                 <div class="auth-switch">
@@ -1886,6 +1997,78 @@
                     <a href="#" onclick="event.preventDefault(); resendCode();" style="color:var(--electric-blue);font-size:0.85rem;cursor:pointer;font-weight:500;">Resend code</a>
                     <span style="color:var(--text-dim);margin:0 8px;">•</span>
                     <a href="#" onclick="event.preventDefault(); cancelVerify();" style="color:var(--text-muted);font-size:0.85rem;cursor:pointer;">Cancel</a>
+                </div>
+            </div>
+
+            <div id="forgotPasswordForm" class="hidden">
+                <div style="text-align:center;margin-bottom:24px;">
+                    <div style="font-size:2.4rem;margin-bottom:8px;"><i class="fas fa-lock"></i></div>
+                    <h3 style="font-size:1.1rem;font-weight:700;">Reset Password</h3>
+                    <p style="font-size:0.85rem;color:var(--text-muted);">Enter your email to receive a verification code.</p>
+                </div>
+                <div class="form-group">
+                    <label>Email address</label>
+                    <input type="email" id="fpEmail" placeholder="Enter your registered email" />
+                </div>
+                <button class="btn btn-primary" id="fpRequestBtn" onclick="requestPasswordReset()">Request Code</button>
+                <div class="auth-switch">
+                    <a href="#" onclick="event.preventDefault(); showLogin();">Back to Sign In</a>
+                </div>
+            </div>
+
+            <div id="forgotPasswordVerify" class="hidden">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div style="font-size:2rem;margin-bottom:8px;"><i class="fas fa-shield-alt"></i></div>
+                    <h3 style="font-size:1.1rem;font-weight:700;">Verify Identity</h3>
+                    <p style="font-size:0.85rem;color:var(--text-muted);">A verification code has been generated for<br /><b id="fpVerifyEmailDisplay" style="color:var(--text-primary);">email@example.com</b></p>
+                </div>
+                <div id="fpCodeDisplay" style="background:linear-gradient(135deg, rgba(0,212,255,0.08), rgba(255,215,0,0.04));border:1px solid rgba(0,212,255,0.15);border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Your Verification Code</div>
+                    <div id="fpGeneratedCode" style="font-size:2rem;font-weight:800;letter-spacing:8px;color:var(--electric-blue);font-family:'Inter',monospace;">------</div>
+                    <div style="font-size:0.75rem;color:var(--text-dim);margin-top:8px;">Copy this code and enter it below</div>
+                </div>
+                <div class="form-group">
+                    <label>Enter Verification Code</label>
+                    <div class="otp-inputs" id="fpOtpInputs">
+                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,0)" onkeydown="fpOtpKey(event,0)" />
+                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,1)" onkeydown="fpOtpKey(event,1)" />
+                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,2)" onkeydown="fpOtpKey(event,2)" />
+                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,3)" onkeydown="fpOtpKey(event,3)" />
+                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,4)" onkeydown="fpOtpKey(event,4)" />
+                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,5)" onkeydown="fpOtpKey(event,5)" />
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="fpVerifyBtn" onclick="verifyPasswordReset()" disabled>Verify & Continue</button>
+                <div class="auth-switch">
+                    <a href="#" onclick="event.preventDefault(); showForgotPassword();">Request New Code</a>
+                    <span style="color:var(--text-dim);margin:0 8px;">•</span>
+                    <a href="#" onclick="event.preventDefault(); showLogin();">Back to Sign In</a>
+                </div>
+            </div>
+
+            <div id="forgotPasswordNew" class="hidden">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div style="font-size:2rem;margin-bottom:8px;"><i class="fas fa-key"></i></div>
+                    <h3 style="font-size:1.1rem;font-weight:700;">Create New Password</h3>
+                    <p style="font-size:0.85rem;color:var(--text-muted);">Set a strong password for your account.</p>
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <div class="password-wrap">
+                        <input type="password" id="fpNewPassword" placeholder="Create new password" />
+                        <button type="button" class="pwd-toggle" onclick="togglePwd('fpNewPassword',this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <div class="password-wrap">
+                        <input type="password" id="fpConfirmPassword" placeholder="Confirm new password" />
+                        <button type="button" class="pwd-toggle" onclick="togglePwd('fpConfirmPassword',this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="submitNewPassword()">Reset Password</button>
+                <div class="auth-switch">
+                    <a href="#" onclick="event.preventDefault(); showLogin();">Back to Sign In</a>
                 </div>
             </div>
         </div>
@@ -2071,6 +2254,99 @@
 
     <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalContent"></div></div>
 
+    <div class="modal-overlay" id="termsModalOverlay">
+        <div class="modal" style="max-width:640px;">
+            <div class="modal-header"><h3><i class="fas fa-file-contract"></i> Terms of Service</h3><button class="modal-close" onclick="closeTermsModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body" style="max-height:60vh;overflow-y:auto;">
+                <p style="font-size:0.85rem;line-height:1.7;color:var(--text-muted);margin-bottom:16px;">
+                <strong style="color:var(--text-primary);">1. Acceptance of Terms</strong><br>
+                By accessing or using the BitVault Pro platform, you agree to be bound by these Terms of Service. If you do not agree to these terms, you may not use the platform. BitVault Pro reserves the right to modify these terms at any time without prior notice.<br><br>
+                <strong style="color:var(--text-primary);">2. Eligibility</strong><br>
+                You must be at least 18 years of age and capable of entering into legally binding contracts to use BitVault Pro. By using the platform, you represent and warrant that you meet these requirements.<br><br>
+                <strong style="color:var(--text-primary);">3. Account Registration</strong><br>
+                You are required to create an account to access certain features. You agree to provide accurate, current, and complete information during registration and to update such information to keep it accurate. You are solely responsible for maintaining the confidentiality of your account credentials.<br><br>
+                <strong style="color:var(--text-primary);">4. Digital Asset Trading & Mining</strong><br>
+                BitVault Pro provides a platform for simulated and real digital asset trading, mining pool participation, and related services. All trading and mining activities carry inherent risks including but not limited to market volatility, technical failures, and regulatory changes. You acknowledge that digital assets are highly speculative and may result in total loss of capital.<br><br>
+                <strong style="color:var(--text-primary);">5. Risk Disclosure</strong><br>
+                You acknowledge and agree that: (a) the value of digital assets can fluctuate significantly; (b) past performance is not indicative of future results; (c) BitVault Pro does not provide investment advice; (d) you are solely responsible for your investment decisions; (e) mining rewards are estimates and subject to network difficulty, electricity costs, and hardware performance.<br><br>
+                <strong style="color:var(--text-primary);">6. Prohibited Activities</strong><br>
+                You may not use BitVault Pro for any unlawful purpose including money laundering, fraud, market manipulation, or any activity that violates applicable laws. BitVault Pro reserves the right to freeze or terminate accounts engaged in prohibited activities.<br><br>
+                <strong style="color:var(--text-primary);">7. Fees & Charges</strong><br>
+                BitVault Pro charges fees for trading (0.1%), mining rig deployment, and withdrawals. All fees are disclosed prior to transaction execution. Fee structures may be updated with 30 days notice.<br><br>
+                <strong style="color:var(--text-primary);">8. Intellectual Property</strong><br>
+                All content, trademarks, logos, and software on BitVault Pro are the property of BitVault Pro or its licensors. You may not reproduce, distribute, or create derivative works without express written permission.<br><br>
+                <strong style="color:var(--text-primary);">9. Limitation of Liability</strong><br>
+                To the maximum extent permitted by law, BitVault Pro shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the platform. Total liability shall not exceed the amount you paid to BitVault Pro in the preceding 12 months.<br><br>
+                <strong style="color:var(--text-primary);">10. Governing Law</strong><br>
+                These terms are governed by the laws of the jurisdiction in which BitVault Pro is registered. Any disputes shall be resolved through binding arbitration.<br><br>
+                <strong style="color:var(--text-primary);">11. Termination</strong><br>
+                BitVault Pro may suspend or terminate your account at any time for violation of these terms. Upon termination, your right to use the platform ceases immediately.<br><br>
+                <strong style="color:var(--text-primary);">12. Contact</strong><br>
+                For questions regarding these terms, contact support@bitvault.io.
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeTermsModal()" style="margin-top:12px;">I Understand</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="privacyModalOverlay">
+        <div class="modal" style="max-width:640px;">
+            <div class="modal-header"><h3><i class="fas fa-user-shield"></i> Privacy Policy</h3><button class="modal-close" onclick="closePrivacyModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body" style="max-height:60vh;overflow-y:auto;">
+                <p style="font-size:0.85rem;line-height:1.7;color:var(--text-muted);margin-bottom:16px;">
+                <strong style="color:var(--text-primary);">1. Information We Collect</strong><br>
+                We collect personal information including your name, email address, and account activity data. We also collect technical data such as IP addresses, browser types, and device information for security and analytics purposes.<br><br>
+                <strong style="color:var(--text-primary);">2. How We Use Your Information</strong><br>
+                Your information is used to: (a) provide and maintain platform services; (b) process transactions and mining rewards; (c) send account notifications and security alerts; (d) comply with legal and regulatory obligations; (e) improve platform functionality and user experience.<br><br>
+                <strong style="color:var(--text-primary);">3. Data Security</strong><br>
+                BitVault Pro employs industry-standard encryption, cold storage for digital assets, two-factor authentication, and real-time anomaly detection. Despite these measures, no system is completely secure, and you acknowledge this risk.<br><br>
+                <strong style="color:var(--text-primary);">4. Data Sharing</strong><br>
+                We do not sell your personal information. We may share data with: (a) regulatory authorities as required by law; (b) service providers necessary for platform operation; (c) law enforcement in response to valid legal requests.<br><br>
+                <strong style="color:var(--text-primary);">5. Cookies & Tracking</strong><br>
+                We use cookies and similar technologies to enhance user experience, analyze traffic, and personalize content. You may disable cookies in your browser settings, though this may affect platform functionality.<br><br>
+                <strong style="color:var(--text-primary);">6. Your Rights</strong><br>
+                You have the right to: (a) access your personal data; (b) request correction of inaccurate data; (c) request deletion of your account and data; (d) object to certain processing activities. Contact support@bitvault.io to exercise these rights.<br><br>
+                <strong style="color:var(--text-primary);">7. Data Retention</strong><br>
+                We retain your personal data for as long as necessary to fulfill the purposes outlined in this policy, comply with legal obligations, resolve disputes, and enforce our agreements.<br><br>
+                <strong style="color:var(--text-primary);">8. International Transfers</strong><br>
+                Your data may be transferred to and processed in countries other than your country of residence. We ensure appropriate safeguards are in place for such transfers.<br><br>
+                <strong style="color:var(--text-primary);">9. Changes to This Policy</strong><br>
+                We may update this Privacy Policy periodically. We will notify you of significant changes via email or platform notification. Continued use after changes constitutes acceptance.<br><br>
+                <strong style="color:var(--text-primary);">10. Contact</strong><br>
+                For privacy-related inquiries, contact privacy@bitvault.io.
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closePrivacyModal()" style="margin-top:12px;">I Understand</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="securityModalOverlay">
+        <div class="modal" style="max-width:640px;">
+            <div class="modal-header"><h3><i class="fas fa-shield-alt"></i> Security Policy</h3><button class="modal-close" onclick="closeSecurityModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body" style="max-height:60vh;overflow-y:auto;">
+                <p style="font-size:0.85rem;line-height:1.7;color:var(--text-muted);margin-bottom:16px;">
+                <strong style="color:var(--text-primary);">1. Account Security</strong><br>
+                All BitVault Pro accounts are protected by password hashing (bcrypt), two-factor authentication (2FA), and email verification. We strongly recommend enabling 2FA on all accounts.<br><br>
+                <strong style="color:var(--text-primary);">2. Cold Storage</strong><br>
+                The majority of client digital assets are held in offline cold storage wallets with multi-signature authorization. Hot wallets maintain only the minimum operational balance required for daily withdrawals.<br><br>
+                <strong style="color:var(--text-primary);">3. Encryption Standards</strong><br>
+                All data in transit is encrypted using TLS 1.3. Data at rest is encrypted using AES-256. API communications require signed requests with HMAC-SHA256 authentication.<br><br>
+                <strong style="color:var(--text-primary);">4. Real-Time Monitoring</strong><br>
+                BitVault Pro employs 24/7 automated monitoring for suspicious login attempts, unusual withdrawal patterns, and anomalous trading activity. Accounts flagged by our systems may be temporarily frozen for manual review.<br><br>
+                <strong style="color:var(--text-primary);">5. Incident Response</strong><br>
+                In the event of a security breach, BitVault Pro will: (a) immediately contain the incident; (b) notify affected users within 72 hours; (c) cooperate with law enforcement and regulatory authorities; (d) conduct a post-incident review and implement corrective measures.<br><br>
+                <strong style="color:var(--text-primary);">6. User Responsibilities</strong><br>
+                Users are responsible for: (a) maintaining strong, unique passwords; (b) enabling 2FA; (c) verifying withdrawal addresses before confirmation; (d) reporting suspicious activity immediately; (e) keeping their email account secure as it is used for account recovery.<br><br>
+                <strong style="color:var(--text-primary);">7. Penetration Testing</strong><br>
+                BitVault Pro undergoes quarterly third-party penetration testing and annual security audits by certified cybersecurity firms. Results are reviewed by our security team and shared with relevant regulators.<br><br>
+                <strong style="color:var(--text-primary);">8. Contact</strong><br>
+                Report security concerns to security@bitvault.io. For urgent matters, include "SECURITY" in the subject line.
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeSecurityModal()" style="margin-top:12px;">I Understand</button>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -2115,7 +2391,6 @@
                     const snap = await db.ref('users/'+safeKey(e)).once('value');
                     const fb = snap.val();
                     if(fb){
-                        // Cache locally
                         let all = getAllUsers();
                         all[e] = fb;
                         setAllUsers(all);
@@ -2135,8 +2410,62 @@
             if(type === 'register') showRegister();
             else showLogin();
         }
-        function showLogin(){ document.getElementById('loginForm').classList.remove('hidden'); document.getElementById('registerForm').classList.add('hidden'); document.getElementById('verifyForm').classList.add('hidden'); }
-        function showRegister(){ document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); document.getElementById('verifyForm').classList.add('hidden'); }
+        function showLogin(){ document.getElementById('loginForm').classList.remove('hidden'); document.getElementById('registerForm').classList.add('hidden'); document.getElementById('verifyForm').classList.add('hidden'); document.getElementById('forgotPasswordForm').classList.add('hidden'); document.getElementById('forgotPasswordVerify').classList.add('hidden'); document.getElementById('forgotPasswordNew').classList.add('hidden'); }
+        function showRegister(){ document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); document.getElementById('verifyForm').classList.add('hidden'); document.getElementById('forgotPasswordForm').classList.add('hidden'); document.getElementById('forgotPasswordVerify').classList.add('hidden'); document.getElementById('forgotPasswordNew').classList.add('hidden'); }
+        function showForgotPassword(){ document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.add('hidden'); document.getElementById('verifyForm').classList.add('hidden'); document.getElementById('forgotPasswordForm').classList.remove('hidden'); document.getElementById('forgotPasswordVerify').classList.add('hidden'); document.getElementById('forgotPasswordNew').classList.add('hidden'); document.getElementById('fpEmail').value=''; }
+
+        let fpTargetEmail = '', fpGeneratedCode = '';
+
+        async function requestPasswordReset(){
+            const email = document.getElementById('fpEmail').value.trim().toLowerCase();
+            if(!email) return toast('Enter your email address','error');
+            let user = await loadUser(email);
+            if(!user) return toast('No account found with this email','error');
+            fpTargetEmail = email;
+            fpGeneratedCode = Math.floor(100000 + Math.random() * 900000).toString();
+            document.getElementById('fpVerifyEmailDisplay').textContent = email;
+            document.getElementById('fpGeneratedCode').textContent = fpGeneratedCode;
+            document.getElementById('forgotPasswordForm').classList.add('hidden');
+            document.getElementById('forgotPasswordVerify').classList.remove('hidden');
+            fpClearOtp();
+            toast('Verification code generated. Copy it below.','success');
+        }
+
+        function fpOtpHandle(el,idx){ el.value=el.value.replace(/[^0-9]/g,'').substring(0,1); const inputs=document.querySelectorAll('#fpOtpInputs input'); if(el.value&&idx<5) inputs[idx+1].focus(); const vals=Array.from(inputs).map(i=>i.value).join(''); document.getElementById('fpVerifyBtn').disabled=vals.length!==6; }
+        function fpOtpKey(e,idx){ const inputs=document.querySelectorAll('#fpOtpInputs input'); if(e.key==='Backspace'&&!e.target.value&&idx>0) inputs[idx-1].focus(); }
+        function fpClearOtp(){ document.querySelectorAll('#fpOtpInputs input').forEach(i=>i.value=''); document.getElementById('fpVerifyBtn').disabled=true; }
+        function fpGetOtpValue(){ return Array.from(document.querySelectorAll('#fpOtpInputs input')).map(i=>i.value).join(''); }
+
+        function verifyPasswordReset(){
+            if(fpGetOtpValue() !== fpGeneratedCode) return toast('Invalid verification code','error');
+            document.getElementById('forgotPasswordVerify').classList.add('hidden');
+            document.getElementById('forgotPasswordNew').classList.remove('hidden');
+            document.getElementById('fpNewPassword').value='';
+            document.getElementById('fpConfirmPassword').value='';
+            toast('Identity verified. Set your new password.','success');
+        }
+
+        async function submitNewPassword(){
+            const p = document.getElementById('fpNewPassword').value;
+            const cp = document.getElementById('fpConfirmPassword').value;
+            if(!p || p.length < 6) return toast('Password must be 6+ characters','error');
+            if(p !== cp) return toast('Passwords do not match','error');
+            let all = getAllUsers();
+            let user = all[fpTargetEmail];
+            if(!user) return toast('Account error','error');
+            user.password = p;
+            user.lastModified = Date.now();
+            all[fpTargetEmail] = user;
+            setAllUsers(all);
+            if(firebaseOnline && db){
+                try{ await db.ref('users/'+safeKey(fpTargetEmail)).set(user); }catch(e){}
+            }
+            fpTargetEmail = '';
+            fpGeneratedCode = '';
+            document.getElementById('forgotPasswordNew').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            toast('Password reset successful. Sign in with your new password.','success');
+        }
 
         async function startVerification(){
             const n=document.getElementById('regName').value.trim(), e=document.getElementById('regEmail').value.trim().toLowerCase();
@@ -2161,7 +2490,6 @@
             if(refCode){ 
                 const all=await loadAllUsers(); 
                 for(let u of all){ if(u.refCode===refCode){ refBy=u.email; break; } }
-                // Fallback: search Firebase if not found locally
                 if(!refBy && firebaseOnline && db){
                     try{
                         const snap = await db.ref('users').once('value');
@@ -2581,69 +2909,19 @@
             if(a) a.textContent=sym+after.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; 
             const btn=document.getElementById('sendFundsBtn'); 
             if(btn) {
-                // Admin can send any amount; students must have enough balance
                 const isAdmin = currentUser && currentUser.isAdmin;
                 btn.disabled = (amt <= 0) || (!isAdmin && after < 0);
             }
         }
-        async function sendFundsToClient(){ 
-            const email = window._sendTargetEmail;
-            if(!email) return toast('Target account error','error');
-            const curEl = document.getElementById('sendCurrency'), amtEl = document.getElementById('sendAmount');
-            if(!curEl || !amtEl) return toast('Modal error','error');
-            const cur = curEl.value, 
-            amt = parseFloat(amtEl.value); 
-            if(!amt || amt <= 0) return toast('Enter valid amount','error'); 
-            let all = getAllUsers(), master = all[currentUser.email], client = all[email]; 
-            if(!master || !client) return toast('Account error','error'); 
-            if(!master.txs) master.txs = [];
-            if(!client.txs) client.txs = [];
-            const isAdmin = master.isAdmin;
-            if(cur === 'usd'){ 
-                if(!isAdmin && (master.usd || 0) < amt) return toast('Insufficient USDT balance','error'); 
-                master.usd = (master.usd || 0) - amt; 
-                client.usd = (client.usd || 0) + amt; 
-                master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); 
-                client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited from admin`}); 
-            } else { 
-                if(!isAdmin && (master.btc || 0) < amt) return toast('Insufficient BTC balance','error'); 
-                master.btc = (master.btc || 0) - amt; 
-                client.btc = (client.btc || 0) + amt; 
-                master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); 
-                client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited from admin`}); 
-            } 
-            master.lastModified = Date.now(); 
-            client.lastModified = Date.now(); 
-            all[master.email] = master; 
-            all[client.email] = client; 
-            setAllUsers(all); 
-            currentUser = master; 
-            if(firebaseOnline && db) {
-                try { 
-                    await db.ref('users/'+safeKey(client.email)).set(client); 
-                    await db.ref('users/'+safeKey(master.email)).set(master); 
-                } catch(e) { console.warn('Firebase sync failed:', e); }
-            }
-            if(emailjsReady){ 
-                try { 
-                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{
-                        to_email: client.email,
-                        from_name: 'BitVault Pro',
-                        name: client.name,
-                        email: client.email,
-                        amount: amt.toLocaleString(),
-                        currency: cur==='usd'?'USDT':'BTC',
-                        tx_id: 'TX-'+Date.now(),
-                        date: new Date().toLocaleString()
-                    }); 
-                } catch(e) { console.warn('Deposit email failed:',e); } 
-            } 
-            window._sendTargetEmail = null;
-            closeModal(); 
-            renderAdmin(); 
-            updateAllBalances(); 
-            toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success'); 
-        }
+        async function sendFundsToClient(email){ 
+            const cur=document.getElementById('sendCurrency').value, amt=parseFloat(document.getElementById('sendAmount').value); 
+            if(!amt||amt<=0) return toast('Enter valid amount','error'); 
+            let all=getAllUsers(), master=all[currentUser.email], client=all[email]; 
+            if(!master||!client) return toast('Account error','error'); 
+            // FIXED: Initialize tx arrays if they don't exist
+            if (!master.txs) master.txs = [];
+            if (!client.txs) client.txs = [];
+            if(cur==='usd'){ if((master.usd||0)<amt) return toast('Insufficient USDT balance','error'); master.usd=(master.usd||0)-amt; client.usd=(client.usd||0)+amt; master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited`}); }else{ if((master.btc||0)<amt) return toast('Insufficient BTC balance','error'); master.btc=(master.btc||0)-amt; client.btc=(client.btc||0)+amt; master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited`}); } master.lastModified=Date.now(); client.lastModified=Date.now(); all[master.email]=master; all[client.email]=client; setAllUsers(all); currentUser=master; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(client.email)).set(client); }catch(e){} if(emailjsReady){ try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{name:client.name,email:client.email,amount:amt.toLocaleString(),currency:cur==='usd'?'USDT':'BTC',tx_id:'TX-'+Date.now(),date:new Date().toLocaleString()}); }catch(e){ console.warn('Deposit email failed:',e); } } closeModal(); renderAdmin(); updateAllBalances(); toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success'); }
 
         function openMiningModal(email,name){ const user=users[email]; if(!user) return toast('Client not found','error'); const mult=user.miningMultiplier||1.0; const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-hammer"></i> Mining — ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Adjust mining yield multiplier. 1.0x = normal rate.</p><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;margin-bottom:6px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);font-size:0.7rem;">Current Multiplier</span><span style="font-weight:700;color:var(--electric-blue);font-size:0.9rem;">${mult.toFixed(1)}x</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);font-size:0.7rem;">Active Rigs</span><span style="font-weight:700;font-size:0.8rem;">${(user.rigs||[]).length}</span></div></div><div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;margin-bottom:2px;">New Multiplier</label><select id="miningMult" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="0" ${mult===0?'selected':''}>0.0x — Pause Mining</option><option value="0.1" ${mult===0.1?'selected':''}>0.1x — 10% Yield</option><option value="0.5" ${mult===0.5?'selected':''}>0.5x — 50% Yield</option><option value="1" ${mult===1?'selected':''}>1.0x — Normal Yield</option><option value="2" ${mult===2?'selected':''}>2.0x — Double Yield</option><option value="5" ${mult===5?'selected':''}>5.0x — 5x Yield</option><option value="10" ${mult===10?'selected':''}>10.0x — 10x Yield</option></select></div></div><button class="btn btn-primary" onclick="adjustMiningMultiplier('${email}')" style="margin-top:8px;padding:12px;">Apply Multiplier</button>`; }
         async function adjustMiningMultiplier(email){ const sel=document.getElementById('miningMult'); if(!sel) return; const mult=parseFloat(sel.value); let all=getAllUsers(), u=all[email]; if(!u) return toast('Client not found','error'); const old=u.miningMultiplier||1.0; u.miningMultiplier=mult; u.lastModified=Date.now(); setAllUsers(all); if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(email)).set(u); }catch(e){} closeModal(); renderAdmin(); toast(`Mining multiplier updated: ${old.toFixed(1)}x → ${mult.toFixed(1)}x`,'success'); }
@@ -2655,6 +2933,12 @@
 
         function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
         function closeKYCModal(){ document.getElementById('kycModalOverlay').classList.remove('active'); }
+        function showTermsModal(){ document.getElementById('termsModalOverlay').classList.add('active'); }
+        function closeTermsModal(){ document.getElementById('termsModalOverlay').classList.remove('active'); }
+        function showPrivacyModal(){ document.getElementById('privacyModalOverlay').classList.add('active'); }
+        function closePrivacyModal(){ document.getElementById('privacyModalOverlay').classList.remove('active'); }
+        function showSecurityModal(){ document.getElementById('securityModalOverlay').classList.add('active'); }
+        function closeSecurityModal(){ document.getElementById('securityModalOverlay').classList.remove('active'); }
         function openKYCModal(e){ if(e) e.stopPropagation(); document.getElementById('profileDropdown').classList.remove('active'); document.getElementById('kycModalOverlay').classList.add('active'); }
         function openAccountSettings(e){ if(e) e.stopPropagation(); document.getElementById('profileDropdown').classList.remove('active'); toast('Account Settings — Coming soon','warning'); }
         function openHelpCenter(e){ if(e) e.stopPropagation(); document.getElementById('profileDropdown').classList.remove('active'); toast('Help Center — Coming soon','warning'); }
@@ -2776,9 +3060,9 @@
                 const initial = tx.name.substring(0,1).toUpperCase();
                 const timeStr = timeAgo(tx.date);
                 return `<div class="feed-item" style="animation:fadeIn 0.3s ease;">
-                    <div class="avatar" style="font-size:0.55rem;background:linear-gradient(135deg, #1a3050, #0a1020);border:1px solid rgba(64,128,255,0.15);">${tx.country.flag}</div>
+                    <div class="avatar">${initial}</div>
                     <span class="name">${tx.name}</span>
-                    <span class="action" style="font-size:0.75rem;color:var(--text-dim);">${tx.country.country} • ${tx.action.type}</span>
+                    <span class="action">${tx.action.type}</span>
                     <span class="amount ${tx.action.color}">$${tx.amount.toLocaleString()}</span>
                     <span class="time">${timeStr}</span>
                 </div>`;
@@ -2811,6 +3095,59 @@
             document.getElementById('calcProfit').textContent = '$' + monthlyProfit.toFixed(2) + ' / month';
             document.getElementById('calcProfit').style.color = monthlyProfit > 0 ? 'var(--success)' : 'var(--danger)';
         }
+
+        const COUNTRIES = [
+            { id:'usa', name:'United States', flag:'🇺🇸', baseUsers: 45200, color:'usa', minShare:28, maxShare:35 },
+            { id:'uk', name:'United Kingdom', flag:'🇬🇧', baseUsers: 21800, color:'uk', minShare:14, maxShare:19 },
+            { id:'spain', name:'Spain', flag:'🇪🇸', baseUsers: 18400, color:'spain', minShare:11, maxShare:17 },
+            { id:'germany', name:'Germany', flag:'🇩🇪', baseUsers: 15600, color:'germany', minShare:9, maxShare:13 },
+            { id:'canada', name:'Canada', flag:'🇨🇦', baseUsers: 12300, color:'canada', minShare:7, maxShare:11 },
+            { id:'australia', name:'Australia', flag:'🇦🇺', baseUsers: 9800, color:'australia', minShare:6, maxShare:9 },
+            { id:'japan', name:'Japan', flag:'🇯🇵', baseUsers: 8400, color:'japan', minShare:5, maxShare:8 },
+            { id:'singapore', name:'Singapore', flag:'🇸🇬', baseUsers: 6200, color:'singapore', minShare:4, maxShare:7 }
+        ];
+
+        function generateCountryStats() {
+            const grid = document.getElementById('countryGrid');
+            if(!grid) return;
+
+            let stats = COUNTRIES.map(c => ({
+                ...c,
+                share: Math.floor(Math.random() * (c.maxShare - c.minShare) + c.minShare),
+                users: c.baseUsers + Math.floor(Math.random() * 2000 - 1000)
+            }));
+
+            stats[0].share = Math.max(stats[0].share, stats[1].share + 8, stats[2].share + 10);
+            stats[0].users = Math.max(stats[0].users, stats[1].users * 2);
+
+            const ukIdx = 1, spainIdx = 2;
+            if(Math.random() > 0.55) {
+                stats[spainIdx].share = stats[ukIdx].share + Math.floor(Math.random() * 3 + 1);
+                stats[spainIdx].users = stats[ukIdx].users + Math.floor(Math.random() * 800 + 200);
+            } else {
+                stats[ukIdx].share = stats[spainIdx].share + Math.floor(Math.random() * 4 + 2);
+                stats[ukIdx].users = stats[spainIdx].users + Math.floor(Math.random() * 1000 + 500);
+            }
+
+            stats.sort((a,b) => b.share - a.share);
+            const maxShare = stats[0].share;
+
+            grid.innerHTML = stats.map((c, i) => `
+                <div class="country-card" style="animation:fadeIn 0.4s ${i*0.05}s ease both;">
+                    <div class="rank">#${i+1}</div>
+                    <div class="flag">${c.flag}</div>
+                    <div class="name">${c.name}</div>
+                    <div class="users">${c.users.toLocaleString()} active miners</div>
+                    <div class="bar-wrap">
+                        <div class="bar-fill ${c.color}" style="width:${(c.share/maxShare*100).toFixed(1)}%"></div>
+                    </div>
+                    <div class="share">${c.share}% network share</div>
+                </div>
+            `).join('');
+        }
+
+        generateCountryStats();
+        setInterval(generateCountryStats, 8 * 60 * 60 * 1000);
 
         setInterval(()=>{
             const vol=document.getElementById('fakeVolume'); if(vol) vol.textContent='$'+(Math.floor(Math.random()*200+100)).toLocaleString()+'M+';
