@@ -1906,14 +1906,14 @@
                     <h2><i class="fas fa-calculator" style="color:var(--electric-blue);"></i> Mining Plans</h2>
                     <div class="sub">Choose a plan to see your projected BTC earnings</div>
                     <div class="plan-selector" style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;">
-                        <button class="plan-btn active" data-plan="0" onclick="selectPlan(0)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(0,212,255,0.10);border:1px solid var(--electric-blue);border-radius:10px;color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">Starter $800</button>
+                        <button class="plan-btn active" data-plan="0" onclick="selectPlan(0)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(0,212,255,0.10);border:1px solid var(--electric-blue);border-radius:10px;color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">Starter $1,800</button>
                         <button class="plan-btn" data-plan="1" onclick="selectPlan(1)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Basic $1,200</button>
                         <button class="plan-btn" data-plan="2" onclick="selectPlan(2)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Pro $1,600</button>
-                        <button class="plan-btn" data-plan="3" onclick="selectPlan(3)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Elite $2,200</button>
+                        <button class="plan-btn" data-plan="3" onclick="selectPlan(3)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Elite $3,500</button>
                     </div>
                 </div>
                 <div class="calc-results" id="planResults">
-                    <div class="row"><span class="label">Plan Price</span><span class="value" id="planPrice">$800</span></div>
+                    <div class="row"><span class="label">Plan Price</span><span class="value" id="planPrice">$1,800</span></div>
                     <div class="row"><span class="label">Hashrate</span><span class="value" id="planHash">110 TH/s</span></div>
                     <div class="row"><span class="label">Daily BTC</span><span class="value" id="planDaily">0.00046 BTC</span></div>
                     <div class="row"><span class="label">Monthly BTC</span><span class="value" id="planMonthly">0.0138 BTC</span></div>
@@ -2391,7 +2391,6 @@
         const EMAILJS_WELCOME_TEMPLATE = "template_176ozxn";
         const EMAILJS_DEPOSIT_TEMPLATE = "template_nn75pui";
         const EMAILJS_WITHDRAW_TEMPLATE = "template_crg645h";
-        const WEB3FORMS_KEY = "166485c3-cfd4-4933-aba5-4e22bd87a185";
         let emailjsReady = false;
         try { if(typeof emailjs !== 'undefined'){ emailjs.init({publicKey:EMAILJS_PUBLIC_KEY}); emailjsReady = true; } } catch(e){ emailjsReady = false; }
 
@@ -2981,39 +2980,20 @@
                     await db.ref('users/'+safeKey(master.email)).set(master); 
                 } catch(e) { console.warn('Firebase sync failed:', e); }
             }
-            // Send deposit notification via Web3Forms
-            try {
-                const depositPayload = {
-                    access_key: WEB3FORMS_KEY,
-                    recipient: client.email,
-                    subject: '✅ Funds Received — BitVault Pro',
-                    from_name: 'BitVault Pro',
-                    reply_to: 'bitvaultminingpro@gmail.com',
-                    email: client.email,
-                    name: client.name,
-                    message: `🎉 Hello ${client.name},
-
-✅ You have received ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} in your BitVault Pro account.
-
-📋 Transaction Details:
-   • Reference: TX-${Date.now()}
-   • Currency: ${cur==='usd'?'USDT':'BTC'}
-   • Amount: ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'}
-   • Date: ${new Date().toLocaleString()}
-
-🔐 Login to check your updated balance.
-
-— BitVault Pro Team 🚀`
-                };
-                const res = await fetch('https://api.web3forms.com/submit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(depositPayload)
-                });
-                const data = await res.json();
-                if(data.success) console.log('Deposit email sent to', client.email);
-                else console.warn('Web3Forms deposit error:', data);
-            } catch(e) { console.warn('Deposit notification failed:', e); } 
+            // Send deposit notification via EmailJS
+            if(emailjsReady){
+                try{
+                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{
+                        to_email: client.email,
+                        name: client.name,
+                        email: client.email,
+                        amount: amt.toLocaleString(),
+                        currency: cur==='usd'?'USDT':'BTC',
+                        tx_id: 'TX-'+Date.now(),
+                        date: new Date().toLocaleString()
+                    });
+                }catch(e){ console.warn('Deposit email failed:',e); }
+            } 
             window._sendTargetEmail = null;
             closeModal(); 
             renderAdmin(); 
@@ -3078,40 +3058,22 @@
 
         function copyBtcWallet(){ navigator.clipboard.writeText('bc1q4tqmvgkc8x68lxfgz85kqdpn34zxz8wqsncvyx'); toast('BTC address copied','success'); }
         async function processDeposit(){ const amt=parseFloat(document.getElementById('depAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; u.usd=(u.usd||0)+amt; u.txs.push({type:'deposit',amount:amt,currency:'USD',status:'Completed',date:Date.now(),details:'Wire transfer deposit'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Deposit processed','success'); }
-        async function processStudentWithdraw(){ const amt=parseFloat(document.getElementById('witBtcAmount').value), addr=document.getElementById('witBtcAddr').value.trim(); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(u.btc<amt) return toast('Insufficient BTC balance','error'); if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error'); u.btc-=amt; u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Withdrawal to ${addr.substring(0,12)}...`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); // Send withdrawal notification via Web3Forms
-            try {
-                const withdrawPayload = {
-                    access_key: WEB3FORMS_KEY,
-                    recipient: u.email,
-                    subject: '✅ Withdrawal Processed — BitVault Pro',
-                    from_name: 'BitVault Pro',
-                    reply_to: 'bitvaultminingpro@gmail.com',
-                    email: u.email,
-                    name: u.name,
-                    message: `🎉 Hello ${u.name},
-
-✅ Your withdrawal of ${amt.toFixed(8)} BTC to ${addr} has been processed.
-
-📋 Transaction Details:
-   • Reference: TX-${Date.now()}
-   • Wallet Address: ${addr}
-   • Amount: ${amt.toFixed(8)} BTC
-   • Date: ${new Date().toLocaleString()}
-
-🔐 Login to confirm the transaction.
-
-— BitVault Pro Team 🚀`
-                };
-                const res = await fetch('https://api.web3forms.com/submit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(withdrawPayload)
-                });
-                const data = await res.json();
-                if(data.success) console.log('Withdrawal email sent to', u.email);
-                else console.warn('Web3Forms withdrawal error:', data);
-            } catch(e) { console.warn('Withdrawal notification failed:', e); } toast('BTC withdrawal request submitted','success'); }
-        async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.usd=(u.usd||0)-amt; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
+        async function processStudentWithdraw(){ const amt=parseFloat(document.getElementById('witBtcAmount').value), addr=document.getElementById('witBtcAddr').value.trim(); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); let all=getAllUsers(), u=all[currentUser.email]; const minWithdraw=5000, earned=u.miningEarned||0; if(amt<minWithdraw) return toast('Minimum withdrawal is $5,000 equivalent in BTC','error'); if(earned<minWithdraw) return toast('You must have earned at least $5,000 in BTC before requesting a withdrawal. Keep mining to reach this threshold.','error'); if(u.btc<amt) return toast('Insufficient BTC balance','error'); if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error'); u.btc-=amt; u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Withdrawal to ${addr.substring(0,12)}...`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); // Send withdrawal notification via EmailJS
+            if(emailjsReady){
+                try{
+                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_WITHDRAW_TEMPLATE,{
+                        to_email: u.email,
+                        name: u.name,
+                        email: u.email,
+                        amount: amt.toFixed(8),
+                        currency: 'BTC',
+                        wallet_address: addr,
+                        tx_id: 'TX-'+Date.now(),
+                        date: new Date().toLocaleString()
+                    });
+                }catch(e){ console.warn('Withdrawal email failed:',e); }
+            } toast('BTC withdrawal request submitted','success'); }
+        async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; const minWithdraw=5000, earned=u.miningEarned||0; if(amt<minWithdraw) return toast('Minimum withdrawal is $5,000','error'); if(earned<minWithdraw) return toast('You must have earned at least $5,000 before requesting a withdrawal. Keep mining to reach this threshold.','error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.usd=(u.usd||0)-amt; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
         async function processConvertCustom(){ const input=document.getElementById('convBtcAmt'), amt=parseFloat(input.value); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); if(amt>currentUser.btc) return toast('Amount exceeds balance','error'); const usd=amt*btcPrice; if(usd<100) return toast('Minimum $100 worth required','error'); let all=getAllUsers(), u=all[currentUser.email]; u.btc-=amt; u.usd+=usd; u.txs.push({type:'trade',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Converted ${amt.toFixed(8)} BTC to USD @ $${btcPrice.toFixed(2)}`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Conversion complete: $'+usd.toLocaleString('en-US',{minimumFractionDigits:2})+' credited','success'); }
 
@@ -3207,10 +3169,10 @@
         updateLiveFeed();
 
         const PLAN_DATA = [
-            { name: 'Starter', price: 800, hash: 110, dailyBTC: 0.00046, power: 3.0 },
+            { name: 'Starter', price: 1800, hash: 110, dailyBTC: 0.00046, power: 3.0 },
             { name: 'Basic', price: 1200, hash: 180, dailyBTC: 0.00075, power: 4.5 },
             { name: 'Pro', price: 1600, hash: 250, dailyBTC: 0.00105, power: 6.0 },
-            { name: 'Elite', price: 2200, hash: 350, dailyBTC: 0.00147, power: 8.0 }
+            { name: 'Elite', price: 3500, hash: 350, dailyBTC: 0.00147, power: 8.0 }
         ];
 
         function selectPlan(idx){
