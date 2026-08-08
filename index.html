@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover" />
-    <title>BitVault Pro — Digital Asset Exchange</title>
+    <title>BitVault</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
@@ -1968,6 +1968,209 @@
             max-height: 1200px;
         }
 
+    
+        /* FIX: Mobile hero - no huge empty space */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 16px 0 8px !important;
+                gap: 12px !important;
+                min-height: auto !important;
+            }
+            .hero-text h1 {
+                font-size: 1.7rem !important;
+                line-height: 1.25 !important;
+            }
+            .hero-text p {
+                font-size: 0.88rem !important;
+                margin-top: 8px !important;
+            }
+            .hero-text .cta-row {
+                margin-top: 14px !important;
+                gap: 10px !important;
+            }
+            .hero-text .cta-row a {
+                padding: 11px 24px !important;
+                font-size: 0.9rem !important;
+            }
+            .hero-visual {
+                font-size: 3.2rem !important;
+                margin: 4px 0 !important;
+                min-height: 0 !important;
+            }
+            .hero-visual i {
+                animation: none !important;
+            }
+            .stats-bar {
+                margin-top: 8px !important;
+                margin-bottom: 16px !important;
+            }
+        }
+
+    
+        /* FIX: Global Network clean mobile layout */
+        .country-row {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding: 10px 12px !important;
+            margin-bottom: 6px !important;
+            background: rgba(5,10,20,0.35) !important;
+            border-radius: 10px !important;
+            flex-wrap: nowrap !important;
+        }
+        .country-rank {
+            min-width: 28px !important;
+            font-weight: 800 !important;
+            font-size: 0.85rem !important;
+            flex-shrink: 0 !important;
+        }
+        .country-flag {
+            width: 28px !important;
+            height: 20px !important;
+            object-fit: cover !important;
+            border-radius: 3px !important;
+            flex-shrink: 0 !important;
+        }
+        .country-info {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+        }
+        .country-info .name {
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        .country-info .users {
+            font-size: 0.7rem !important;
+            color: var(--text-muted) !important;
+            white-space: nowrap !important;
+        }
+        .country-bar-area {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-end !important;
+            min-width: 90px !important;
+            max-width: 110px !important;
+            flex-shrink: 0 !important;
+        }
+        .country-bar-wrap {
+            width: 100% !important;
+            height: 5px !important;
+            background: rgba(255,255,255,0.06) !important;
+            border-radius: 4px !important;
+            overflow: hidden !important;
+            margin-bottom: 3px !important;
+        }
+        .country-bar-fill {
+            height: 100% !important;
+            border-radius: 4px !important;
+        }
+        .country-share {
+            font-size: 0.68rem !important;
+            font-weight: 600 !important;
+            white-space: nowrap !important;
+        }
+        @media (max-width: 480px) {
+            .country-bar-area {
+                min-width: 70px !important;
+                max-width: 80px !important;
+            }
+            .country-info .name { font-size: 0.8rem !important; }
+            .country-share { font-size: 0.62rem !important; }
+        }
+
+    
+        /* FIX: Recent Activity no overlap on mobile */
+        @media (max-width: 768px) {
+            .tx-table td, .tx-table th {
+                padding: 8px 6px !important;
+                font-size: 0.75rem !important;
+            }
+            /* Activity list items */
+            .feed-item, .activity-item, [class*="activity"] {
+                flex-wrap: wrap !important;
+            }
+            /* Dashboard recent activity cards */
+            .card .tx-table {
+                display: block !important;
+                overflow-x: auto !important;
+            }
+        }
+        /* Force activity rows to stack cleanly */
+        .recent-activity-item, .activity-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+            padding: 10px 0 !important;
+            border-bottom: 1px solid rgba(64,128,255,0.04) !important;
+        }
+        .recent-activity-item .left, .activity-row .left {
+            flex: 1 !important;
+            min-width: 0 !important;
+        }
+        .recent-activity-item .right, .activity-row .right {
+            text-align: right !important;
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+        }
+
+    
+        /* FIX: Overall mobile polish - tighter, no waste space */
+        @media (max-width: 768px) {
+            .landing-wrapper {
+                padding: 10px 12px 30px !important;
+            }
+            .live-feed-section,
+            .calc-section,
+            .btc-calculator,
+            .country-stats-section {
+                padding: 16px 14px !important;
+                margin: 12px 0 16px !important;
+                border-radius: 14px !important;
+            }
+            .live-feed-section h2,
+            .btc-calculator h2,
+            .country-stats-section h2 {
+                font-size: 1.15rem !important;
+            }
+            .page {
+                padding: 12px !important;
+            }
+            .card {
+                padding: 14px 14px !important;
+                border-radius: 12px !important;
+            }
+            .card-value {
+                font-size: 1.25rem !important;
+            }
+            .topbar {
+                height: 54px !important;
+                padding: 0 10px !important;
+            }
+            .menu-toggle {
+                width: 36px !important;
+                height: 36px !important;
+                font-size: 1.1rem !important;
+            }
+            .plan-btn {
+                font-size: 0.7rem !important;
+                padding: 8px 8px !important;
+                min-width: 70px !important;
+            }
+            .calc-section {
+                grid-template-columns: 1fr !important;
+            }
+            .rig-card {
+                padding: 14px !important;
+            }
+            .rig-name { font-size: 0.95rem !important; }
+            .rig-price { font-size: 1.05rem !important; }
+        }
+
     </style>
 <base target="_blank">
 <base target="_blank">
@@ -1977,7 +2180,7 @@
     <!-- ── PRELOADER ── -->
     <div class="preloader" id="preloader">
         <div class="logo">⚡ BitVault</div>
-        <div class="sub">Digital Asset Platform</div>
+        
         <div class="bar"></div>
     </div>
 
@@ -1988,7 +2191,7 @@
     <div id="landingPage">
         <div class="landing-wrapper">
             <div class="top-bar">
-                <div class="logo">⚡ <span>BitVault</span><small>PRO</small></div>
+                <div class="logo">⚡ <span>BitVault</span></div>
                 <div class="ticker">
                     <span>BTC/USD <span class="price" id="topPrice">$65,000.00</span> <span class="up" id="topPriceChange">+0.0%</span></span>
                     <span><i class="fas fa-bolt" style="color:var(--electric-blue);"></i> Hashrate: <span class="hash" id="topHashrate">2.4 EH/s</span></span>
@@ -2043,7 +2246,7 @@
 
             <section class="calc-section">
                 <div>
-                    <h2><i class="fas fa-calculator" style="color:var(--electric-blue);"></i> Mining Plans</h2>
+                    <h2><i class="fas fa-server" style="color:var(--electric-blue);margin-right:8px;"></i> Mining Plans</h2>
                     <div class="sub">Choose a plan to see your projected BTC earnings</div>
                     <div class="plan-selector" style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;">
                         <button class="plan-btn active" data-plan="0" onclick="selectPlan(0)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(0,212,255,0.10);border:1px solid var(--electric-blue);border-radius:10px;color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">Starter $1,800</button>
@@ -2067,7 +2270,7 @@
             
             <!-- BTC Calculator & Converter -->
             <div class="btc-calculator">
-                <h2><i class="fas fa-calculator" style="color:var(--electric-blue);margin-right:8px;"></i> BTC ⇄ USD Calculator</h2>
+                <h2><i class="fas fa-exchange-alt" style="color:var(--electric-blue);margin-right:8px;"></i> BTC ⇄ USD Calculator</h2>
                 <div class="sub">Convert Bitcoin to USDT or see projected mining earnings in real time</div>
                 
                 <div class="calc-row">
@@ -2109,7 +2312,7 @@
                     <a href="#" onclick="event.preventDefault(); showSecurityModal();">Security</a>
                     <a href="#" onclick="event.preventDefault(); toast('Contact: support@bitvault.io','info');">Contact</a>
                 </div>
-                BitVault PRO &bull; 2026 &bull; Institutional Grade &bull; All rights reserved.
+                BitVault &bull; 2026 &bull; All rights reserved.
             </div>
         </div>
     </div>
@@ -2284,7 +2487,6 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2><span>⚡</span> BitVault</h2>
-                <div class="tag">Digital Asset Platform</div>
             </div>
             <nav class="nav-menu">
                 <div class="nav-item active" onclick="navigate('dashboard')"><span class="icon"><i class="fas fa-chart-line"></i></span> Dashboard</div>
@@ -2995,7 +3197,24 @@
             updateDashPrice();
             const act=document.getElementById('dashActivity'), txs=[...(currentUser.txs||[])].sort((a,b)=>b.date-a.date).slice(0,6);
             if(txs.length===0) act.innerHTML='<div class="empty-state"><div class="icon"><i class="fas fa-inbox"></i></div><h3>No recent activity</h3><p>Trading and mining activity will appear here</p></div>';
-            else act.innerHTML=txs.map(tx=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(64,128,255,0.04);"><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:1rem;">${tx.type==='deposit'?'<i class="fas fa-arrow-down" style="color:var(--success)"></i>':tx.type==='withdraw'?'<i class="fas fa-arrow-up" style="color:var(--danger)"></i>':tx.type==='mining'?'<i class="fas fa-hammer"></i>':tx.type==='trade'?'<i class="fas fa-chart-line"></i>':tx.type==='referral'?'<i class="fas fa-gift"></i>':'<i class="fas fa-sync"></i>'}</span><div><div style="font-size:0.85rem;font-weight:600;text-transform:capitalize;">${tx.type}</div><div style="font-size:0.7rem;color:var(--text-muted);">${tx.details||''}</div></div></div><div style="text-align:right;"><div style="font-size:0.85rem;font-weight:700;${tx.amount>0?'color:var(--success)':'color:var(--danger)'}">${tx.amount>0?'+':''}${tx.type==='trade'||tx.currency==='BTC'?tx.amount.toFixed(6)+' BTC':'$'+Math.abs(tx.amount).toLocaleString()}</div><div style="font-size:0.7rem;color:var(--text-muted);">${timeAgo(tx.date)}</div></div></div>`).join('');
+            else act.innerHTML=txs.map(tx=>{
+                const icon = tx.type==='deposit'?'<i class="fas fa-arrow-down" style="color:var(--success)"></i>':tx.type==='withdraw'?'<i class="fas fa-arrow-up" style="color:var(--danger)"></i>':tx.type==='mining'?'<i class="fas fa-hammer"></i>':tx.type==='trade'?'<i class="fas fa-chart-line"></i>':tx.type==='referral'?'<i class="fas fa-gift"></i>':'<i class="fas fa-sync"></i>';
+                const amtStr = (tx.type==='trade'||tx.currency==='BTC') ? ((tx.amount>0?'+':'')+tx.amount.toFixed(6)+' BTC') : ((tx.amount>0?'+':'')+'$'+Math.abs(tx.amount).toLocaleString());
+                const amtColor = tx.amount>0 ? 'var(--success)' : 'var(--danger)';
+                return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid rgba(64,128,255,0.04);">
+                    <div style="display:flex;align-items:flex-start;gap:8px;min-width:0;flex:1;">
+                        <span style="font-size:0.95rem;flex-shrink:0;margin-top:2px;">${icon}</span>
+                        <div style="min-width:0;overflow:hidden;">
+                            <div style="font-size:0.82rem;font-weight:600;text-transform:capitalize;">${tx.type}</div>
+                            <div style="font-size:0.68rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${tx.details||''}</div>
+                        </div>
+                    </div>
+                    <div style="text-align:right;flex-shrink:0;">
+                        <div style="font-size:0.8rem;font-weight:700;color:${amtColor};white-space:nowrap;">${amtStr}</div>
+                        <div style="font-size:0.65rem;color:var(--text-muted);">${timeAgo(tx.date)}</div>
+                    </div>
+                </div>`;
+            }).join('');
             const rigsEl=document.getElementById('dashRigs');
             const userRigs=currentUser.rigs||[];
             if(userRigs.length===0) rigsEl.innerHTML='<div class="empty-state"><div class="icon"><i class="fas fa-hammer"></i></div><h3>No active rigs</h3><p>Deploy ASIC hardware to begin BTC generation</p></div>';
