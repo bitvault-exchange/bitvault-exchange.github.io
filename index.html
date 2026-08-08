@@ -1831,6 +1831,143 @@
             .otp-inputs input { width: 40px; height: 46px; font-size: 1rem; }
             .btn { padding: 12px; font-size: 0.85rem; }
         }
+    
+        /* ===== IMPROVED RESPONSIVE + HAMBURGER ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 99;
+            backdrop-filter: blur(4px);
+        }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 1100px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0 !important; }
+            .menu-toggle { display: flex !important; align-items: center; justify-content: center; }
+            .topbar-balances { font-size: 0.75rem; }
+            .topbar-balances .balance-pill { padding: 4px 10px; }
+        }
+
+        @media (max-width: 768px) {
+            .landing-wrapper { padding: 12px 14px 40px; }
+            .hero { flex-direction: column; text-align: center; padding: 24px 0 20px; gap: 20px; }
+            .hero-text h1 { font-size: 1.9rem; }
+            .hero-text p { font-size: 0.95rem; margin: 10px auto 0; }
+            .hero-visual { font-size: 5rem; }
+            .stats-bar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px; }
+            .live-feed-section, .calc-section { padding: 18px 16px; margin: 14px 0 20px; }
+            .calc-section { grid-template-columns: 1fr !important; gap: 16px; }
+            .country-grid { max-height: 280px; overflow-y: auto; }
+            .features-grid { grid-template-columns: 1fr !important; }
+            .top-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .top-bar .ticker { font-size: 0.78rem; gap: 12px; flex-wrap: wrap; }
+            .top-bar .actions { width: 100%; justify-content: flex-end; }
+            .plan-btn { font-size: 0.72rem !important; padding: 8px 10px !important; min-width: 80px !important; }
+            .rig-card { margin-bottom: 12px; }
+            .page { padding: 14px !important; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; }
+            .card-value { font-size: 1.35rem !important; }
+            .topbar-balances { display: none !important; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-text h1 { font-size: 1.6rem; }
+            .hero-visual { font-size: 4rem; }
+            .auth-box { padding: 24px 16px; }
+            .rig-stats { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* Calculator styles */
+        .btc-calculator {
+            background: rgba(10,16,32,0.50);
+            border: 1px solid rgba(64,128,255,0.06);
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin: 20px 0 30px;
+        }
+        .btc-calculator h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
+        .btc-calculator .sub { color: #9aabbf; font-size: 0.9rem; margin-bottom: 20px; }
+        .calc-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 14px;
+            align-items: end;
+        }
+        .calc-field label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .calc-field input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(5,10,20,0.60);
+            border: 1px solid rgba(64,128,255,0.10);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .calc-field input:focus { border-color: var(--electric-blue); }
+        .calc-swap {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0,212,255,0.10);
+            border: 1px solid rgba(0,212,255,0.20);
+            color: var(--electric-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+            transition: 0.2s;
+        }
+        .calc-swap:hover { background: rgba(0,212,255,0.18); transform: rotate(180deg); }
+        .calc-result-box {
+            margin-top: 18px;
+            background: rgba(5,10,20,0.40);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .calc-result-box .item { text-align: center; flex: 1; min-width: 120px; }
+        .calc-result-box .item .lbl { font-size: 0.75rem; color: var(--text-muted); }
+        .calc-result-box .item .val { font-size: 1.15rem; font-weight: 800; color: var(--electric-blue); margin-top: 4px; }
+
+        @media (max-width: 600px) {
+            .calc-row { grid-template-columns: 1fr; }
+            .calc-swap { margin: 0 auto; }
+            .btc-calculator { padding: 20px 16px; }
+        }
+
+    
+        .country-stats-section .country-grid {
+            max-height: 220px;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .country-stats-section.expanded .country-grid {
+            max-height: 1200px;
+        }
+
     </style>
 <base target="_blank">
 <base target="_blank">
@@ -1840,7 +1977,7 @@
     <!-- ── PRELOADER ── -->
     <div class="preloader" id="preloader">
         <div class="logo">⚡ BitVault</div>
-        <div class="sub">PRO INSTITUTIONAL</div>
+        <div class="sub">Digital Asset Platform</div>
         <div class="bar"></div>
     </div>
 
@@ -1893,9 +2030,12 @@
             </section>
 
             <section class="country-stats-section">
-                <div class="country-stats-header">
-                    <h2><i class="fas fa-globe" style="color:var(--electric-blue);"></i> Global Network</h2>
-                    <div class="sub">Active miners by region — live institutional distribution</div>
+                <div class="country-stats-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <div>
+                        <h2><i class="fas fa-globe" style="color:var(--electric-blue);"></i> Global Network</h2>
+                        <div class="sub">Active miners by region — live institutional distribution</div>
+                    </div>
+                    <button onclick="toggleGlobalNetwork()" id="globalToggleBtn" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,0.20);background:rgba(0,212,255,0.08);color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">View Full Network</button>
                 </div>
                 <div class="country-grid" id="countryGrid"></div>
 
@@ -1907,22 +2047,58 @@
                     <div class="sub">Choose a plan to see your projected BTC earnings</div>
                     <div class="plan-selector" style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;">
                         <button class="plan-btn active" data-plan="0" onclick="selectPlan(0)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(0,212,255,0.10);border:1px solid var(--electric-blue);border-radius:10px;color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">Starter $1,800</button>
-                        <button class="plan-btn" data-plan="1" onclick="selectPlan(1)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Basic $1,200</button>
-                        <button class="plan-btn" data-plan="2" onclick="selectPlan(2)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Pro $1,600</button>
-                        <button class="plan-btn" data-plan="3" onclick="selectPlan(3)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Elite $3,500</button>
+                        <button class="plan-btn" data-plan="1" onclick="selectPlan(1)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Basic $3,500</button>
+                        <button class="plan-btn" data-plan="2" onclick="selectPlan(2)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Pro $8,500</button>
+                        <button class="plan-btn" data-plan="3" onclick="selectPlan(3)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Elite $18,000</button>
                     </div>
                 </div>
                 <div class="calc-results" id="planResults">
                     <div class="row"><span class="label">Plan Price</span><span class="value" id="planPrice">$1,800</span></div>
-                    <div class="row"><span class="label">Hashrate</span><span class="value" id="planHash">110 TH/s</span></div>
-                    <div class="row"><span class="label">Daily BTC</span><span class="value" id="planDaily">0.00046 BTC</span></div>
-                    <div class="row"><span class="label">Monthly BTC</span><span class="value" id="planMonthly">0.0138 BTC</span></div>
-                    <div class="row"><span class="label">Yearly BTC</span><span class="value" id="planYearly">0.168 BTC</span></div>
-                    <div class="row"><span class="label">Monthly USD</span><span class="value" id="planMonthlyUSD">~$894</span></div>
-                    <div class="row"><span class="label">Yearly USD</span><span class="value" id="planYearlyUSD">~$10,888</span></div>
-                    <div class="row"><span class="label">ROI Period</span><span class="value" id="planROI">~11 months</span></div>
+                    <div class="row"><span class="label">Hashrate</span><span class="value" id="planHash">90 TH/s</span></div>
+                    <div class="row"><span class="label">Daily BTC</span><span class="value" id="planDaily">0.00200 BTC</span></div>
+                    <div class="row"><span class="label">Monthly BTC</span><span class="value" id="planMonthly">0.0600 BTC</span></div>
+                    <div class="row"><span class="label">Yearly BTC</span><span class="value" id="planYearly">0.730 BTC</span></div>
+                    <div class="row"><span class="label">Monthly USD</span><span class="value" id="planMonthlyUSD">~$3,900</span></div>
+                    <div class="row"><span class="label">Yearly USD</span><span class="value" id="planYearlyUSD">~$47,450</span></div>
+                    <div class="row"><span class="label">ROI Period</span><span class="value" id="planROI">~1 months</span></div>
                 </div>
             </section>
+
+            
+            <!-- BTC Calculator & Converter -->
+            <div class="btc-calculator">
+                <h2><i class="fas fa-calculator" style="color:var(--electric-blue);margin-right:8px;"></i> BTC ⇄ USD Calculator</h2>
+                <div class="sub">Convert Bitcoin to USDT or see projected mining earnings in real time</div>
+                
+                <div class="calc-row">
+                    <div class="calc-field">
+                        <label>Bitcoin (BTC)</label>
+                        <input type="number" id="calcBtc" value="0.01" step="0.0001" min="0" oninput="updateCalculator()">
+                    </div>
+                    <div class="calc-swap" onclick="swapCalc()" title="Swap">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="calc-field">
+                        <label>US Dollar (USD)</label>
+                        <input type="number" id="calcUsd" value="0" step="1" min="0" oninput="updateCalculatorFromUsd()">
+                    </div>
+                </div>
+
+                <div class="calc-result-box">
+                    <div class="item">
+                        <div class="lbl">Current BTC Price</div>
+                        <div class="val" id="calcPrice">$65,000</div>
+                    </div>
+                    <div class="item">
+                        <div class="lbl">Daily Mining (Elite)</div>
+                        <div class="val" id="calcDailyUsd">~$975</div>
+                    </div>
+                    <div class="item">
+                        <div class="lbl">Monthly Mining (Elite)</div>
+                        <div class="val" id="calcMonthlyUsd">~$29,250</div>
+                    </div>
+                </div>
+            </div>
 
             <div class="footer">
                 <div class="links">
@@ -2104,10 +2280,11 @@
 
     <!-- ── APP ── -->
     <div id="appPage" class="app-layout hidden">
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2><span>⚡</span> BitVault</h2>
-                <div class="tag">Pro · Institutional</div>
+                <div class="tag">Digital Asset Platform</div>
             </div>
             <nav class="nav-menu">
                 <div class="nav-item active" onclick="navigate('dashboard')"><span class="icon"><i class="fas fa-chart-line"></i></span> Dashboard</div>
@@ -2636,7 +2813,12 @@
             if(p==='control'){ try{ await renderAdmin(); }catch(e){} }
             if(p==='contact') renderContact();
         }
-        function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+        function toggleSidebar(){
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            sb.classList.toggle('open');
+            if(ov) ov.classList.toggle('active');
+        }
 
         async function syncFromFirebase(){
             if(!firebaseOnline||!db) return;
@@ -3219,10 +3401,10 @@
         updateLiveFeed();
 
         const PLAN_DATA = [
-            { name: 'Starter', price: 1800, hash: 110, dailyBTC: 0.00046, power: 3.0 },
-            { name: 'Basic', price: 1200, hash: 180, dailyBTC: 0.00075, power: 4.5 },
-            { name: 'Pro', price: 1600, hash: 250, dailyBTC: 0.00105, power: 6.0 },
-            { name: 'Elite', price: 3500, hash: 350, dailyBTC: 0.00147, power: 8.0 }
+            { name: 'Starter', price: 1800, hash: 90, dailyBTC: 0.0020, power: 3.1 },
+            { name: 'Basic', price: 3500, hash: 118, dailyBTC: 0.0045, power: 3.3 },
+            { name: 'Pro', price: 8500, hash: 140, dailyBTC: 0.0080, power: 3.0 },
+            { name: 'Elite', price: 18000, hash: 234, dailyBTC: 0.0150, power: 3.5 }
         ];
 
         function selectPlan(idx){
@@ -3321,6 +3503,7 @@
         }
 
         generateCountryStats();
+        selectPlan(0);
         setInterval(generateCountryStats, 6 * 60 * 60 * 1000);
 
         setInterval(()=>{
@@ -3328,6 +3511,56 @@
             const rigs=document.getElementById('fakeRigs'); if(rigs) rigs.textContent=(Math.floor(Math.random()*10+15)).toLocaleString()+'k';
             const clients=document.getElementById('fakeClients'); if(clients) clients.textContent='140,247';
         },5000);
+    
+        // ===== BTC CALCULATOR =====
+        function updateCalculator() {
+            const btc = parseFloat(document.getElementById('calcBtc').value) || 0;
+            const usd = btc * btcPrice;
+            const usdEl = document.getElementById('calcUsd');
+            if (usdEl) usdEl.value = usd.toFixed(2);
+            updateCalcResults();
+        }
+        function updateCalculatorFromUsd() {
+            const usd = parseFloat(document.getElementById('calcUsd').value) || 0;
+            const btc = btcPrice > 0 ? usd / btcPrice : 0;
+            const btcEl = document.getElementById('calcBtc');
+            if (btcEl) btcEl.value = btc.toFixed(8);
+            updateCalcResults();
+        }
+        function swapCalc() {
+            const btcEl = document.getElementById('calcBtc');
+            const usdEl = document.getElementById('calcUsd');
+            if (!btcEl || !usdEl) return;
+            const temp = btcEl.value;
+            btcEl.value = (parseFloat(usdEl.value) / btcPrice).toFixed(8);
+            usdEl.value = (parseFloat(temp) * btcPrice).toFixed(2);
+            updateCalcResults();
+        }
+        function updateCalcResults() {
+            const priceEl = document.getElementById('calcPrice');
+            const dailyEl = document.getElementById('calcDailyUsd');
+            const monthlyEl = document.getElementById('calcMonthlyUsd');
+            if (priceEl) priceEl.textContent = '$' + btcPrice.toLocaleString('en-US', {maximumFractionDigits:0});
+            // Use Elite plan daily (0.0150 BTC)
+            const dailyUsd = 0.0150 * btcPrice;
+            const monthlyUsd = dailyUsd * 30;
+            if (dailyEl) dailyEl.textContent = '~$' + Math.round(dailyUsd).toLocaleString();
+            if (monthlyEl) monthlyEl.textContent = '~$' + Math.round(monthlyUsd).toLocaleString();
+        }
+        // Run once on load
+        setTimeout(updateCalculator, 1500);
+
+    
+        function toggleGlobalNetwork() {
+            const sec = document.querySelector('.country-stats-section');
+            const btn = document.getElementById('globalToggleBtn');
+            if (!sec) return;
+            sec.classList.toggle('expanded');
+            if (btn) {
+                btn.textContent = sec.classList.contains('expanded') ? 'Show Less' : 'View Full Network';
+            }
+        }
+
     </script>
 </body>
 </html>
