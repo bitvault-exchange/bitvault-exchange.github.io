@@ -1853,7 +1853,7 @@
             <div class="top-bar">
                 <div class="logo">⚡ <span>BitVault</span><small>PRO</small></div>
                 <div class="ticker">
-                    <span>BTC/USD <span class="price" id="topPrice">$81,234.50</span> <span class="up" id="topPriceChange">+2.4%</span></span>
+                    <span>BTC/USD <span class="price" id="topPrice">$65,000.00</span> <span class="up" id="topPriceChange">+0.0%</span></span>
                     <span><i class="fas fa-bolt" style="color:var(--electric-blue);"></i> Hashrate: <span class="hash" id="topHashrate">2.4 EH/s</span></span>
                     <span><i class="fas fa-users" style="color:var(--gold);"></i> Miners: <span class="gold" id="topMiners">1,247</span></span>
                 </div>
@@ -2396,15 +2396,15 @@
 
         const RIG_PURCHASE_LIMIT = 3;
         const RIGS = [
-            { id:'basic', name:'Antminer S19j', icon:'<i class="fas fa-bolt"></i>', hash:'90 TH/s', power:'3.1 kW', daily:0.00018, price:800, tag:'Entry' },
-            { id:'advanced', name:'Whatsminer M50', icon:'<i class="fas fa-bolt"></i>', hash:'118 TH/s', power:'3.3 kW', daily:0.00095, price:2200, tag:'Popular' },
-            { id:'pro', name:'Antminer S19 XP', icon:'<i class="fas fa-bolt"></i>', hash:'140 TH/s', power:'3.0 kW', daily:0.0016, price:6500, tag:'Best' },
-            { id:'enterprise', name:'Bitmain S21 Pro', icon:'<i class="fas fa-bolt"></i>', hash:'234 TH/s', power:'3.5 kW', daily:0.0031, price:18000, tag:'Pro' }
+            { id:'basic', name:'Antminer S19j', icon:'<i class="fas fa-bolt"></i>', hash:'90 TH/s', power:'3.1 kW', daily:0.0020, price:1800, tag:'Entry' },
+            { id:'advanced', name:'Whatsminer M50', icon:'<i class="fas fa-bolt"></i>', hash:'118 TH/s', power:'3.3 kW', daily:0.0045, price:3500, tag:'Popular' },
+            { id:'pro', name:'Antminer S19 XP', icon:'<i class="fas fa-bolt"></i>', hash:'140 TH/s', power:'3.0 kW', daily:0.0080, price:8500, tag:'Best' },
+            { id:'enterprise', name:'Bitmain S21 Pro', icon:'<i class="fas fa-bolt"></i>', hash:'234 TH/s', power:'3.5 kW', daily:0.0150, price:18000, tag:'Pro' }
         ];
 
         window._sendTargetEmail = null;
         let currentUser = null, users = JSON.parse(localStorage.getItem('bv_users')) || {};
-        let btcPrice = 80000.00, btcPriceChange24h = 0, priceHistory = [], tradeMode = 'buy', currentPage = 'dashboard', chartPeriod = '1';
+        let btcPrice = 65000.00, btcPriceChange24h = 0, priceHistory = [], tradeMode = 'buy', currentPage = 'dashboard', chartPeriod = '1';
         let priceUpdateInterval, miningInterval, syncInterval, tempRegData = null, tempVerifCode = '';
 
         function safeKey(e){ return e.replace(/\./g,','); }
@@ -2717,10 +2717,60 @@
         }
 
         async function fetchBTCPrice(){
-            try{ const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true'); const d=await r.json(); if(d.bitcoin){ btcPrice=d.bitcoin.usd; btcPriceChange24h=d.bitcoin.usd_24h_change||0; return true; } }catch(e){}
-            try{ const r=await fetch('https://api.coinbase.com/v2/exchange-rates?currency=BTC'); const d=await r.json(); if(d.data&&d.data.rates&&d.data.rates.USD){ btcPrice=parseFloat(d.data.rates.USD); btcPriceChange24h=0; return true; } }catch(e){}
-            try{ const r=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT'); const d=await r.json(); if(d&&d.lastPrice){ btcPrice=parseFloat(d.lastPrice); btcPriceChange24h=parseFloat(d.priceChangePercent)||0; return true; } }catch(e){}
+            // Try CoinGecko first
+            try {
+                const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
+                const d = await r.json();
+                if (d.bitcoin && d.bitcoin.usd) {
+                    btcPrice = d.bitcoin.usd;
+                    btcPriceChange24h = d.bitcoin.usd_24h_change || 0;
+                    updateTopBarPrice();
+                    return true;
+                }
+            } catch(e) {}
+
+            // Fallback: Coinbase
+            try {
+                const r = await fetch('https://api.coinbase.com/v2/exchange-rates?currency=BTC');
+                const d = await r.json();
+                if (d.data && d.data.rates && d.data.rates.USD) {
+                    btcPrice = parseFloat(d.data.rates.USD);
+                    btcPriceChange24h = 0;
+                    updateTopBarPrice();
+                    return true;
+                }
+            } catch(e) {}
+
+            // Fallback: Binance
+            try {
+                const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
+                const d = await r.json();
+                if (d && d.lastPrice) {
+                    btcPrice = parseFloat(d.lastPrice);
+                    btcPriceChange24h = parseFloat(d.priceChangePercent) || 0;
+                    updateTopBarPrice();
+                    return true;
+                }
+            } catch(e) {}
+
             return false;
+        }
+
+        // New helper – updates the top bar price immediately
+        function updateTopBarPrice() {
+            const priceEl = document.getElementById('topPrice');
+            const changeEl = document.getElementById('topPriceChange');
+            if (priceEl) {
+                priceEl.textContent = '$' + btcPrice.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+            if (changeEl) {
+                const pct = btcPriceChange24h;
+                changeEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+                changeEl.className = pct >= 0 ? 'up' : 'down';
+            }
         }
 
         async function fetchBTCHistory(d){ try{ const r=await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${d}`); const data=await r.json(); if(data.prices&&data.prices.length>0) return data.prices.map(p=>({price:p[1],time:p[0]})); }catch(e){} return null; }
@@ -2738,7 +2788,7 @@
             priceUpdateInterval=setInterval(async()=>{
                 const ok=await fetchBTCPrice(); if(ok){ priceHistory.push({price:btcPrice,time:Date.now()}); if(priceHistory.length>500) priceHistory.shift(); }
                 updateDashPrice(); if(currentPage==='dashboard'){ drawChart('priceChart'); renderDashboard(); } if(currentPage==='trade'){ updateTradePrice(); drawChart('tradeChart'); updateOrderBook(); } updateAllBalances();
-            },30000);
+            },15000);
         }
 
         function startMiningSimulation(){
