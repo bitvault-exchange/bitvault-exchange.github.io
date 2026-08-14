@@ -2171,8 +2171,67 @@
             .rig-price { font-size: 1.05rem !important; }
         }
 
+    
+        /* ===== DEMO VISIBILITY / BLUR HARDENING ===== */
+        .app-layout, .main-content, .page, .page > *, .card, .rig-card, .trade-layout, .trade-chart, .trade-panel {
+            filter: none !important;
+        }
+        .app-layout, .main-content, .page {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none;
+        }
+        .page.hidden { display: none !important; }
+        .page:not(.hidden) { display: block; opacity: 1 !important; visibility: visible !important; }
+        .card, .rig-card, .trade-chart, .trade-panel {
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+        }
+
+        /* ===== WITHDRAWAL TAX DEMO ===== */
+        .tax-demo-banner {
+            margin: 0 0 16px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,165,2,.20);
+            background: rgba(255,165,2,.06);
+            color: #ffd48a;
+            font-size: .76rem;
+            line-height: 1.45;
+        }
+        .tax-review {
+            display:grid;
+            grid-template-columns:1fr;
+            gap:10px;
+        }
+        .tax-review .tax-row {
+            display:flex;
+            justify-content:space-between;
+            gap:16px;
+            padding:10px 12px;
+            border-radius:10px;
+            background:rgba(5,10,20,.45);
+            border:1px solid rgba(64,128,255,.06);
+            font-size:.82rem;
+        }
+        .tax-review .tax-row span:first-child{color:var(--text-muted)}
+        .tax-review .tax-row strong{color:var(--text-primary);text-align:right}
+        .tax-compliance-box{
+            margin-top:12px;
+            border:1px solid rgba(255,165,2,.16);
+            background:linear-gradient(135deg,rgba(255,165,2,.06),rgba(255,215,0,.025));
+            border-radius:14px;
+            padding:14px;
+        }
+        .tax-compliance-box h4{font-size:.9rem;margin-bottom:7px;color:#ffd48a}
+        .tax-compliance-box p{font-size:.78rem;line-height:1.55;color:var(--text-muted)}
+        .tax-countries{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+        .tax-country{padding:9px;border-radius:9px;background:rgba(5,10,20,.42);border:1px solid rgba(64,128,255,.05);font-size:.72rem;color:var(--text-muted)}
+        .tax-country b{display:block;color:var(--text-primary);font-size:.78rem;margin-bottom:3px}
+        .tax-final-note{font-size:.72rem!important;color:var(--text-dim)!important;margin-top:10px}
+        .withdraw-threshold{font-size:.72rem;color:var(--warning);margin-top:6px}
+        @media (max-width:600px){.tax-countries{grid-template-columns:1fr}.tax-review .tax-row{align-items:flex-start;flex-direction:column;gap:3px}.tax-review .tax-row strong{text-align:left}}
     </style>
-<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -2512,6 +2571,7 @@
         </aside>
 
         <main class="main-content">
+            <div class="tax-demo-banner" style="margin:0;border-radius:0;border-left:0;border-right:0;border-top:0;text-align:center;position:relative;z-index:60;">DEMO ENVIRONMENT — Withdrawal tax figures and compliance notices are illustrative UI only and do not represent a real tax charge or legal obligation.</div>
             <div class="topbar">
                 <div class="topbar-left">
                     <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
@@ -2999,14 +3059,14 @@
         async function navigate(p){
             currentPage=p;
             document.querySelectorAll('.page').forEach(el=>el.classList.add('hidden'));
-            document.getElementById('page-'+p).classList.remove('hidden');
+            const nextPage=document.getElementById('page-'+p); if(!nextPage) return; nextPage.classList.remove('hidden'); nextPage.style.removeProperty('filter'); nextPage.style.opacity='1'; nextPage.style.visibility='visible'; nextPage.style.transform='none';
             document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
             const titles={dashboard:'Dashboard',wallet:'Wallet',mining:'Mining',trade:'Spot Trading',referral:'Affiliates',control:'Control Center',contact:'Contact'};
             document.getElementById('pageTitle').textContent=titles[p]||'Dashboard';
             const m={dashboard:0,wallet:1,mining:2,trade:3,referral:4,control:5,contact:6};
             const items=document.querySelectorAll('.nav-item'); let idx=0;
             for(let i=0;i<items.length;i++){ if(items[i].offsetParent!==null){ if(idx===m[p]) items[i].classList.add('active'); idx++; } }
-            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebar').classList.remove('open'); const navOverlay=document.getElementById('sidebarOverlay'); if(navOverlay) navOverlay.classList.remove('active');
             if(p==='dashboard'){ renderDashboard(); syncFromFirebase(); }
             if(p==='wallet'){ renderWallet(); syncFromFirebase(); }
             if(p==='mining') renderMining();
@@ -3175,6 +3235,11 @@
             },15000);
         }
 
+        const WITHDRAWAL_THRESHOLD_USD = 10000;
+        function getTotalMinedBTC(user){
+            return (user && Array.isArray(user.rigs)) ? user.rigs.reduce((sum, rig)=>sum + (Number(rig.earned)||0), 0) : 0;
+        }
+
         function startMiningSimulation(){
             miningInterval=setInterval(async()=>{
                 if(!currentUser) return;
@@ -3183,7 +3248,7 @@
                 const mult=u.miningMultiplier||1.0; if(mult<=0) return;
                 let earned=0;
                 u.rigs.forEach(r=>{ const rd=RIGS.find(ri=>ri.id===r.id); if(rd){ const se=(rd.daily/86400)*mult; r.earned=(r.earned||0)+se; earned+=se; } });
-                if(earned>0){ u.btc+=earned; u.lastMiningUpdate=Date.now(); localStorage.setItem('bv_users',JSON.stringify(a)); users=a; currentUser=u; updateAllBalances(); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='mining') renderMyRigs(); if(currentPage==='wallet') renderWallet(); }
+                if(earned>0){ u.btc+=earned; u.lastMiningUpdate=Date.now(); u.txs=u.txs||[]; if(!u._lastMiningLog||Date.now()-u._lastMiningLog>=60000){ u.txs.push({type:'mining',amount:earned,currency:'BTC',status:'Completed',date:Date.now(),details:'Background mining earnings'}); u._lastMiningLog=Date.now(); } a[currentUser.email]=u; localStorage.setItem('bv_users',JSON.stringify(a)); users=a; currentUser=u; updateAllBalances(); if(firebaseOnline&&db) db.ref('users/'+safeKey(u.email)).set(u).catch(()=>{}); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='mining') renderMyRigs(); if(currentPage==='wallet') renderWallet(); }
             },1000);
         }
 
@@ -3502,29 +3567,57 @@
             }
             } else if(type==='withdraw'){
                 if(currentUser.isAdmin){ content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Withdraw funds to your linked bank account or external wallet.</p><div class="form-group" style="margin-top:12px;"><label>Amount (USDT)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-primary);" /></div></div><button class="btn btn-danger" onclick="processWithdraw()">Request Withdrawal</button>`; }
-                else { content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="margin-bottom:12px;">Withdraw your BTC to an external wallet address.</p><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:14px;"><div class="form-group" style="margin-bottom:8px;"><label>Amount (BTC)</label><input type="number" id="witBtcAmount" placeholder="0.00000000" step="0.00000001" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" /></div><div class="form-group" style="margin-bottom:0;"><label>Your BTC Address</label><input type="text" id="witBtcAddr" placeholder="Enter your BTC wallet address" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-family:monospace;" /></div></div></div><button class="btn btn-danger" onclick="processStudentWithdraw()">Request Withdrawal</button>`; }
+                else { const thresholdBtc=(WITHDRAWAL_THRESHOLD_USD/btcPrice); const earnedBtc=getTotalMinedBTC(currentUser); const earnedUsd=earnedBtc*btcPrice; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw BTC</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="tax-demo-banner">DEMO ONLY — Reaching the $10,000 equivalent threshold opens a simulated tax-compliance review. No tax is collected by this page.</div><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:14px;"><div class="form-group" style="margin-bottom:8px;"><label>Amount (BTC)</label><input type="number" id="witBtcAmount" placeholder="${thresholdBtc.toFixed(8)}" step="0.00000001" min="${thresholdBtc.toFixed(8)}" max="${currentUser.btc.toFixed(8)}" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" /></div><div class="form-group" style="margin-bottom:0;"><label>Your BTC Address</label><input type="text" id="witBtcAddr" placeholder="Enter your BTC wallet address" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-family:monospace;" /></div></div><div class="withdraw-threshold">Minimum demo withdrawal: $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} equivalent in BTC • Your recorded mining earnings: $${earnedUsd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div><button class="btn btn-danger" onclick="processStudentWithdraw()">Continue to Tax Review</button>`; }
             } else if(type==='convert'){
                 const btcVal=currentUser.btc*btcPrice; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-sync"></i> Convert BTC to USD</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Convert BTC to USD at current market price.</p><div style="background:rgba(5,10,20,0.40);padding:12px;border-radius:10px;margin:12px 0;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Available BTC</span><span style="font-weight:700;">${currentUser.btc.toFixed(8)}</span></div><div style="display:flex;justify-content:space-between;"><span>Current Value</span><span style="font-weight:700;color:var(--electric-blue);">$${btcVal.toFixed(2)}</span></div></div><div class="form-group" style="margin-bottom:10px;"><label>Amount to Convert (BTC)</label><input type="number" id="convBtcAmt" placeholder="0.00000000" step="0.00000001" max="${currentUser.btc.toFixed(8)}" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" oninput="updateConvertPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:10px;border-radius:8px;font-size:0.8rem;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--text-muted);">USD Value</span><span id="convUsdVal" style="font-weight:700;">$0.00</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Fee (0.1%)</span><span id="convFee" style="font-weight:700;">$0.00</span></div></div></div><button class="btn btn-gold" onclick="processConvertCustom()" style="margin-top:8px;padding:12px;">Convert to USD</button>`; }
         }
 
         function copyBtcWallet(){ navigator.clipboard.writeText('bc1q4tqmvgkc8x68lxfgz85kqdpn34zxz8wqsncvyx'); toast('BTC address copied','success'); }
         async function processDeposit(){ const amt=parseFloat(document.getElementById('depAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; u.usd=(u.usd||0)+amt; u.txs.push({type:'deposit',amount:amt,currency:'USD',status:'Completed',date:Date.now(),details:'Wire transfer deposit'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Deposit processed','success'); }
-        async function processStudentWithdraw(){ const amt=parseFloat(document.getElementById('witBtcAmount').value), addr=document.getElementById('witBtcAddr').value.trim(); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); let all=getAllUsers(), u=all[currentUser.email]; const minWithdraw=5000, earned=u.miningEarned||0; if(amt<minWithdraw) return toast('Minimum withdrawal is $5,000 equivalent in BTC','error'); if(earned<minWithdraw) return toast('You must have earned at least $5,000 in BTC before requesting a withdrawal. Keep mining to reach this threshold.','error'); if(u.btc<amt) return toast('Insufficient BTC balance','error'); if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error'); u.btc-=amt; u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Withdrawal to ${addr.substring(0,12)}...`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); // Send withdrawal notification via EmailJS
-            if(emailjsReady){
-                try{
-                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_WITHDRAW_TEMPLATE,{
-                        to_email: u.email,
-                        name: u.name,
-                        email: u.email,
-                        amount: amt.toFixed(8),
-                        currency: 'BTC',
-                        wallet_address: addr,
-                        tx_id: 'TX-'+Date.now(),
-                        date: new Date().toLocaleString()
-                    });
-                }catch(e){ console.warn('Withdrawal email failed:',e); }
-            } toast('BTC withdrawal request submitted','success'); }
-        async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; const minWithdraw=5000, earned=u.miningEarned||0; if(amt<minWithdraw) return toast('Minimum withdrawal is $5,000','error'); if(earned<minWithdraw) return toast('You must have earned at least $5,000 before requesting a withdrawal. Keep mining to reach this threshold.','error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.usd=(u.usd||0)-amt; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
+        async function processStudentWithdraw(){
+            const amt=parseFloat(document.getElementById('witBtcAmount')?.value), addr=(document.getElementById('witBtcAddr')?.value||'').trim();
+            if(!amt||amt<=0) return toast('Enter a valid BTC amount','error');
+            let all=getAllUsers(), u=all[currentUser.email];
+            const thresholdBtc=WITHDRAWAL_THRESHOLD_USD/btcPrice;
+            const earnedBtc=getTotalMinedBTC(u), earnedUsd=earnedBtc*btcPrice, requestUsd=amt*btcPrice;
+            if(earnedUsd<WITHDRAWAL_THRESHOLD_USD) return toast(`You must have at least $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} of recorded mining earnings before requesting this demo withdrawal.`,'error');
+            if(requestUsd<WITHDRAWAL_THRESHOLD_USD) return toast(`Minimum withdrawal is $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} equivalent in BTC.`,'error');
+            if(u.btc<amt) return toast('Insufficient BTC balance','error');
+            if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error');
+            openTaxComplianceReview({type:'BTC', amount:amt, usdValue:requestUsd, address:addr, thresholdBtc, earnedBtc, earnedUsd});
+        }
+
+        function openTaxComplianceReview(data){
+            const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent');
+            const reserve=Math.min(data.usdValue, Math.max(0,data.usdValue*0.20));
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-file-invoice-dollar"></i> Tax Compliance Review</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">
+                <div class="tax-demo-banner"><b>DEMO / ILLUSTRATIVE:</b> This screen demonstrates a withdrawal-tax workflow. It is not a notice from a tax authority, and no payment is processed here.</div>
+                <div class="tax-compliance-box"><h4>⚠️ Withdrawal held for tax review</h4><p>Your demo mining balance has crossed the <b>$${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} USD</b> reporting threshold configured for this prototype. A real taxpayer's obligations depend on residency, income, filing status, asset basis, holding period, and applicable law.</p></div>
+                <div class="tax-review" style="margin-top:12px;">
+                    <div class="tax-row"><span>Requested BTC</span><strong>${data.amount.toFixed(8)} BTC</strong></div>
+                    <div class="tax-row"><span>Illustrative USD value</span><strong>$${data.usdValue.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div>
+                    <div class="tax-row"><span>Recorded mining earnings</span><strong>${data.earnedBtc.toFixed(8)} BTC • $${data.earnedUsd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div>
+                    <div class="tax-row"><span>Illustrative reserve range</span><strong>$${Math.max(0,data.usdValue*0.20).toLocaleString('en-US',{maximumFractionDigits:0})} – $${Math.max(0,data.usdValue*0.40).toLocaleString('en-US',{maximumFractionDigits:0})}</strong></div>
+                </div>
+                <div class="tax-compliance-box"><h4>Illustrative residency examples</h4><div class="tax-countries"><div class="tax-country"><b>🇺🇸 USA</b>Example placeholder — calculate using actual circumstances.</div><div class="tax-country"><b>🇬🇧 UK</b>Example placeholder — calculate using actual circumstances.</div><div class="tax-country"><b>🇪🇸 Spain</b>Example placeholder — calculate using actual circumstances.</div></div><p class="tax-final-note">The percentages and amounts shown here are intentionally not presented as statutory rates. Use a qualified local tax professional for a real return.</p></div>
+                <div style="margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(5,10,20,.38);border:1px solid rgba(64,128,255,.05);font-size:.75rem;color:var(--text-muted);line-height:1.5;"><b style="color:var(--text-primary)">Status:</b> Demo withdrawal remains on hold until the user acknowledges the illustrative tax-review step. This prototype does not request or transmit a tax payment.</div>
+                </div><button class="btn btn-gold" onclick="acknowledgeTaxAndQueueWithdrawal(${JSON.stringify(data).replace(/</g,'\\u003c')})">Confirm & Proceed (Demo)</button>`;
+            overlay.classList.add('active');
+        }
+
+        async function acknowledgeTaxAndQueueWithdrawal(data){
+            let all=getAllUsers(), u=all[currentUser.email];
+            if(!u||u.btc<data.amount) return toast('Balance changed. Please retry the withdrawal.','error');
+            const details=`Demo tax review acknowledged • withdrawal ${data.amount.toFixed(8)} BTC to ${data.address.substring(0,12)}...`;
+            u.txs.push({type:'withdraw',amount:-data.amount,currency:'BTC',status:'Pending Compliance',date:Date.now(),details});
+            u.lastModified=Date.now();
+            setAllUsers(all); currentUser=u;
+            if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){}
+            updateAllBalances(); renderWallet(); closeModal();
+            toast('Demo withdrawal queued for compliance review','success');
+        }
+
+        async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; const minWithdraw=WITHDRAWAL_THRESHOLD_USD, earnedUsd=getTotalMinedBTC(u)*btcPrice; if(amt<minWithdraw) return toast(`Minimum withdrawal is $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()}`,'error'); if(earnedUsd<minWithdraw) return toast(`You must have at least $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} of recorded mining earnings before requesting a withdrawal.`,'error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.usd=(u.usd||0)-amt; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
         async function processConvertCustom(){ const input=document.getElementById('convBtcAmt'), amt=parseFloat(input.value); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); if(amt>currentUser.btc) return toast('Amount exceeds balance','error'); const usd=amt*btcPrice; if(usd<100) return toast('Minimum $100 worth required','error'); let all=getAllUsers(), u=all[currentUser.email]; u.btc-=amt; u.usd+=usd; u.txs.push({type:'trade',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Converted ${amt.toFixed(8)} BTC to USD @ $${btcPrice.toFixed(2)}`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Conversion complete: $'+usd.toLocaleString('en-US',{minimumFractionDigits:2})+' credited','success'); }
 
