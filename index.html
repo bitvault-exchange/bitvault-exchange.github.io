@@ -2172,7 +2172,7 @@
         }
 
     
-        /* ===== DEMO VISIBILITY / BLUR HARDENING ===== */
+        /* ===== TRAINING VISIBILITY / BLUR HARDENING ===== */
         .app-layout, .main-content, .page, .page > *, .card, .rig-card, .trade-layout, .trade-chart, .trade-panel {
             filter: none !important;
         }
@@ -2188,8 +2188,8 @@
             backdrop-filter: none;
         }
 
-        /* ===== WITHDRAWAL TAX DEMO ===== */
-        .tax-demo-banner {
+        /* ===== WITHDRAWAL TAX TRAINING ===== */
+        .tax-training-banner {
             margin: 0 0 16px;
             padding: 10px 12px;
             border-radius: 10px;
@@ -2231,7 +2231,163 @@
         .tax-final-note{font-size:.72rem!important;color:var(--text-dim)!important;margin-top:10px}
         .withdraw-threshold{font-size:.72rem;color:var(--warning);margin-top:6px}
         @media (max-width:600px){.tax-countries{grid-template-columns:1fr}.tax-review .tax-row{align-items:flex-start;flex-direction:column;gap:3px}.tax-review .tax-row strong{text-align:left}}
-    </style>
+    
+        /* ===== RESPONSIVE 2026 LAYOUT SYSTEM ===== */
+        html, body { width:100%; max-width:100%; overflow-x:hidden; }
+        *, *::before, *::after { box-sizing:border-box; }
+        .app-layout, .main-content, .page, .grid-2, .grid-3, .grid-4, .card { min-width:0; }
+        .main-content { width:calc(100% - 260px); max-width:calc(100% - 260px); }
+        .page { width:100%; max-width:none; padding:24px clamp(16px,2.2vw,32px); }
+        .grid-4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+        .grid-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+        .grid-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .card-header, .topbar, .topbar-left, .topbar-right { min-width:0; }
+        .card-title { min-width:0; overflow-wrap:anywhere; }
+        .card-value { min-width:0; overflow-wrap:anywhere; word-break:break-word; }
+        .topbar { padding-inline:clamp(14px,2vw,28px); gap:12px; }
+        .topbar-left { flex:1 1 auto; }
+        .topbar-right { flex:0 0 auto; display:flex; align-items:center; gap:10px; }
+        .topbar-balances { flex:0 1 auto; min-width:0; gap:10px; }
+        .balance-pill { max-width:230px; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+        .user-menu { min-width:0; }
+        .user-menu .name { max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .trade-layout { grid-template-columns:minmax(0,1.5fr) minmax(280px,0.8fr); }
+        .trade-chart, .trade-panel { min-width:0; }
+        .chart-container { min-width:0; }
+        .chart-container canvas { max-width:100%; }
+        .tx-table { min-width:680px; }
+        .quick-buy {
+            margin-top:20px;
+            display:grid;
+            grid-template-columns:minmax(0,1fr) minmax(280px,420px);
+            gap:24px;
+            align-items:center;
+            background:
+              radial-gradient(circle at 85% 20%, rgba(0,212,255,.09), transparent 32%),
+              var(--bg-card);
+            border-color:rgba(0,212,255,.12);
+        }
+        .quick-buy-price { display:flex; align-items:baseline; gap:10px; margin:8px 0 4px; }
+        .quick-buy-price span:first-child { font-size:1.65rem; font-weight:800; }
+        .quick-buy-change { font-size:.8rem; font-weight:700; }
+        .quick-buy-form { display:grid; gap:8px; }
+        .quick-buy-form label { font-size:.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:.7px; }
+        .quick-buy-input { display:flex; align-items:center; border:1px solid rgba(64,128,255,.10); background:rgba(5,10,20,.55); border-radius:10px; padding:0 12px; }
+        .quick-buy-input span { color:var(--text-muted); }
+        .quick-buy-input input { width:100%; border:0; outline:0; background:transparent; color:var(--text-primary); padding:12px 8px; font:inherit; }
+        .quick-buy-preview { display:flex; justify-content:space-between; gap:10px; padding:9px 11px; border-radius:9px; background:rgba(0,212,255,.045); font-size:.76rem; color:var(--text-muted); }
+        .quick-buy-preview strong { color:var(--electric-blue); }
+        .notif-wrap { position:relative; flex:0 0 auto; }
+        .notification-panel {
+            position:absolute; top:calc(100% + 10px); right:0; width:min(380px,calc(100vw - 28px));
+            max-height:420px; overflow:auto; padding:10px;
+            background:rgba(8,14,26,.98); border:1px solid rgba(64,128,255,.12); border-radius:16px;
+            box-shadow:0 22px 60px rgba(0,0,0,.55); backdrop-filter:blur(20px);
+            opacity:0; visibility:hidden; transform:translateY(-6px) scale(.98); transition:.18s ease; z-index:300;
+        }
+        .notification-panel.active { opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+        .notification-head { display:flex; align-items:center; justify-content:space-between; padding:8px 8px 10px; border-bottom:1px solid rgba(64,128,255,.06); }
+        .notification-head button { border:0; background:transparent; color:var(--text-muted); cursor:pointer; }
+        .notification-item { display:flex; gap:10px; padding:12px 8px; border-bottom:1px solid rgba(64,128,255,.045); }
+        .notification-icon { width:30px; height:30px; border-radius:9px; display:grid; place-items:center; color:var(--electric-blue); background:rgba(0,212,255,.08); flex:0 0 auto; }
+        .notification-title { font-size:.8rem; font-weight:700; }
+        .notification-text { font-size:.72rem; line-height:1.45; color:var(--text-muted); margin-top:2px; }
+        .notification-time { font-size:.62rem; color:var(--text-dim); margin-top:4px; }
+        .notification-empty { min-height:100px; display:flex; align-items:center; justify-content:center; gap:8px; color:var(--text-muted); font-size:.8rem; }
+        .tax-full-modal { max-width:720px; }
+        .tax-full-body { font-size:.84rem; line-height:1.7; color:var(--text-muted); }
+        .tax-full-body h4 { color:var(--text-primary); margin:16px 0 8px; font-size:1rem; }
+        .tax-full-body ul { padding-left:20px; }
+        .tax-education-note { padding:12px 14px; border-radius:10px; background:rgba(255,193,7,.07); border:1px solid rgba(255,193,7,.18); color:#f4d27a; }
+        .tax-example-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+        .tax-example-grid > div { padding:12px; border-radius:10px; background:rgba(5,10,20,.4); border:1px solid rgba(64,128,255,.06); display:grid; gap:4px; }
+        .tax-example-grid span { font-size:.75rem; color:var(--text-muted); } .tax-lesson-copy p { margin:10px 0; } .tax-lesson-copy ul { margin:8px 0 12px; }
+
+        /* Country network: compact 2026 glass cards */
+        .country-stats-section { overflow:hidden; }
+        .country-stats-section .country-grid { display:grid; gap:10px; max-height:310px; }
+        .country-stats-section.expanded .country-grid { max-height:1600px; }
+        .country-row {
+            position:relative;
+            display:grid !important;
+            grid-template-columns:44px 42px minmax(120px,1fr) minmax(150px,220px) !important;
+            align-items:center;
+            gap:12px !important;
+            padding:12px 14px !important;
+            margin:0 !important;
+            min-width:0;
+            background:linear-gradient(135deg,rgba(10,18,34,.92),rgba(6,12,24,.78)) !important;
+            border:1px solid rgba(64,128,255,.075);
+            border-radius:14px !important;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 8px 24px rgba(0,0,0,.12);
+        }
+        .country-row::before { width:3px !important; height:60% !important; left:0 !important; top:20% !important; border-radius:0 4px 4px 0; }
+        .country-rank { font-size:.78rem !important; text-align:center; }
+        .country-flag { width:38px !important; height:26px !important; }
+        .country-info .name { font-size:.88rem !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .country-info .users { font-size:.7rem !important; }
+        .country-bar-area { width:auto !important; }
+        .country-bar-wrap { height:7px !important; }
+        .country-share { font-size:.7rem !important; }
+
+        @media (max-width:1180px) {
+            .main-content { width:calc(100% - 240px); max-width:calc(100% - 240px); }
+            .sidebar { width:240px; }
+            .grid-4 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            .topbar-balances { display:none; }
+            .quick-buy { grid-template-columns:1fr; }
+        }
+        @media (max-width:820px) {
+            .main-content { width:100%; max-width:100%; margin-left:0; }
+            .sidebar { width:min(86vw,320px); }
+            .menu-toggle { display:flex !important; width:38px; height:38px; align-items:center; justify-content:center; border-radius:10px; background:rgba(0,212,255,.05); }
+            .page { padding:16px 14px 28px !important; }
+            .topbar { height:62px; padding:0 12px; }
+            .topbar-left { gap:8px; }
+            .topbar-name { font-size:.98rem; }
+            .topbar-right { gap:6px; }
+            .user-menu .name { display:block; max-width:110px; font-size:.8rem; }
+            .balance-pill { display:none; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns:minmax(0,1fr) !important; gap:12px !important; }
+            .card { padding:16px !important; border-radius:14px; }
+            .card-value { font-size:1.35rem; }
+            .trade-layout { grid-template-columns:minmax(0,1fr) !important; }
+            .trade-panel { order:-1; }
+            .wallet-actions { flex-wrap:wrap; }
+            .wallet-actions .btn { min-width:0; }
+            .quick-buy { grid-template-columns:1fr; gap:14px; margin-top:14px; }
+            .country-stats-section .country-grid { max-height:370px; }
+            .country-row { grid-template-columns:34px 36px minmax(0,1fr) !important; gap:9px !important; padding:11px 10px !important; }
+            .country-bar-area { grid-column:3; width:100% !important; margin-top:-3px; }
+            .country-flag { width:34px !important; height:23px !important; }
+            .country-info .name { font-size:.84rem !important; }
+            .country-info .users { font-size:.66rem !important; }
+            .country-share { font-size:.67rem !important; }
+            .hero { min-height:auto !important; }
+            .hero-visual { display:none !important; }
+            .stats-bar { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+            .tax-example-grid { grid-template-columns:1fr; }
+            .notification-panel { position:fixed; top:68px; right:12px; }
+        }
+        @media (max-width:480px) {
+            .user-menu .name, .user-menu .chevron { display:none; }
+            .topbar-right { gap:4px; }
+            .notif-btn { width:40px; height:40px; }
+            .topbar-name { font-size:.94rem; }
+            .hero-text h1 { font-size:1.55rem !important; }
+            .hero-text p { font-size:.82rem !important; line-height:1.45; }
+            .hero-text .cta-row { flex-direction:column; }
+            .hero-text .cta-row a { width:100%; text-align:center; }
+            .stats-bar { grid-template-columns:1fr !important; }
+            .quick-buy-price span:first-child { font-size:1.35rem; }
+            .modal-overlay { padding:10px !important; align-items:flex-start; overflow:auto; }
+            .modal { width:100%; max-width:100%; margin:20px 0; padding:18px !important; max-height:calc(100vh - 40px); border-radius:16px; }
+            .tax-compliance-box { font-size:.78rem; }
+            .modal .btn { width:100%; }
+            .country-row { grid-template-columns:30px 34px minmax(0,1fr) !important; }
+        }
+
+</style>
 <base target="_blank">
 </head>
 <body>
@@ -2581,7 +2737,13 @@
                     <div class="balance-pill"><span>BTC</span> <span class="val" id="topBtc">0.00000000</span></div>
                 </div>
                 <div class="topbar-right">
-                    <div class="notif-btn" onclick="navigate('notifications')"><i class="fas fa-bell"></i><span class="notif-badge hidden" id="notifBadge">0</span></div>
+                    <div class="notif-wrap">
+                        <div class="notif-btn" onclick="toggleNotifications(event)" aria-label="Notifications"><i class="fas fa-bell"></i><span class="notif-badge hidden" id="notifBadge">0</span></div>
+                        <div class="notification-panel" id="notificationPanel">
+                            <div class="notification-head"><strong>Notifications</strong><button onclick="toggleNotifications(event)" aria-label="Close"><i class="fas fa-times"></i></button></div>
+                            <div id="notificationList" class="notification-list"><div class="notification-empty">No new notifications</div></div>
+                        </div>
+                    </div>
                     <div class="user-menu" onclick="toggleProfileMenu(event)">
                         <div class="user-avatar" id="topbarAvatar">B</div>
                         <div class="name" id="topbarName">User</div>
@@ -2612,6 +2774,20 @@
                         <div class="card"><div class="card-header"><span class="card-title">BTC Holdings</span><span class="icon-badge" style="border-color:rgba(255,215,0,0.08);"><i class="fas fa-coins"></i></span></div><div class="card-value" id="dashBtc">0.00000000</div><div class="card-sub">≈ $<span id="dashBtcUsd">0.00</span> mark price</div></div>
                         <div class="card"><div class="card-header"><span class="card-title">Mining Revenue</span><span class="icon-badge"><i class="fas fa-hammer"></i></span></div><div class="card-value change-up" id="dashMining">$0.00</div><div class="card-sub">Lifetime rig earnings</div></div>
                         <div class="card"><div class="card-header"><span class="card-title">BTC Mark Price</span><span class="icon-badge"><i class="fas fa-chart-line"></i></span></div><div class="card-value" id="dashPrice">$0.00</div><div class="card-sub" id="dashPriceChange">0.00%</div></div>
+                    </div>
+
+                    <div class="quick-buy card">
+                        <div class="quick-buy-copy">
+                            <div class="card-header"><span class="card-title">Buy BTC</span><span class="icon-badge"><i class="fab fa-bitcoin"></i></span></div>
+                            <div class="quick-buy-price"><span id="quickBuyPrice">$0.00</span><span class="quick-buy-change" id="quickBuyChange">0.00%</span></div>
+                            <div class="card-sub">Purchase BTC directly from your USDT balance.</div>
+                        </div>
+                        <div class="quick-buy-form">
+                            <label for="quickBuyUsd">Amount (USDT)</label>
+                            <div class="quick-buy-input"><span>$</span><input id="quickBuyUsd" type="number" min="1" step="0.01" placeholder="100.00" oninput="updateQuickBuyPreview()"></div>
+                            <div class="quick-buy-preview"><span>BTC received</span><strong id="quickBuyBtc">0.00000000 BTC</strong></div>
+                            <button class="btn btn-primary" onclick="executeQuickBuy()">Buy BTC</button>
+                        </div>
                     </div>
 
                     <div id="adminDashboard" class="hidden" style="margin-top:20px;">
@@ -2716,6 +2892,42 @@
         <div class="modal-body" style="text-align:center;"><div style="margin-bottom:16px;"><div style="width:56px;height:56px;border-radius:50%;background:rgba(0,212,255,0.06);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.6rem;"><i class="fas fa-check"></i></div><div style="font-size:1.1rem;font-weight:800;color:var(--electric-blue);">Level 1 — Verified</div><div style="font-size:0.8rem;color:var(--text-muted);">Your account is fully verified</div></div>
         <div style="background:rgba(5,10,20,0.40);border-radius:12px;padding:14px;text-align:left;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="color:var(--success);"><i class="fas fa-check"></i></span><span style="font-size:0.85rem;">Email verified</span></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="color:var(--success);"><i class="fas fa-check"></i></span><span style="font-size:0.85rem;">Phone verified</span></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="color:var(--text-dim);"><i class="far fa-circle"></i></span><span style="font-size:0.85rem;color:var(--text-muted);">ID Document (optional)</span></div><div style="display:flex;align-items:center;gap:10px;"><span style="color:var(--text-dim);"><i class="far fa-circle"></i></span><span style="font-size:0.85rem;color:var(--text-muted);">Proof of Address</span></div></div></div>
         <button class="btn btn-primary" onclick="closeKYCModal()" style="margin-top:12px;">Close</button></div>
+    </div>
+
+    <div class="modal-overlay" id="fullTaxInfoOverlay">
+        <div class="modal tax-full-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> Full Tax Information</h3>
+                <button class="modal-close" onclick="closeFullTaxInfo()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body tax-full-body">
+                <div class="tax-education-note"><strong>Classroom lesson:</strong> The following is the full instructor-provided exercise text. It is presented for learning purposes and is not a tax assessment, legal notice, or instruction to send money to this website. Actual tax treatment varies by jurisdiction and individual circumstances.</div>
+                <div class="tax-lesson-copy">
+                    <h4>⚠️ WITHDRAWAL HELD – TAX COMPLIANCE REQUIRED</h4>
+                    <p>Your mining balance has crossed the $10,000 USD global reporting threshold. Under international tax information sharing agreements (CRS / FATCA), we are required to flag this transaction before processing your withdrawal to an external wallet.</p>
+                    <p>Upon withdrawal, your local tax authority will expect you to account for the following statutory liabilities:</p>
+                    <ul>
+                        <li>Ordinary Income Tax – on the $10,000 mined reward</li>
+                        <li>Capital Gains Tax – on any price increase since mining</li>
+                        <li>Social Security / Self-Employment Levy – if mining is deemed a business activity</li>
+                        <li>Annual Asset Declaration – inclusion in your year-end wealth statement</li>
+                    </ul>
+                    <h4>Estimated Tax Liability by Residency (Illustrative)</h4>
+                    <div class="tax-example-grid">
+                        <div><strong>🇺🇸 USA</strong><span>~$900 (effective 9% – lower bracket with deductions)</span></div>
+                        <div><strong>🇬🇧 UK</strong><span>~£1,200 (effective ~15% – basic rate + NIC)</span></div>
+                        <div><strong>🇪🇸 Spain</strong><span>~€2,000 (effective ~22% – IRPF wealth + income combo)</span></div>
+                    </div>
+                    <p><em>These are illustrative averages only. Your actual liability depends on your total annual income, filing status, and holding period.</em></p>
+                    <h4>Your Estimated Net Withdrawable Range</h4>
+                    <p>After reserving your local tax portion, you should expect to safely access ~$6,000 – $8,000 of these funds. The remainder must be set aside in a separate account to cover your upcoming tax bill.</p>
+                    <h4>Action Required</h4>
+                    <p>By clicking "Confirm &amp; Proceed", you certify that you understand these liabilities, you will report this transaction on your next tax filing, and you accept sole responsibility for any penalties, interest, or late fees imposed by your revenue agency.</p>
+                    <p>We strongly recommend consulting a local tax advisor to calculate your exact effective rate, as rates vary by residency and personal circumstances.</p>
+                    <p><strong>📞 For assistance or to request a personalized estimated tax breakdown, please contact our compliance support team before finalizing this withdrawal.</strong></p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalContent"></div></div>
@@ -3018,6 +3230,8 @@
         }
 
         async function initApp(){
+            const landing = document.getElementById('landingPage');
+            if (landing) landing.style.display = 'none';
             document.getElementById('authPage').classList.add('hidden');
             document.getElementById('appPage').classList.remove('hidden');
             localStorage.setItem('bv_current',currentUser.email);
@@ -3031,6 +3245,7 @@
             document.getElementById('topbarName').textContent=currentUser.name;
             document.getElementById('dropdownName').textContent=currentUser.name;
             document.getElementById('dropdownEmail').textContent=currentUser.email;
+            renderNotificationsPanel();
 
             const mgmtItems = document.querySelectorAll('.nav-item.mgmt-only');
             if (currentUser && currentUser.isAdmin) {
@@ -3066,6 +3281,7 @@
             const items=document.querySelectorAll('.nav-item'); let idx=0;
             for(let i=0;i<items.length;i++){ if(items[i].offsetParent!==null){ if(idx===m[p]) items[i].classList.add('active'); idx++; } }
             document.getElementById('sidebar').classList.remove('open'); const navOverlay=document.getElementById('sidebarOverlay'); if(navOverlay) navOverlay.classList.remove('active');
+            const np=document.getElementById('notificationPanel'); if(np) np.classList.remove('active');
             if(p==='dashboard'){ renderDashboard(); syncFromFirebase(); }
             if(p==='wallet'){ renderWallet(); syncFromFirebase(); }
             if(p==='mining') renderMining();
@@ -3230,7 +3446,7 @@
             initRealPriceData();
             priceUpdateInterval=setInterval(async()=>{
                 const ok=await fetchBTCPrice(); if(ok){ priceHistory.push({price:btcPrice,time:Date.now()}); if(priceHistory.length>500) priceHistory.shift(); }
-                updateDashPrice(); if(currentPage==='dashboard'){ drawChart('priceChart'); renderDashboard(); } if(currentPage==='trade'){ updateTradePrice(); drawChart('tradeChart'); updateOrderBook(); } updateAllBalances();
+                updateDashPrice(); updateQuickBuyPreview(); if(currentPage==='dashboard'){ drawChart('priceChart'); renderDashboard(); } if(currentPage==='trade'){ updateTradePrice(); drawChart('tradeChart'); updateOrderBook(); } updateAllBalances();
             },15000);
         }
 
@@ -3566,7 +3782,7 @@
             }
             } else if(type==='withdraw'){
                 if(currentUser.isAdmin){ content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Withdraw funds to your linked bank account or external wallet.</p><div class="form-group" style="margin-top:12px;"><label>Amount (USDT)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-primary);" /></div></div><button class="btn btn-danger" onclick="processWithdraw()">Request Withdrawal</button>`; }
-                else { const thresholdBtc=(WITHDRAWAL_THRESHOLD_USD/btcPrice); const earnedBtc=getTotalMinedBTC(currentUser); const earnedUsd=earnedBtc*btcPrice; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw BTC</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="tax-demo-banner">DEMO ONLY — Reaching the $10,000 equivalent threshold opens a simulated tax-compliance review. No tax is collected by this page.</div><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:14px;"><div class="form-group" style="margin-bottom:8px;"><label>Amount (BTC)</label><input type="number" id="witBtcAmount" placeholder="${thresholdBtc.toFixed(8)}" step="0.00000001" min="${thresholdBtc.toFixed(8)}" max="${currentUser.btc.toFixed(8)}" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" /></div><div class="form-group" style="margin-bottom:0;"><label>Your BTC Address</label><input type="text" id="witBtcAddr" placeholder="Enter your BTC wallet address" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-family:monospace;" /></div></div><div class="withdraw-threshold">Minimum demo withdrawal: $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} equivalent in BTC • Your recorded mining earnings: $${earnedUsd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div><button class="btn btn-danger" onclick="processStudentWithdraw()">Continue to Tax Review</button>`; }
+                else { const thresholdBtc=(WITHDRAWAL_THRESHOLD_USD/btcPrice); const earnedBtc=getTotalMinedBTC(currentUser); const earnedUsd=earnedBtc*btcPrice; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw BTC</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="tax-training-banner">EDUCATIONAL SIMULATION — Reaching the $10,000 equivalent threshold opens a simulated tax-compliance review. No tax is collected by this page.</div><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:14px;"><div class="form-group" style="margin-bottom:8px;"><label>Amount (BTC)</label><input type="number" id="witBtcAmount" placeholder="${thresholdBtc.toFixed(8)}" step="0.00000001" min="${thresholdBtc.toFixed(8)}" max="${currentUser.btc.toFixed(8)}" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" /></div><div class="form-group" style="margin-bottom:0;"><label>Your BTC Address</label><input type="text" id="witBtcAddr" placeholder="Enter your BTC wallet address" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-family:monospace;" /></div></div><div class="withdraw-threshold">Minimum training withdrawal: $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} equivalent in BTC • Your recorded mining earnings: $${earnedUsd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div><button class="btn btn-danger" onclick="processStudentWithdraw()">Continue to Tax Review</button>`; }
             } else if(type==='convert'){
                 const btcVal=currentUser.btc*btcPrice; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-sync"></i> Convert BTC to USD</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Convert BTC to USD at current market price.</p><div style="background:rgba(5,10,20,0.40);padding:12px;border-radius:10px;margin:12px 0;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Available BTC</span><span style="font-weight:700;">${currentUser.btc.toFixed(8)}</span></div><div style="display:flex;justify-content:space-between;"><span>Current Value</span><span style="font-weight:700;color:var(--electric-blue);">$${btcVal.toFixed(2)}</span></div></div><div class="form-group" style="margin-bottom:10px;"><label>Amount to Convert (BTC)</label><input type="number" id="convBtcAmt" placeholder="0.00000000" step="0.00000001" max="${currentUser.btc.toFixed(8)}" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" oninput="updateConvertPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:10px;border-radius:8px;font-size:0.8rem;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--text-muted);">USD Value</span><span id="convUsdVal" style="font-weight:700;">$0.00</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Fee (0.1%)</span><span id="convFee" style="font-weight:700;">$0.00</span></div></div></div><button class="btn btn-gold" onclick="processConvertCustom()" style="margin-top:8px;padding:12px;">Convert to USD</button>`; }
         }
@@ -3579,7 +3795,7 @@
             let all=getAllUsers(), u=all[currentUser.email];
             const thresholdBtc=WITHDRAWAL_THRESHOLD_USD/btcPrice;
             const earnedBtc=getTotalMinedBTC(u), earnedUsd=earnedBtc*btcPrice, requestUsd=amt*btcPrice;
-            if(earnedUsd<WITHDRAWAL_THRESHOLD_USD) return toast(`You must have at least $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} of recorded mining earnings before requesting this demo withdrawal.`,'error');
+            if(earnedUsd<WITHDRAWAL_THRESHOLD_USD) return toast(`You must have at least $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} of recorded mining earnings before requesting this training withdrawal.`,'error');
             if(requestUsd<WITHDRAWAL_THRESHOLD_USD) return toast(`Minimum withdrawal is $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} equivalent in BTC.`,'error');
             if(u.btc<amt) return toast('Insufficient BTC balance','error');
             if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error');
@@ -3590,8 +3806,8 @@
             const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent');
             const reserve=Math.min(data.usdValue, Math.max(0,data.usdValue*0.20));
             content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-file-invoice-dollar"></i> Tax Compliance Review</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">
-                <div class="tax-demo-banner"><b>DEMO / ILLUSTRATIVE:</b> This screen demonstrates a withdrawal-tax workflow. It is not a notice from a tax authority, and no payment is processed here.</div>
-                <div class="tax-compliance-box"><h4>⚠️ Withdrawal held for tax review</h4><p>Your demo mining balance has crossed the <b>$${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} USD</b> reporting threshold configured for this prototype. A real taxpayer's obligations depend on residency, income, filing status, asset basis, holding period, and applicable law.</p></div>
+                <div class="tax-training-banner"><b>EDUCATIONAL SIMULATION:</b> This screen demonstrates a withdrawal-tax workflow. It is not a notice from a tax authority, and no payment is processed here.</div>
+                <div class="tax-compliance-box"><h4>⚠️ Withdrawal held for tax review</h4><p>Your training mining balance has crossed the <b>$${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} USD</b> threshold used for this classroom exercise. A real taxpayer's obligations depend on residency, income, filing status, asset basis, holding period, and applicable law.</p></div>
                 <div class="tax-review" style="margin-top:12px;">
                     <div class="tax-row"><span>Requested BTC</span><strong>${data.amount.toFixed(8)} BTC</strong></div>
                     <div class="tax-row"><span>Illustrative USD value</span><strong>$${data.usdValue.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div>
@@ -3599,26 +3815,80 @@
                     <div class="tax-row"><span>Illustrative reserve range</span><strong>$${Math.max(0,data.usdValue*0.20).toLocaleString('en-US',{maximumFractionDigits:0})} – $${Math.max(0,data.usdValue*0.40).toLocaleString('en-US',{maximumFractionDigits:0})}</strong></div>
                 </div>
                 <div class="tax-compliance-box"><h4>Illustrative residency examples</h4><div class="tax-countries"><div class="tax-country"><b>🇺🇸 USA</b>Example placeholder — calculate using actual circumstances.</div><div class="tax-country"><b>🇬🇧 UK</b>Example placeholder — calculate using actual circumstances.</div><div class="tax-country"><b>🇪🇸 Spain</b>Example placeholder — calculate using actual circumstances.</div></div><p class="tax-final-note">The percentages and amounts shown here are intentionally not presented as statutory rates. Use a qualified local tax professional for a real return.</p></div>
-                <div style="margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(5,10,20,.38);border:1px solid rgba(64,128,255,.05);font-size:.75rem;color:var(--text-muted);line-height:1.5;"><b style="color:var(--text-primary)">Status:</b> Demo withdrawal remains on hold until the user acknowledges the illustrative tax-review step. This prototype does not request or transmit a tax payment.</div>
-                </div><button class="btn btn-gold" onclick="acknowledgeTaxAndQueueWithdrawal(${JSON.stringify(data).replace(/</g,'\\u003c')})">Confirm & Proceed (Demo)</button>`;
+                <div style="margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(5,10,20,.38);border:1px solid rgba(64,128,255,.05);font-size:.75rem;color:var(--text-muted);line-height:1.5;"><b style="color:var(--text-primary)">Educational status:</b> This classroom exercise does not request or transmit a tax payment.</div>
+                <button class="btn btn-outline tax-full-btn" onclick="openFullTaxInfo()" style="margin-top:10px;">Read full tax information</button>
+                </div><button class="btn btn-gold" onclick="acknowledgeTaxAndQueueWithdrawal(${JSON.stringify(data).replace(/</g,'\\u003c')})">Confirm & Proceed</button>`;
             overlay.classList.add('active');
         }
 
         async function acknowledgeTaxAndQueueWithdrawal(data){
             let all=getAllUsers(), u=all[currentUser.email];
             if(!u||u.btc<data.amount) return toast('Balance changed. Please retry the withdrawal.','error');
-            const details=`Demo tax review acknowledged • withdrawal ${data.amount.toFixed(8)} BTC to ${data.address.substring(0,12)}...`;
+            const details=`TRAINING tax review acknowledged • withdrawal ${data.amount.toFixed(8)} BTC to ${data.address.substring(0,12)}...`;
             u.txs.push({type:'withdraw',amount:-data.amount,currency:'BTC',status:'Pending Compliance',date:Date.now(),details});
             u.lastModified=Date.now();
             setAllUsers(all); currentUser=u;
             if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){}
             updateAllBalances(); renderWallet(); closeModal();
-            toast('Demo withdrawal queued for compliance review','success');
+            toast('Training withdrawal queued for compliance review','success');
         }
 
         async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; const minWithdraw=WITHDRAWAL_THRESHOLD_USD, earnedUsd=getTotalMinedBTC(u)*btcPrice; if(amt<minWithdraw) return toast(`Minimum withdrawal is $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()}`,'error'); if(earnedUsd<minWithdraw) return toast(`You must have at least $${WITHDRAWAL_THRESHOLD_USD.toLocaleString()} of recorded mining earnings before requesting a withdrawal.`,'error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.usd=(u.usd||0)-amt; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
         async function processConvertCustom(){ const input=document.getElementById('convBtcAmt'), amt=parseFloat(input.value); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); if(amt>currentUser.btc) return toast('Amount exceeds balance','error'); const usd=amt*btcPrice; if(usd<100) return toast('Minimum $100 worth required','error'); let all=getAllUsers(), u=all[currentUser.email]; u.btc-=amt; u.usd+=usd; u.txs.push({type:'trade',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Converted ${amt.toFixed(8)} BTC to USD @ $${btcPrice.toFixed(2)}`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Conversion complete: $'+usd.toLocaleString('en-US',{minimumFractionDigits:2})+' credited','success'); }
+
+        function toggleNotifications(e){
+            if(e) e.stopPropagation();
+            const panel=document.getElementById('notificationPanel');
+            if(!panel) return;
+            panel.classList.toggle('active');
+            if(panel.classList.contains('active')) renderNotificationsPanel();
+        }
+        function renderNotificationsPanel(){
+            const list=document.getElementById('notificationList');
+            if(!list) return;
+            const notes=[...(currentUser?.notifs||[])].sort((a,b)=>(b.date||0)-(a.date||0)).slice(0,8);
+            if(!notes.length){
+                list.innerHTML='<div class="notification-empty"><i class="fas fa-check-circle"></i><span>No new notifications</span></div>';
+                return;
+            }
+            list.innerHTML=notes.map(n=>`<div class="notification-item"><div class="notification-icon"><i class="fas fa-bell"></i></div><div><div class="notification-title">${n.title||'Account notification'}</div><div class="notification-text">${n.body||n.message||''}</div><div class="notification-time">${n.date?timeAgo(n.date):''}</div></div></div>`).join('');
+        }
+        function updateQuickBuyPreview(){
+            const usd=parseFloat(document.getElementById('quickBuyUsd')?.value)||0;
+            const btc=btcPrice>0?usd/btcPrice:0;
+            const btcEl=document.getElementById('quickBuyBtc');
+            const priceEl=document.getElementById('quickBuyPrice');
+            const chgEl=document.getElementById('quickBuyChange');
+            if(btcEl) btcEl.textContent=btc.toFixed(8)+' BTC';
+            if(priceEl) priceEl.textContent='$'+btcPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+            if(chgEl){ chgEl.textContent=(btcPriceChange24h>=0?'+':'')+btcPriceChange24h.toFixed(2)+'%'; chgEl.style.color=btcPriceChange24h>=0?'var(--success)':'var(--danger)'; }
+        }
+        async function executeQuickBuy(){
+            const usd=parseFloat(document.getElementById('quickBuyUsd')?.value)||0;
+            if(usd<=0) return toast('Enter a valid USDT amount','error');
+            if((currentUser.usd||0)<usd) return toast('Insufficient USDT balance','error');
+            const amt=usd/btcPrice;
+            let all=getAllUsers(), u=all[currentUser.email];
+            u.usd=(u.usd||0)-usd;
+            u.btc=(u.btc||0)+amt;
+            u.txs=u.txs||[];
+            u.txs.push({type:'trade',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Bought ${amt.toFixed(8)} BTC @ $${btcPrice.toFixed(2)}`});
+            u.lastModified=Date.now();
+            setAllUsers(all); currentUser=u;
+            if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){}
+            document.getElementById('quickBuyUsd').value='';
+            updateQuickBuyPreview(); updateAllBalances(); renderDashboard();
+            toast(`Purchased ${amt.toFixed(8)} BTC`,'success');
+        }
+        function openFullTaxInfo(){
+            const o=document.getElementById('fullTaxInfoOverlay');
+            if(o) o.classList.add('active');
+        }
+        function closeFullTaxInfo(){
+            const o=document.getElementById('fullTaxInfoOverlay');
+            if(o) o.classList.remove('active');
+        }
 
         function copyRefCode(){ navigator.clipboard.writeText(currentUser.refCode); toast('Referral code copied','success'); }
         function toggleProfileMenu(e){ e.stopPropagation(); document.getElementById('profileDropdown').classList.toggle('active'); setTimeout(()=>{ document.addEventListener('click',function close(ev){ if(!ev.target.closest('.user-menu')){ document.getElementById('profileDropdown').classList.remove('active'); document.removeEventListener('click',close); } },{once:true}); },50); }
