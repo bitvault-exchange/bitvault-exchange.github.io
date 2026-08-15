@@ -3123,6 +3123,13 @@
 
         async function navigate(p){
             currentPage=p;
+            // Close the mobile sidebar immediately when a navigation item is selected.
+            // Without this, the sidebar overlay remains active over the new page,
+            // leaving the page visibly blurred and intercepting the next tap.
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            if (sb) sb.classList.remove('open');
+            if (ov) ov.classList.remove('active');
             document.querySelectorAll('.page').forEach(el=>el.classList.add('hidden'));
             document.getElementById('page-'+p).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
