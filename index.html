@@ -2532,6 +2532,7 @@
                 <div class="nav-item" onclick="navigate('mining')"><span class="icon"><i class="fas fa-hammer"></i></span> Mining</div>
                 <div class="nav-item" onclick="navigate('trade')"><span class="icon"><i class="fas fa-chart-bar"></i></span> Spot Trading</div>
                 <div class="nav-item" onclick="navigate('referral')"><span class="icon"><i class="fas fa-gift"></i></span> Affiliates</div>
+                <div class="nav-item" onclick="openProfileCenter(event)"><span class="icon"><i class="fas fa-user-circle"></i></span> Profile</div>
                 <div class="nav-item mgmt-only" onclick="navigate('control')">
                     <span class="icon"><i class="fas fa-cog"></i></span> Control Center
                 </div>
@@ -2765,14 +2766,6 @@
                     <div class="profile-stat"><span>KYC level</span><strong id="profileKycLevel">Level 1</strong></div>
                     <div class="profile-stat"><span>Referral code</span><strong id="profileRefCode">----</strong></div>
                     <div class="profile-stat"><span>Member since</span><strong id="profileJoined">—</strong></div>
-                </div>
-                <div style="margin-top:14px;padding:12px;border:1px solid rgba(64,128,255,.08);border-radius:14px;background:rgba(5,10,20,.35);">
-                    <div style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Profile Photo</div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <img id="profilePhotoPreview" src="" alt="Profile" style="width:52px;height:52px;border-radius:50%;object-fit:cover;display:none;border:1px solid rgba(0,212,255,.25);">
-                        <div style="flex:1;"><div style="font-size:.76rem;color:var(--text-muted);margin-bottom:7px;">Choose a photo from your phone.</div><input id="profilePhotoInput" type="file" accept="image/jpeg,image/png,image/webp" style="width:100%;font-size:.72rem;color:var(--text-muted);" onchange="uploadProfilePhoto(this)"></div>
-                    </div>
-                    <div id="profilePhotoStatus" style="font-size:.7rem;color:var(--text-muted);margin-top:7px;"></div>
                 </div>
                 <div class="profile-actions">
                     <button class="btn btn-outline" onclick="openKYCModal();closeProfileCenter();"><i class="fas fa-shield-alt"></i> KYC Status</button>
@@ -3105,7 +3098,6 @@
             document.getElementById('topbarName').textContent=currentUser.name;
             document.getElementById('dropdownName').textContent=currentUser.name;
             document.getElementById('dropdownEmail').textContent=currentUser.email;
-            applyProfilePhoto(currentUser.profilePhotoUrl||'');
 
             const mgmtItems = document.querySelectorAll('.nav-item.mgmt-only');
             if (currentUser && currentUser.isAdmin) {
@@ -3464,7 +3456,7 @@
             const owned=(currentUser.rigs||[]).filter(r=>r.id===rid).length, mult=currentUser.miningMultiplier||1, dailyBtc=rig.daily*mult, monthlyBtc=dailyBtc*30;
             const dailyUsdt=dailyBtc*btcPrice, monthlyUsdt=monthlyBtc*btcPrice;
             const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.className='modal bv-mining-modal';
-            content.innerHTML=`<div class="modal-header"><div><div class="bv-modal-kicker">${rig.tag} mining hardware</div><h3 class="bv-modal-title"><i class="fas fa-microchip"></i> Rig Details</h3></div><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="bv-rig-modal-top"><div class="bv-rig-modal-icon ${rig.iconClass||''}">${rig.icon}</div><div class="bv-rig-modal-copy"><h4>${rig.name}</h4><p>${rig.hash} • ${rig.power} • ${rig.tag}</p></div></div><div class="bv-modal-stat-grid"><div class="bv-modal-stat"><div class="label">Purchase Price</div><div class="value cyan">${formatUSDT(rig.price)}</div></div><div class="bv-modal-stat"><div class="label">Currently Owned</div><div class="value">${owned} / ${currentUser.isAdmin?'∞':RIG_PURCHASE_LIMIT}</div></div></div><div class="bv-rig-output"><div class="bv-rig-output-title">Projected mining output</div><div class="bv-rig-output-grid"><div class="bv-rig-output-item"><span>Per Day</span><strong class="cyan">${formatBTC(dailyBtc)}</strong></div><div class="bv-rig-output-item"><span>Per Day (USDT)</span><strong>${formatUSDT(dailyUsdt)}</strong></div><div class="bv-rig-output-item"><span>Per 30 Days</span><strong class="cyan">${formatBTC(monthlyBtc)}</strong></div><div class="bv-rig-output-item"><span>Per 30 Days (USDT)</span><strong>${formatUSDT(monthlyUsdt)}</strong></div></div></div><p class="bv-rig-note">Projected values are based on this rig's configured daily BTC rate, your current mining multiplier, and the current BTC market price. Displayed output follows the rig configuration and the account mining multiplier while the rig is active.</p><button class="btn btn-primary" style="width:100%;margin-top:14px;" onclick="closeModal();setTimeout(()=>{const b=document.querySelector('[data-rig="${rig.id}"] .btn');if(b&&!b.disabled)b.click();},120)">Deploy ${rig.name}</button></div>`;
+            content.innerHTML=`<div class="modal-header"><div><div class="bv-modal-kicker">${rig.tag} mining hardware</div><h3 class="bv-modal-title"><i class="fas fa-microchip"></i> Rig Details</h3></div><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="bv-rig-modal-top"><div class="bv-rig-modal-icon ${rig.iconClass||''}">${rig.icon}</div><div class="bv-rig-modal-copy"><h4>${rig.name}</h4><p>${rig.hash} • ${rig.power} • ${rig.tag}</p></div></div><div class="bv-modal-stat-grid"><div class="bv-modal-stat"><div class="label">Purchase Price</div><div class="value cyan">${formatUSDT(rig.price)}</div></div><div class="bv-modal-stat"><div class="label">Currently Owned</div><div class="value">${owned} / ${currentUser.isAdmin?'∞':RIG_PURCHASE_LIMIT}</div></div></div><div class="bv-rig-output"><div class="bv-rig-output-title">Projected mining output</div><div class="bv-rig-output-grid"><div class="bv-rig-output-item"><span>Per Day</span><strong class="cyan">${formatBTC(dailyBtc)}</strong></div><div class="bv-rig-output-item"><span>Per Day (USDT)</span><strong>${formatUSDT(dailyUsdt)}</strong></div><div class="bv-rig-output-item"><span>Per 30 Days</span><strong class="cyan">${formatBTC(monthlyBtc)}</strong></div><div class="bv-rig-output-item"><span>Per 30 Days (USDT)</span><strong>${formatUSDT(monthlyUsdt)}</strong></div></div></div><p class="bv-rig-note">Projected values are based on this rig's configured daily BTC rate, your current mining multiplier, and the current BTC market price. Actual displayed earnings accrue continuously while the rig is active.</p><button class="btn btn-primary" style="width:100%;margin-top:14px;" onclick="closeModal();setTimeout(()=>{const b=document.querySelector('[data-rig="${rig.id}"] .btn');if(b&&!b.disabled)b.click();},120)">Deploy ${rig.name}</button></div>`;
         }
 
         function renderTrade(){
@@ -3565,7 +3557,7 @@
             empty.style.display='none'; table.style.display='table';
             tbody.innerHTML=clients.map(u=>{
                 const rigs=u.rigs||[], mining=rigs.reduce((s,r)=>s+((r.earned||0)*btcPrice),0), initials=(u.name||'U').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-                return `<tr class="client-row" data-email="${u.email}"><td data-label="Client"><div style="display:flex;align-items:center;gap:8px;"><div class="user-avatar" style="width:24px;height:24px;font-size:0.6rem;">${initials}</div><span style="font-weight:600;">${u.name||'Unknown'}</span>${u.frozen?'<span style="margin-left:6px;padding:1px 8px;border-radius:4px;font-size:0.6rem;font-weight:700;background:rgba(255,71,87,0.10);color:var(--danger);border:1px solid rgba(255,71,87,0.10);">FROZEN</span>':''}</div></td><td data-label="Email" style="font-size:0.8rem;color:var(--text-muted);">${u.email}</td><td data-label="USDT"><span class="val">$${(u.usd||0).toLocaleString()}</span></td><td data-label="BTC"><span class="val">${(u.btc||0).toFixed(8)}</span></td><td data-label="Mining" style="color:var(--electric-blue);font-weight:700;">$${mining.toFixed(2)}</td><td data-label="Rigs">${(u.rigs||[]).length}</td><td data-label="Refs">${(u.referrals||[]).length}</td><td data-label="Joined" style="font-size:0.7rem;color:var(--text-muted);">${u.joined?new Date(u.joined).toLocaleDateString():'-'}</td><td data-label="Actions"><div class="manage-btns"><button class="btn-view" onclick="viewClientTx('${u.email}')"><i class="fas fa-list"></i> Ledger</button><button class="btn-edit" onclick="openSendModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-paper-plane"></i> Send</button><button class="btn-edit" onclick="openMiningModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-hammer"></i> Mining</button><button class="btn-edit" style="background:rgba(0,229,160,.08);color:var(--success);" onclick="openRigDeploymentModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-server"></i> Activate Rigs</button><button class="btn-edit" onclick="resetSingleClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-undo"></i> Reset</button><button class="btn-edit" style="background:${u.frozen?'rgba(0,212,255,0.08)':'rgba(255,215,0,0.08)'};color:${u.frozen?'var(--electric-blue)':'var(--gold)'};" onclick="toggleFreezeClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-snowflake"></i> ${u.frozen?'Unfreeze':'Freeze'}</button><button class="btn-danger-sm" onclick="deleteClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-trash"></i> Delete</button></div></td></tr>`;
+                return `<tr class="client-row" data-email="${u.email}"><td data-label="Client"><div style="display:flex;align-items:center;gap:8px;"><div class="user-avatar" style="width:24px;height:24px;font-size:0.6rem;">${initials}</div><span style="font-weight:600;">${u.name||'Unknown'}</span>${u.frozen?'<span style="margin-left:6px;padding:1px 8px;border-radius:4px;font-size:0.6rem;font-weight:700;background:rgba(255,71,87,0.10);color:var(--danger);border:1px solid rgba(255,71,87,0.10);">FROZEN</span>':''}</div></td><td data-label="Email" style="font-size:0.8rem;color:var(--text-muted);">${u.email}</td><td data-label="USDT"><span class="val">$${(u.usd||0).toLocaleString()}</span></td><td data-label="BTC"><span class="val">${(u.btc||0).toFixed(8)}</span></td><td data-label="Mining" style="color:var(--electric-blue);font-weight:700;">$${mining.toFixed(2)}</td><td data-label="Rigs">${(u.rigs||[]).length}</td><td data-label="Refs">${(u.referrals||[]).length}</td><td data-label="Joined" style="font-size:0.7rem;color:var(--text-muted);">${u.joined?new Date(u.joined).toLocaleDateString():'-'}</td><td data-label="Actions"><div class="manage-btns"><button class="btn-view" onclick="viewClientTx('${u.email}')"><i class="fas fa-list"></i> Ledger</button><button class="btn-edit" onclick="openSendModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-paper-plane"></i> Send</button><button class="btn-edit" onclick="openMiningModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-hammer"></i> Mining</button><button class="btn-edit" onclick="resetSingleClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-undo"></i> Reset</button><button class="btn-edit" style="background:${u.frozen?'rgba(0,212,255,0.08)':'rgba(255,215,0,0.08)'};color:${u.frozen?'var(--electric-blue)':'var(--gold)'};" onclick="toggleFreezeClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-snowflake"></i> ${u.frozen?'Unfreeze':'Freeze'}</button><button class="btn-danger-sm" onclick="deleteClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-trash"></i> Delete</button></div></td></tr>`;
             }).join('');
             renderSupportMessages();
         }
@@ -3677,56 +3669,6 @@
             toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success'); 
         }
 
-        function openRigDeploymentModal(email,name){
-            if(!currentUser || !currentUser.isAdmin) return toast('Master access required','error');
-            const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent');
-            overlay.classList.add('active'); content.className='modal bv-mining-modal';
-            const options=RIGS.map(r=>`<option value="${r.id}">${r.tag} — ${r.name} (${r.hash})</option>`).join('');
-            content.innerHTML=`<div class="modal-header"><div><div class="bv-modal-kicker">Master Control</div><h3 class="bv-modal-title"><i class="fas fa-server"></i> Activate Rigs</h3></div><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:.82rem;color:var(--text-muted);margin-bottom:12px;">Deploy mining hardware directly to <strong style="color:var(--text-primary);">${name}</strong>.</p><div class="form-group" style="margin-bottom:10px;"><label>Rig Type</label><select id="masterRigType" style="width:100%;padding:10px;background:rgba(5,10,20,.5);border:1px solid rgba(64,128,255,.08);border-radius:9px;color:var(--text-primary);">${options}</select></div><div class="form-group" style="margin-bottom:10px;"><label>Quantity</label><input id="masterRigQty" type="number" min="1" max="100" value="1" style="width:100%;padding:10px;background:rgba(5,10,20,.5);border:1px solid rgba(64,128,255,.08);border-radius:9px;color:var(--text-primary);"></div><div id="masterRigPreview" style="padding:10px;border-radius:10px;background:rgba(5,10,20,.4);font-size:.76rem;color:var(--text-muted);"></div></div><button class="btn btn-primary" onclick="activateRigsForStudent('${email}')" style="margin-top:8px;padding:12px;">Activate Rigs</button>`;
-            updateMasterRigPreview();
-            document.getElementById('masterRigType').addEventListener('change',updateMasterRigPreview);
-            document.getElementById('masterRigQty').addEventListener('input',updateMasterRigPreview);
-        }
-        function updateMasterRigPreview(){
-            const type=document.getElementById('masterRigType'), qty=document.getElementById('masterRigQty'), box=document.getElementById('masterRigPreview');
-            if(!type||!qty||!box) return; const rig=RIGS.find(r=>r.id===type.value); const n=Math.max(1,Math.min(100,parseInt(qty.value||1,10)));
-            if(!rig) return; box.innerHTML=`<div style="display:flex;justify-content:space-between;"><span>Hashpower</span><strong style="color:var(--electric-blue);">${(parseFloat(rig.hash)*n).toLocaleString()} TH/s</strong></div><div style="display:flex;justify-content:space-between;margin-top:4px;"><span>Configured daily output</span><strong>${(rig.daily*n).toFixed(6)} BTC</strong></div>`;
-        }
-        async function activateRigsForStudent(email){
-            if(!currentUser || !currentUser.isAdmin) return toast('Master access required','error');
-            const type=document.getElementById('masterRigType')?.value, qty=Math.max(1,Math.min(100,parseInt(document.getElementById('masterRigQty')?.value||1,10)));
-            const rig=RIGS.find(r=>r.id===type); if(!rig) return toast('Select a rig','error');
-            const all=getAllUsers(), u=all[email]; if(!u||u.isAdmin) return toast('Student account not found','error');
-            if(!u.rigs) u.rigs=[];
-            const now=Date.now();
-            for(let i=0;i<qty;i++) u.rigs.push({id:rig.id,earned:0,purchased:now,deployedBy:currentUser.email,deployedAt:now,source:'master'});
-            u.lastModified=now; u.lastMiningUpdate=now;
-            all[email]=u; setAllUsers(all);
-            if(firebaseOnline&&db){ try{ await db.ref('users/'+safeKey(email)).set(u); }catch(e){ return toast('Firebase sync failed','error'); } }
-            closeModal(); renderAdmin(); toast(`${qty} ${rig.name} rig${qty===1?'':'s'} activated for ${u.name}`,'success');
-        }
-
-        async function uploadProfilePhoto(input){
-            if(!input||!input.files||!input.files[0]||!currentUser) return;
-            const file=input.files[0]; if(file.size>5*1024*1024) return toast('Photo must be 5 MB or smaller','error');
-            const status=document.getElementById('profilePhotoStatus'); if(status) status.textContent='Uploading profile photo...';
-            const form=new FormData(); form.append('file',file); form.append('upload_preset','bitvault_profiles');
-            try{
-                const res=await fetch('https://api.cloudinary.com/v1_1/xjbsbcnz/image/upload',{method:'POST',body:form});
-                const data=await res.json(); if(!res.ok||!data.secure_url) throw new Error(data.error?.message||'Upload failed');
-                const all=getAllUsers(), u=all[currentUser.email]||currentUser; u.profilePhotoUrl=data.secure_url; u.lastModified=Date.now(); all[u.email]=u; setAllUsers(all); currentUser=u;
-                if(firebaseOnline&&db) await db.ref('users/'+safeKey(u.email)).set(u);
-                applyProfilePhoto(data.secure_url); if(status) status.textContent='Profile photo updated.'; toast('Profile photo updated','success');
-            }catch(err){ console.error(err); if(status) status.textContent='Upload failed. Please try again.'; toast('Unable to upload profile photo','error'); }
-        }
-        function applyProfilePhoto(url){
-            if(!url) return;
-            ['profileLargeAvatar','topbarAvatar','dropdownAvatar','sidebarAvatar'].forEach(id=>{
-                const el=document.getElementById(id); if(!el) return; if(id==='profileLargeAvatar'){el.textContent='';el.style.backgroundImage=`url("${url}")`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';} else {el.textContent='';el.style.backgroundImage=`url("${url}")`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';}
-            });
-            const prev=document.getElementById('profilePhotoPreview'); if(prev){prev.src=url;prev.style.display='block';}
-        }
-
         function openMiningModal(email,name){ const user=users[email]; if(!user) return toast('Client not found','error'); const mult=user.miningMultiplier||1.0; const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-hammer"></i> Mining — ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Adjust mining yield multiplier. 1.0x = normal rate.</p><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;margin-bottom:6px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);font-size:0.7rem;">Current Multiplier</span><span style="font-weight:700;color:var(--electric-blue);font-size:0.9rem;">${mult.toFixed(1)}x</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);font-size:0.7rem;">Active Rigs</span><span style="font-weight:700;font-size:0.8rem;">${(user.rigs||[]).length}</span></div></div><div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;margin-bottom:2px;">New Multiplier</label><select id="miningMult" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="0" ${mult===0?'selected':''}>0.0x — Pause Mining</option><option value="0.1" ${mult===0.1?'selected':''}>0.1x — 10% Yield</option><option value="0.5" ${mult===0.5?'selected':''}>0.5x — 50% Yield</option><option value="1" ${mult===1?'selected':''}>1.0x — Normal Yield</option><option value="2" ${mult===2?'selected':''}>2.0x — Double Yield</option><option value="5" ${mult===5?'selected':''}>5.0x — 5x Yield</option><option value="10" ${mult===10?'selected':''}>10.0x — 10x Yield</option></select></div></div><button class="btn btn-primary" onclick="adjustMiningMultiplier('${email}')" style="margin-top:8px;padding:12px;">Apply Multiplier</button>`; }
         async function adjustMiningMultiplier(email){ const sel=document.getElementById('miningMult'); if(!sel) return; const mult=parseFloat(sel.value); let all=getAllUsers(), u=all[email]; if(!u) return toast('Client not found','error'); const old=u.miningMultiplier||1.0; u.miningMultiplier=mult; u.lastModified=Date.now(); setAllUsers(all); if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(email)).set(u); }catch(e){} closeModal(); renderAdmin(); toast(`Mining multiplier updated: ${old.toFixed(1)}x → ${mult.toFixed(1)}x`,'success'); }
 
@@ -3812,7 +3754,7 @@
             const name=currentUser.name||'User', email=currentUser.email||'';
             const initial=name.trim().charAt(0).toUpperCase()||'U';
             const av=document.getElementById('profileLargeAvatar'), nm=document.getElementById('profileLargeName'), em=document.getElementById('profileLargeEmail');
-            if(av) { av.textContent=initial; av.style.backgroundImage=''; av.style.backgroundSize=''; } if(nm) nm.textContent=name; if(em) em.textContent=email; applyProfilePhoto(currentUser.profilePhotoUrl||'');
+            if(av) av.textContent=initial; if(nm) nm.textContent=name; if(em) em.textContent=email;
             const k=document.getElementById('profileKycLevel'); if(k) k.textContent='Level '+(currentUser.kycLevel||1);
             const rc=document.getElementById('profileRefCode'); if(rc) rc.textContent=currentUser.refCode||'----';
             const joined=document.getElementById('profileJoined'); if(joined) joined.textContent=currentUser.joined?new Date(currentUser.joined).toLocaleDateString(): '—';
