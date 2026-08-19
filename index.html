@@ -3140,12 +3140,20 @@ body{background:#020812!important;color:#e9f2ff}
 
         function logout(){
             currentUser = null;
+
+            // Clear ALL persistent login data
             localStorage.removeItem('bv_current');
+            localStorage.removeItem('bv_last_user');
+            localStorage.removeItem('bv_autologin');
+
+            // Clear current browser session
             sessionStorage.removeItem('bv_session');
+
             clearInterval(priceUpdateInterval);
             clearInterval(miningInterval);
             clearInterval(syncInterval);
-            // ✅ FIXED: Force redirect to landing page
+
+            // Return to the normal landing/login page
             window.location.href = window.location.href.split('?')[0];
         }
 
