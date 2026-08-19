@@ -2256,6 +2256,7 @@
 </style>
 <base target="_blank">
 <base target="_blank">
+<style id="bitvault-bottom-nav-override">
         /* FINAL DESKTOP BOTTOM-NAV OVERRIDE — matches the approved sample and is also available on PC */
         @media (min-width:769px){
             #mobileBottomNav{position:fixed!important;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));left:50%!important;right:auto!important;bottom:12px!important;transform:translateX(-50%)!important;width:min(720px,calc(100vw - 360px))!important;min-width:560px!important;height:64px!important;z-index:110!important;background:rgba(5,14,28,.94)!important;border:1px solid rgba(64,128,255,.14)!important;border-radius:18px!important;box-shadow:0 16px 44px rgba(0,0,0,.42),0 0 24px rgba(0,120,255,.06)!important;backdrop-filter:blur(18px)!important;padding:5px!important;gap:3px!important}
@@ -2264,6 +2265,7 @@
             #mobileBottomNav button:hover{color:#b8d8ff!important;background:rgba(0,212,255,.05)!important;border-radius:12px!important}
             .main-content{padding-bottom:92px!important}
         }
+</style>
 
 <style id="bitvault-approved-v2">
 /* Approved landing/dashboard visual system from the supplied BitVault dummy. */
@@ -2333,6 +2335,14 @@ body{background:#020812!important;color:#e9f2ff}
 .sidebar .nav-item[data-action="profile"]{background:transparent}
 /* Profile modal owns the email detail; do not show a duplicate email stat elsewhere. */
 .profile-email-stat{grid-column:1/-1!important}
+
+/* Mobile drawer: keep the full menu above the fixed bottom navigation and allow the menu itself to scroll. */
+@media(max-width:1100px){
+  #sidebar{z-index:1200!important;height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;}
+  #sidebarOverlay{z-index:1190!important;}
+  #sidebar .nav-menu{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding-bottom:96px!important;-webkit-overflow-scrolling:touch!important;}
+  #sidebar .sidebar-footer{flex:0 0 auto!important;}
+}
 </style>
 
 
@@ -2404,7 +2414,7 @@ body{background:#020812!important;color:#e9f2ff}
 <section class="bv-landing-features">
 <div class="bv-feature-card"><div class="bv-feature-icon cyan"><i class="fas fa-bolt"></i></div><strong>DEPLOY RIGS</strong><span>Deploy powerful mining rigs and start earning.</span></div>
 <div class="bv-feature-card"><div class="bv-feature-icon gold"><i class="fab fa-bitcoin"></i></div><strong>REAL-TIME EARNINGS</strong><span>Earn Bitcoin 24/7 with real-time settlements.</span></div>
-<div class="bv-feature-card"><div class="bv-feature-icon green"><i class="fas fa-shield-halved"></i></div><strong>SECURE &amp; RELIABLE</strong><span>Bank-level security to protect your assets.</span></div>
+<div class="bv-feature-card"><div class="bv-feature-icon green"><i class="fas fa-shield-alt"></i></div><strong>SECURE &amp; RELIABLE</strong><span>Bank-level security to protect your assets.</span></div>
 <div class="bv-feature-card"><div class="bv-feature-icon purple"><i class="fas fa-chart-line"></i></div><strong>FULL CONTROL</strong><span>Manage rigs, track performance, and grow faster.</span></div>
 </section>
 <div class="stats-bar" id="statsBar">
