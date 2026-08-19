@@ -2963,7 +2963,7 @@ body{background:#020812!important;color:#e9f2ff}
         window._sendTargetEmail = null;
         let currentUser = null, users = JSON.parse(localStorage.getItem('bv_users')) || {};
         let btcPrice = 65000.00, btcPriceChange24h = 0, priceHistory = [], tradeMode = 'buy', currentPage = 'dashboard', chartPeriod = '1';
-        let priceUpdateInterval, miningInterval, syncInterval, tempRegData = null, tempVerifCode = '';
+        let priceUpdateInterval, miningInterval, miningServerInterval, syncInterval, btcLiveSocket = null, btcLiveSocketRetry = null, tempRegData = null, tempVerifCode = '';
 
         function safeKey(e){ return e.replace(/\./g,','); }
         function unsafeKey(k){ return k.replace(/,/g,'.'); }
@@ -3130,30 +3130,27 @@ body{background:#020812!important;color:#e9f2ff}
             if(!u&&firebaseOnline&&db){ try{ const s=await db.ref('users/'+safeKey(e)).once('value'); const fb=s.val(); if(fb&&fb.password===p){ a[e]=fb; setAllUsers(a); u=fb; } }catch(e){} }
             if(!u||u.password!==p) return toast('Invalid credentials','error');
             if(u.frozen) return toast('Account frozen. Contact administrator.','error');
-            const now=Date.now();
-            if(!u.miningDayKey) u.miningDayKey=getMiningDayKey(now);
-            if(u.miningDayKey!==getMiningDayKey(now)){ u.miningDayKey=getMiningDayKey(now); u.miningTodayEarned=0; }
-            const earned=accrueMining(u,now);
-            if(earned>0){ u.btc+=earned; u.txs.push({type:'mining',amount:earned,currency:'BTC',status:'Completed',date:now,details:`Background mining earnings (${(u.miningMultiplier||1).toFixed(1)}x rate)`}); }
-            u.lastLogin=new Date().toISOString(); a[e]=u; setAllUsers(a); currentUser=u; localStorage.setItem('bv_current',u.email); localStorage.setItem('bv_autologin','1'); localStorage.setItem('bv_last_user',u.email); localStorage.setItem('bv_last_page','dashboard'); initApp();
+            u.lastLogin=new Date().toISOString();
+            a[e]=u; setAllUsers(a); currentUser=u;
+            // Use Firebase as the authoritative mining clock when available.
+            if(!u.isAdmin && firebaseOnline && db) await settleCurrentUserMining(true);
+            else if(!u.isAdmin) await settleCurrentUserMining(false);
+            localStorage.setItem('bv_current',currentUser.email); localStorage.setItem('bv_autologin','1'); localStorage.setItem('bv_last_user',currentUser.email); localStorage.setItem('bv_last_page','dashboard'); initApp();
         }
 
         function logout(){
             currentUser = null;
-
-            // Clear ALL persistent login data
             localStorage.removeItem('bv_current');
             localStorage.removeItem('bv_last_user');
             localStorage.removeItem('bv_autologin');
-
-            // Clear current browser session
+            localStorage.removeItem('bv_last_page');
             sessionStorage.removeItem('bv_session');
-
             clearInterval(priceUpdateInterval);
             clearInterval(miningInterval);
+            clearInterval(miningServerInterval);
             clearInterval(syncInterval);
-
-            // Return to the normal landing/login page
+            if(btcLiveSocket){ try{ btcLiveSocket.close(); }catch(e){} btcLiveSocket=null; }
+            // Return to the normal landing/login state.
             window.location.href = window.location.href.split('?')[0];
         }
 
@@ -3260,9 +3257,13 @@ body{background:#020812!important;color:#e9f2ff}
 
         async function startCloudSync(){
             if(!firebaseOnline) return;
+            clearInterval(syncInterval);
             syncInterval=setInterval(async()=>{
                 if(!currentUser) return;
                 try{
+                    // First settle the currently signed-in user's mining from elapsed time.
+                    await settleCurrentUserMining(true);
+
                     const s=await db.ref('users').once('value'), d=s.val();
                     if(d){
                         const dec={}; Object.keys(d).forEach(k=>{ dec[unsafeKey(k)]=d[k]; });
@@ -3276,27 +3277,21 @@ body{background:#020812!important;color:#e9f2ff}
                             if(!l){ local[email]=fb; changed=true; return; }
                             const fbMod=fb.lastModified||0, lMod=l.lastModified||0;
                             if(fbMod>lMod){
-                                let merged={...fb};
-                                if((l.lastMiningUpdate||0)>(fb.lastMiningUpdate||0)){
-                                    merged.btc=l.btc; merged.rigs=JSON.parse(JSON.stringify(l.rigs)); merged.lastMiningUpdate=l.lastMiningUpdate;
-                                    if(fb.txs&&l.txs){
-                                        const ids=new Set(fb.txs.map(t=>t.date+'|'+(t.details||'')));
-                                        const localOnly=l.txs.filter(t=>!ids.has(t.date+'|'+(t.details||'')));
-                                        merged.txs=[...fb.txs,...localOnly].sort((a,b)=>b.date-a.date);
-                                    }else if(l.txs){ merged.txs=[...l.txs].sort((a,b)=>b.date-a.date); }
-                                }
-                                local[email]=merged; changed=true;
+                                // Never overwrite newer local mining state with an older Firebase copy.
+                                if(email===currentUser.email && (l.lastMiningUpdate||0)>(fb.lastMiningUpdate||0)) return;
+                                local[email]={...fb}; changed=true;
                             }
                         });
-                        if(changed){ localStorage.setItem('bv_users',JSON.stringify(local)); users=local; if(local[currentUser.email]) currentUser=local[currentUser.email]; updateAllBalances(); if(currentPage==='wallet') renderWallet(); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='trade') renderTrade(); if(currentPage==='mining') renderMining(); if(currentPage==='control') renderAdmin(); }
-                    }
-                }catch(e){}
-                try{
-                    let a=getAllUsers(); let u=a[currentUser.email];
-                    if(u){
-                        const fs=await db.ref('users/'+safeKey(u.email)).once('value'); const fb=fs.val();
-                        const fbMod=fb?(fb.lastModified||0):0, lMod=u.lastModified||0;
-                        if(lMod>=fbMod){ u.lastMiningUpdate=Date.now(); await db.ref('users/'+safeKey(u.email)).set(u); }
+                        if(changed){
+                            localStorage.setItem('bv_users',JSON.stringify(local)); users=local;
+                            if(local[currentUser.email]) currentUser=local[currentUser.email];
+                            updateAllBalances();
+                            if(currentPage==='wallet') renderWallet();
+                            if(currentPage==='dashboard') renderDashboard();
+                            if(currentPage==='trade') renderTrade();
+                            if(currentPage==='mining') renderMining();
+                            if(currentPage==='control') renderAdmin();
+                        }
                     }
                 }catch(e){}
             },3000);
@@ -3375,12 +3370,133 @@ body{background:#020812!important;color:#e9f2ff}
             el.textContent=s; chg.textContent=pctStr; chg.className=pct>=0?'card-sub change-up':'card-sub change-down';
             if(hdr){ hdr.textContent=s; hdrChg.textContent=pctStr; hdrChg.style.color=pct>=0?'var(--success)':'var(--danger)'; }
         }
+        function updateLiveBTCUI(){
+            if(!Number.isFinite(btcPrice)||btcPrice<=0) return;
+            const now=Date.now();
+            if(!priceHistory.length || now-priceHistory[priceHistory.length-1].time>=1000){
+                priceHistory.push({price:btcPrice,time:now});
+                if(priceHistory.length>500) priceHistory.shift();
+            }
+            updateTopBarPrice();
+            updateDashPrice();
+            if(currentPage==='dashboard'){ drawChart('priceChart'); renderDashboard(); }
+            if(currentPage==='trade'){ updateTradePrice(); drawChart('tradeChart'); updateOrderBook(); }
+            updateAllBalances();
+        }
+
+        function startLiveBTCWebSocket(){
+            if(btcLiveSocket && (btcLiveSocket.readyState===WebSocket.OPEN || btcLiveSocket.readyState===WebSocket.CONNECTING)) return;
+            try{
+                btcLiveSocket=new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
+                btcLiveSocket.onmessage=(ev)=>{
+                    try{
+                        const d=JSON.parse(ev.data);
+                        if(d && d.c){
+                            btcPrice=parseFloat(d.c);
+                            btcPriceChange24h=parseFloat(d.P)||0;
+                            updateLiveBTCUI();
+                        }
+                    }catch(e){}
+                };
+                btcLiveSocket.onclose=()=>{
+                    btcLiveSocket=null;
+                    clearTimeout(btcLiveSocketRetry);
+                    btcLiveSocketRetry=setTimeout(startLiveBTCWebSocket,5000);
+                };
+                btcLiveSocket.onerror=()=>{ try{ btcLiveSocket.close(); }catch(e){} };
+            }catch(e){ btcLiveSocket=null; }
+        }
+
         async function startPriceSimulation(){
-            initRealPriceData();
+            await initRealPriceData();
+            startLiveBTCWebSocket();
+            clearInterval(priceUpdateInterval);
             priceUpdateInterval=setInterval(async()=>{
-                const ok=await fetchBTCPrice(); if(ok){ priceHistory.push({price:btcPrice,time:Date.now()}); if(priceHistory.length>500) priceHistory.shift(); }
-                updateDashPrice(); if(currentPage==='dashboard'){ drawChart('priceChart'); renderDashboard(); } if(currentPage==='trade'){ updateTradePrice(); drawChart('tradeChart'); updateOrderBook(); } updateAllBalances();
-            },15000);
+                // REST fallback keeps the price fresh if the live socket is unavailable.
+                const ok=await fetchBTCPrice();
+                if(ok) updateLiveBTCUI();
+                if(!btcLiveSocket || btcLiveSocket.readyState!==WebSocket.OPEN) startLiveBTCWebSocket();
+            },10000);
+            document.addEventListener('visibilitychange',()=>{
+                if(!document.hidden){
+                    fetchBTCPrice().then(ok=>{ if(ok) updateLiveBTCUI(); });
+                    startLiveBTCWebSocket();
+                }
+            });
+            window.addEventListener('focus',()=>{
+                fetchBTCPrice().then(ok=>{ if(ok) updateLiveBTCUI(); });
+            });
+        }
+
+        async function settleUserMiningObject(u, now=Date.now()){
+            if(!u || u.isAdmin || !u.rigs || !u.rigs.length) return 0;
+            return accrueMining(u,now);
+        }
+
+        async function settleCurrentUserMining(persistFirebase=false){
+            if(!currentUser || currentUser.isAdmin) return 0;
+            const email=currentUser.email;
+
+            // Server-backed settlement: Firebase is the authoritative clock/state.
+            if(persistFirebase && firebaseOnline && db){
+                try{
+                    const result=await db.ref('users/'+safeKey(email)).transaction(serverUser=>{
+                        if(!serverUser || serverUser.isAdmin) return serverUser;
+                        const settleNow=Date.now();
+                        const last=Number(serverUser.lastMiningUpdate||settleNow);
+                        const elapsed=Math.max(0,(settleNow-last)/1000);
+                        if(!serverUser.rigs || !serverUser.rigs.length){ serverUser.lastMiningUpdate=settleNow; return serverUser; }
+                        let total=0;
+                        const dayKey=getMiningDayKey(settleNow);
+                        if(serverUser.miningDayKey!==dayKey){ serverUser.miningDayKey=dayKey; serverUser.miningTodayEarned=0; }
+                        serverUser.rigs.forEach(r=>{
+                            const rd=RIGS.find(x=>x.id===r.id); if(!rd) return;
+                            const e=(rd.daily/86400)*(serverUser.miningMultiplier||1)*elapsed;
+                            r.earned=(r.earned||0)+e;
+                            total+=e;
+                        });
+                        serverUser.btc=(serverUser.btc||0)+total;
+                        serverUser.miningTodayEarned=(serverUser.miningTodayEarned||0)+total;
+                        serverUser.lastMiningUpdate=settleNow;
+                        serverUser.lastModified=settleNow;
+                        serverUser.txs=serverUser.txs||[];
+                        if(total>0){
+                            serverUser.txs.push({type:'mining',amount:total,currency:'BTC',status:'Completed',date:settleNow,details:`Mining reward — ${serverUser.rigs.length} active rig${serverUser.rigs.length===1?'':'s'} @ ${(serverUser.miningMultiplier||1).toFixed(1)}x`});
+                        }
+                        return serverUser;
+                    });
+                    if(result && result.committed && result.snapshot){
+                        const fresh=result.snapshot.val();
+                        if(fresh){
+                            const a=getAllUsers();
+                            a[email]=fresh;
+                            localStorage.setItem('bv_users',JSON.stringify(a));
+                            users=a; currentUser=fresh;
+                            updateAllBalances();
+                            return 1;
+                        }
+                    }
+                }catch(e){}
+                return 0;
+            }
+
+            // Local/UI settlement. Uses elapsed timestamps, so browser timer throttling
+            // does not stop earnings; the next tick catches up the elapsed time.
+            const a=getAllUsers(), u=a[email];
+            if(!u || !u.rigs || !u.rigs.length) return 0;
+            const now=Date.now();
+            const earned=accrueMining(u,now);
+            if(earned>0){
+                u.btc=(u.btc||0)+earned;
+                u.lastModified=now;
+                u.txs=u.txs||[];
+                u.txs.push({type:'mining',amount:earned,currency:'BTC',status:'Completed',date:now,details:`Mining reward — ${u.rigs.length} active rig${u.rigs.length===1?'':'s'} @ ${(u.miningMultiplier||1).toFixed(1)}x`});
+            }
+            a[email]=u;
+            localStorage.setItem('bv_users',JSON.stringify(a));
+            users=a; currentUser=u;
+            if(earned>0) updateAllBalances();
+            return earned;
         }
 
         async function settleAllStudentMining(){
@@ -3396,7 +3512,6 @@ body{background:#020812!important;color:#e9f2ff}
                     u.btc=(u.btc||0)+earned;
                     u.lastModified=now;
                     u.txs=u.txs||[];
-                    // Keep the ledger readable: one reward entry per settlement, not per second.
                     u.txs.push({type:'mining',amount:earned,currency:'BTC',status:'Completed',date:now,details:`Mining reward — ${u.rigs.length} active rig${u.rigs.length===1?'':'s'} @ ${(u.miningMultiplier||1).toFixed(1)}x`});
                     changed=true;
                 }
@@ -3412,6 +3527,10 @@ body{background:#020812!important;color:#e9f2ff}
         }
 
         function startMiningSimulation(){
+            clearInterval(miningInterval);
+            clearInterval(miningServerInterval);
+
+            // 1-second local display clock. Earnings are timestamp based, not timer based.
             miningInterval=setInterval(async()=>{
                 if(!currentUser) return;
                 if(currentUser.isAdmin){
@@ -3419,14 +3538,34 @@ body{background:#020812!important;color:#e9f2ff}
                     if(currentPage==='control') renderAdmin();
                     return;
                 }
-                let a=getAllUsers(), u=a[currentUser.email];
-                if(!u||!u.rigs) return;
-                const earned=accrueMining(u,Date.now());
-                if(earned>0){ u.btc+=earned; u.lastModified=Date.now(); localStorage.setItem('bv_users',JSON.stringify(a)); users=a; currentUser=u; updateAllBalances(); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='mining') renderMyRigs(); if(currentPage==='wallet') renderWallet(); }
-                else if((u.miningMultiplier||1)<=0 || u.miningActive===false){ localStorage.setItem('bv_users',JSON.stringify(a)); users=a; currentUser=u; }
+                const earned=await settleCurrentUserMining(false);
+                if(earned>0){
+                    if(currentPage==='dashboard') renderDashboard();
+                    if(currentPage==='mining') renderMyRigs();
+                    if(currentPage==='wallet') renderWallet();
+                }
             },1000);
-        }
 
+            // Persist authoritative mining state to Firebase every 5 seconds while online.
+            // If the tab is backgrounded or closed, lastMiningUpdate preserves the elapsed time
+            // and the next authenticated access settles the full gap.
+            miningServerInterval=setInterval(async()=>{
+                if(currentUser && !currentUser.isAdmin && firebaseOnline) await settleCurrentUserMining(true);
+            },5000);
+
+            document.addEventListener('visibilitychange',()=>{
+                if(!document.hidden && currentUser && !currentUser.isAdmin){
+                    settleCurrentUserMining(true).then(()=>{
+                        if(currentPage==='dashboard') renderDashboard();
+                        if(currentPage==='mining') renderMyRigs();
+                        if(currentPage==='wallet') renderWallet();
+                    });
+                }
+            });
+            window.addEventListener('focus',()=>{
+                if(currentUser && !currentUser.isAdmin) settleCurrentUserMining(true);
+            });
+        }
         function renderDashboard(){
             if(!currentUser) return;
             const u=currentUser, usd=u.usd||0, btc=u.btc||0, btcUsd=btc*btcPrice, total=usd+btcUsd, rigs=u.rigs||[], miningTotal=rigs.reduce((s,r)=>s+(r.earned||0)*btcPrice,0);
@@ -3989,7 +4128,11 @@ body{background:#020812!important;color:#e9f2ff}
                 const savedUser=await loadUser(savedEmail);
                 if(savedUser && !savedUser.frozen){
                     currentUser=savedUser;
-                    localStorage.setItem('bv_current',savedUser.email);
+                    if(!currentUser.isAdmin){
+                        if(firebaseOnline && db) await settleCurrentUserMining(true);
+                        else await settleCurrentUserMining(false);
+                    }
+                    localStorage.setItem('bv_current',currentUser.email);
                     localStorage.setItem('bv_last_user',savedUser.email);
                     localStorage.setItem('bv_autologin','1');
                     landing.style.display='none'; auth.style.display='none'; app.classList.remove('hidden');
