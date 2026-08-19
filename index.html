@@ -3150,7 +3150,11 @@ window.addEventListener('error', function(e){
             const landing = document.getElementById('landingPage');
             const auth = document.getElementById('authPage');
             if(!auth) { console.error('Auth page missing'); return; }
-            if(landing) landing.style.display = 'none';
+            if(landing) {
+                landing.classList.add('hidden');
+                landing.style.display = 'none';
+            }
+            auth.classList.remove('hidden');
             auth.style.display = 'flex';
             if(type === 'register') showRegister();
             else showLogin();
@@ -3311,9 +3315,18 @@ window.addEventListener('error', function(e){
             clearInterval(miningInterval);
             clearInterval(syncInterval);
             const landing=document.getElementById('landingPage'), auth=document.getElementById('authPage'), app=document.getElementById('appPage');
-            if(landing) landing.style.display='block';
-            if(auth) auth.style.display='none';
-            if(app) app.classList.add('hidden');
+            if(landing) {
+                landing.classList.remove('hidden');
+                landing.style.display='block';
+            }
+            if(auth) {
+                auth.classList.add('hidden');
+                auth.style.display='none';
+            }
+            if(app) {
+                app.classList.add('hidden');
+                app.style.display='none';
+            }
             closeProfileCenter();
             closeModal();
             const dd=document.getElementById('profileDropdown'); if(dd) dd.classList.remove('active');
