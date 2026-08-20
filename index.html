@@ -2213,6 +2213,82 @@
         .profile-hero-copy h4{font-size:1.05rem;margin-bottom:3px}.profile-hero-copy p{font-size:.76rem;color:var(--text-muted);margin-bottom:7px;word-break:break-all}.profile-tier{display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(0,229,160,.08);color:var(--success);font-size:.65rem;font-weight:700}
         .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.profile-stat{padding:12px;border-radius:12px;background:rgba(5,10,20,.45);border:1px solid rgba(64,128,255,.06)}.profile-stat span{display:block;color:var(--text-muted);font-size:.66rem;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}.profile-stat strong{font-size:.82rem;word-break:break-word} .profile-actions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:14px}.profile-actions .btn{width:100%}
         .profile-avatar-wrap{position:relative;width:72px;height:72px;flex:0 0 72px}.profile-avatar-wrap .profile-large-avatar{width:72px;height:72px}.profile-avatar-upload{position:absolute;right:-2px;bottom:-2px;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;border:2px solid #08111f;background:#0c1828;color:#fff;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.45);font-size:.68rem}.profile-avatar-upload:hover{background:#12304b}.profile-avatar-wrap input{display:none}
+
+        /* ===== APPROVED PROFILE MODAL — SAMPLE 3 ===== */
+        .bv-profile-sample3{
+            width:min(100%,520px)!important;
+            max-width:520px!important;
+            padding:0!important;
+            overflow:hidden!important;
+            background:linear-gradient(180deg,#071426 0%,#050c18 100%)!important;
+            border:1px solid rgba(0,145,255,.18)!important;
+            border-radius:20px!important;
+            box-shadow:0 30px 90px rgba(0,0,0,.62),0 0 34px rgba(0,120,255,.07)!important;
+        }
+        .bv-profile-header{
+            position:relative;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:14px;
+            padding:24px 20px 18px;
+            background:linear-gradient(135deg,rgba(0,122,255,.18) 0%,rgba(0,212,255,.07) 45%,rgba(125,45,255,.18) 100%);
+            border-bottom:1px solid rgba(64,128,255,.10);
+        }
+        .bv-profile-head-left{display:flex;align-items:center;gap:13px;min-width:0}
+        .bv-profile-avatar-wrap{width:66px!important;height:66px!important;flex:0 0 66px!important}
+        .bv-profile-avatar{width:66px!important;height:66px!important;font-size:1.45rem!important;border:1px solid rgba(255,255,255,.10);box-shadow:0 10px 28px rgba(0,110,255,.28)!important}
+        .bv-profile-camera{right:-4px!important;bottom:-3px!important;width:25px!important;height:25px!important;font-size:.62rem!important}
+        .bv-profile-copy{min-width:0}
+        .bv-profile-copy h4{font-size:1.02rem!important;margin:0 0 3px!important;font-weight:800}
+        .bv-profile-copy p{font-size:.73rem!important;margin:0 0 7px!important;color:#8ca2bd!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+        .bv-profile-copy .profile-tier{padding:4px 9px!important;font-size:.62rem!important}
+        .bv-profile-close{
+            width:34px;height:34px;flex:0 0 34px;border:1px solid rgba(64,128,255,.10);border-radius:10px;
+            background:rgba(5,10,20,.35);color:#8da0bb;display:grid;place-items:center;cursor:pointer;font-size:.95rem;transition:.2s
+        }
+        .bv-profile-close:hover{color:#fff;border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.07)}
+        .bv-profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:14px 20px 8px}
+        .bv-profile-stat-pill{
+            min-width:0;text-align:center;padding:11px 7px 10px;border-radius:12px;
+            background:linear-gradient(180deg,rgba(13,30,52,.90),rgba(7,17,31,.86));border:1px solid rgba(64,128,255,.08)
+        }
+        .bv-profile-stat-pill strong{display:block;font-size:.78rem;line-height:1.25;color:#f2f6fb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .bv-profile-stat-pill small{display:block;margin-top:3px;color:#7188a6;font-size:.59rem}
+        .bv-profile-stat-pill>i{display:block;margin:0 auto 4px;color:#a8bdd8;font-size:.7rem}
+        .bv-status-dot{display:block;width:7px;height:7px;border-radius:50%;background:#00e5a0;box-shadow:0 0 9px rgba(0,229,160,.7);margin:0 auto 6px}
+        .bv-profile-menu{margin:0 20px;border:1px solid rgba(64,128,255,.09);border-radius:13px;overflow:hidden;background:rgba(5,14,27,.55)}
+        .bv-profile-row{
+            width:100%;display:flex;align-items:center;gap:10px;padding:11px 12px;border:0;border-bottom:1px solid rgba(64,128,255,.07);
+            background:transparent;color:#eef4fb;text-align:left;cursor:pointer;transition:.18s
+        }
+        .bv-profile-row:last-child{border-bottom:0}
+        .bv-profile-row:hover{background:rgba(0,212,255,.035)}
+        .bv-profile-row-icon{width:28px;height:28px;flex:0 0 28px;border-radius:9px;display:grid;place-items:center;font-size:.68rem}
+        .bv-profile-row-icon.kyc{color:#dfe9f7;background:rgba(64,128,255,.10)}
+        .bv-profile-row-icon.referral{color:#31cfff;background:rgba(0,212,255,.09)}
+        .bv-profile-row-icon.security{color:#dfe9f7;background:rgba(64,128,255,.08)}
+        .bv-profile-row-icon.help{color:#b9a1ff;background:rgba(130,75,255,.10)}
+        .bv-profile-row-copy{min-width:0;flex:1}
+        .bv-profile-row-copy strong{display:block;font-size:.72rem;font-weight:700;color:#f2f6fb;line-height:1.25}
+        .bv-profile-row-copy small{display:block;margin-top:2px;font-size:.61rem;color:#7188a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .bv-profile-row-copy small span{color:#9db1ca}
+        .bv-profile-arrow,.bv-profile-copy-icon{color:#7188a6;font-size:.65rem;flex:0 0 auto}
+        .bv-profile-signout{
+            width:calc(100% - 40px);margin:12px 20px 20px;padding:11px 14px;border-radius:10px;
+            border:1px solid rgba(255,71,87,.55);background:rgba(110,15,29,.20);color:#ff5363;
+            display:flex;align-items:center;justify-content:center;gap:8px;font:700 .76rem Inter,sans-serif;cursor:pointer;transition:.2s
+        }
+        .bv-profile-signout:hover{background:rgba(150,18,35,.30);border-color:rgba(255,71,87,.75);box-shadow:0 0 18px rgba(255,71,87,.08)}
+        @media(max-width:520px){
+            .bv-profile-sample3{width:calc(100vw - 24px)!important;border-radius:18px!important}
+            .bv-profile-header{padding:20px 16px 16px}
+            .bv-profile-stats{padding:12px 16px 8px;gap:7px}
+            .bv-profile-menu{margin:0 16px}
+            .bv-profile-signout{width:calc(100% - 32px);margin-left:16px;margin-right:16px;margin-bottom:16px}
+            .bv-profile-copy p{max-width:185px}
+        }
+
         .bv-buy-provider-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}.bv-buy-provider{box-sizing:border-box;min-width:0;overflow:hidden;display:flex;flex-direction:column;gap:9px;text-align:left;padding:12px;border-radius:16px;border:1px solid rgba(0,212,255,.10);background:rgba(5,15,28,.78);color:var(--text-primary);cursor:pointer;transition:.22s}.bv-buy-provider:hover{border-color:rgba(0,212,255,.35);transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.20)}.bv-buy-provider strong{font-size:.92rem}.bv-buy-provider span{font-size:.70rem;color:var(--text-muted);line-height:1.45}.bv-buy-provider.moon{border-color:rgba(0,212,255,.20)}.bv-buy-provider.ramp{border-color:rgba(255,215,0,.18)}.bv-buy-provider-image{box-sizing:border-box;display:block;width:100%;max-width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;object-position:center;border-radius:13px;margin:0;background:#08111f;overflow:hidden}.bv-buy-provider-label{display:flex;align-items:center;gap:6px;font-size:.92rem;font-weight:800}.bv-buy-provider-label i{font-size:.78rem}.nav-item[data-action="buy"].action-active{background:linear-gradient(90deg,rgba(0,212,255,.18),rgba(0,212,255,.05));color:var(--electric-blue);border-left-color:var(--electric-blue);box-shadow:inset 0 0 24px rgba(0,212,255,.07)}.mobile-bottom-nav button.active{color:var(--electric-blue);background:rgba(0,212,255,.10);border-radius:12px;box-shadow:inset 0 0 18px rgba(0,212,255,.06),0 0 14px rgba(0,212,255,.08)}.mobile-bottom-nav button.action-active{color:var(--electric-blue);background:rgba(0,212,255,.12);border-radius:12px;box-shadow:inset 0 0 22px rgba(0,212,255,.08),0 0 16px rgba(0,212,255,.10)}
         .master-mining-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.master-mining-stat{padding:10px;border-radius:10px;background:rgba(5,10,20,.45);border:1px solid rgba(64,128,255,.06)}.master-mining-stat span{display:block;color:var(--text-muted);font-size:.62rem;text-transform:uppercase}.master-mining-stat strong{display:block;margin-top:4px;font-size:.82rem}.master-rig-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(64,128,255,.05)}.master-rig-row:last-child{border-bottom:0}.master-rig-copy{min-width:0}.master-rig-copy strong{display:block;font-size:.76rem}.master-rig-copy span{display:block;color:var(--text-muted);font-size:.62rem;margin-top:2px}.master-rig-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.master-rig-actions button{font-size:.68rem!important;padding:7px 9px!important;width:auto!important;margin:0!important}.master-mining-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.master-mining-actions .btn{margin:0!important}.master-deploy-grid{display:grid;grid-template-columns:minmax(0,1fr) 90px;gap:8px;align-items:end}.master-mining-status{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:.62rem;font-weight:700}.master-mining-status.on{color:var(--success);background:rgba(0,229,160,.08)}.master-mining-status.off{color:var(--warning);background:rgba(255,165,2,.08)}
 
@@ -2925,35 +3001,69 @@ window.addEventListener('error', function(e){
     </div>
 
 
+    <!-- ── PROFILE MODAL : APPROVED SAMPLE 3 ── -->
     <div class="modal-overlay" id="profileModalOverlay" onclick="if(event.target===this)closeProfileCenter()">
-        <div class="modal profile-center-modal">
-            <div class="modal-header">
-                <h3><i class="fas fa-user-circle"></i> Profile</h3>
-                <button class="modal-close" onclick="closeProfileCenter()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <div class="profile-hero">
-                    <div class="profile-avatar-wrap">
-                        <div class="profile-large-avatar" id="profileLargeAvatar">B</div>
-                        <button type="button" class="profile-avatar-upload" title="Upload profile photo" onclick="triggerProfileUpload(event)"><i class="fas fa-camera"></i></button>
+        <div class="modal profile-center-modal bv-profile-sample3">
+            <div class="bv-profile-header">
+                <div class="bv-profile-head-left">
+                    <div class="profile-avatar-wrap bv-profile-avatar-wrap">
+                        <div class="profile-large-avatar bv-profile-avatar" id="profileLargeAvatar">B</div>
+                        <button type="button" class="profile-avatar-upload bv-profile-camera" title="Upload profile photo" onclick="triggerProfileUpload(event)"><i class="fas fa-camera"></i></button>
                         <input id="profileAvatarInput" type="file" accept="image/png,image/jpeg,image/webp" onchange="handleProfileAvatarUpload(this)">
                     </div>
-                    <div class="profile-hero-copy"><h4 id="profileLargeName">User</h4><p id="profileLargeEmail">user@bitvault.io</p><span id="profileTierBadge" class="profile-tier">Verified account</span></div>
+                    <div class="profile-hero-copy bv-profile-copy">
+                        <h4 id="profileLargeName">User</h4>
+                        <p id="profileLargeEmail">user@bitvault.io</p>
+                        <span id="profileTierBadge" class="profile-tier">Verified account</span>
+                    </div>
                 </div>
-                <div class="profile-grid">
-                    <div class="profile-stat profile-email-stat" style="grid-column:1/-1;"><span>Email Address</span><strong id="profileEmailDetail">user@bitvault.io</strong></div>
-                    <div class="profile-stat"><span>Account status</span><strong>Active</strong></div>
-                    <div class="profile-stat"><span>KYC level</span><strong id="profileKycLevel">Level 1</strong></div>
-                    <div class="profile-stat"><span>Referral code</span><strong id="profileRefCode">----</strong></div>
-                    <div class="profile-stat"><span>Member since</span><strong id="profileJoined">—</strong></div>
+                <button class="bv-profile-close" type="button" aria-label="Close profile" onclick="closeProfileCenter()"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="bv-profile-stats">
+                <div class="bv-profile-stat-pill">
+                    <span class="bv-status-dot"></span>
+                    <strong>Active</strong>
+                    <small>Status</small>
                 </div>
-                <div class="profile-actions">
-                    <button class="btn btn-outline" onclick="openKYCModal();closeProfileCenter();"><i class="fas fa-shield-alt"></i> KYC Status</button>
-                    <button class="btn btn-outline" onclick="copyRefCode();"><i class="fas fa-copy"></i> Copy Referral Code</button>
-                    <button class="btn btn-outline" onclick="openHelpCenter(event);closeProfileCenter();"><i class="fas fa-question-circle"></i> Help Center</button>
-                    <button class="btn btn-outline danger-profile" onclick="closeProfileCenter();logout();"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                <div class="bv-profile-stat-pill">
+                    <i class="fas fa-shield-alt"></i>
+                    <strong id="profileKycLevel">Level 1</strong>
+                    <small>KYC Level</small>
+                </div>
+                <div class="bv-profile-stat-pill">
+                    <i class="far fa-calendar-alt"></i>
+                    <strong id="profileJoined">—</strong>
+                    <small>Member Since</small>
                 </div>
             </div>
+
+            <div class="bv-profile-menu">
+                <button type="button" class="bv-profile-row" onclick="openKYCModal();closeProfileCenter();">
+                    <span class="bv-profile-row-icon kyc"><i class="fas fa-shield-alt"></i></span>
+                    <span class="bv-profile-row-copy"><strong>KYC Status</strong><small>View your verification</small></span>
+                    <i class="fas fa-chevron-right bv-profile-arrow"></i>
+                </button>
+                <button type="button" class="bv-profile-row" onclick="copyRefCode();">
+                    <span class="bv-profile-row-icon referral"><i class="fas fa-user-plus"></i></span>
+                    <span class="bv-profile-row-copy"><strong>Referral Program</strong><small>Code: <span id="profileRefCode">----</span></small></span>
+                    <i class="far fa-copy bv-profile-copy-icon"></i>
+                </button>
+                <button type="button" class="bv-profile-row" onclick="navigate('account-settings');closeProfileCenter();">
+                    <span class="bv-profile-row-icon security"><i class="fas fa-shield-alt"></i></span>
+                    <span class="bv-profile-row-copy"><strong>Security Settings</strong><small>Password &amp; security</small></span>
+                    <i class="fas fa-chevron-right bv-profile-arrow"></i>
+                </button>
+                <button type="button" class="bv-profile-row" onclick="openHelpCenter(event);closeProfileCenter();">
+                    <span class="bv-profile-row-icon help"><i class="fas fa-question-circle"></i></span>
+                    <span class="bv-profile-row-copy"><strong>Help Center</strong><small>Support &amp; FAQ</small></span>
+                    <i class="fas fa-chevron-right bv-profile-arrow"></i>
+                </button>
+            </div>
+
+            <button type="button" class="bv-profile-signout" onclick="closeProfileCenter();logout();">
+                <i class="fas fa-sign-out-alt"></i><span>Sign Out</span>
+            </button>
         </div>
     </div>
 
@@ -3149,13 +3259,16 @@ window.addEventListener('error', function(e){
         function showAuth(type){
             const landing = document.getElementById('landingPage');
             const auth = document.getElementById('authPage');
+            const app = document.getElementById('appPage');
             if(!auth) { console.error('Auth page missing'); return; }
-            if(landing) {
-                landing.classList.add('hidden');
-                landing.style.display = 'none';
-            }
+
+            // IMPORTANT: initApp() adds .hidden to authPage. The .hidden rule uses !important,
+            // so changing only auth.style.display cannot reveal the auth screen after sign-out.
             auth.classList.remove('hidden');
+            if(app) app.classList.add('hidden');
+            if(landing) landing.style.display = 'none';
             auth.style.display = 'flex';
+
             if(type === 'register') showRegister();
             else showLogin();
         }
@@ -3314,19 +3427,16 @@ window.addEventListener('error', function(e){
             clearInterval(priceUpdateInterval);
             clearInterval(miningInterval);
             clearInterval(syncInterval);
-            const landing=document.getElementById('landingPage'), auth=document.getElementById('authPage'), app=document.getElementById('appPage');
-            if(landing) {
-                landing.classList.remove('hidden');
-                landing.style.display='block';
-            }
-            if(auth) {
-                auth.classList.add('hidden');
-                auth.style.display='none';
-            }
-            if(app) {
-                app.classList.add('hidden');
-                app.style.display='none';
-            }
+
+            const landing=document.getElementById('landingPage');
+            const auth=document.getElementById('authPage');
+            const app=document.getElementById('appPage');
+
+            // Return to a known, deterministic signed-out UI state.
+            if(landing){ landing.style.display='block'; landing.classList.remove('hidden'); }
+            if(auth){ auth.style.display='none'; auth.classList.remove('hidden'); }
+            if(app){ app.classList.add('hidden'); app.style.display=''; }
+
             closeProfileCenter();
             closeModal();
             const dd=document.getElementById('profileDropdown'); if(dd) dd.classList.remove('active');
@@ -3346,12 +3456,18 @@ window.addEventListener('error', function(e){
         }
 
         async function initApp(){
-            document.getElementById('authPage').classList.add('hidden');
-            document.getElementById('appPage').classList.remove('hidden');
+            const auth=document.getElementById('authPage');
+            const app=document.getElementById('appPage');
+
+            // Validate first. Never hide both authentication and application containers.
             if(!currentUser || !currentUser.email){
                 logout();
                 return;
             }
+
+            if(auth){ auth.classList.add('hidden'); auth.style.display='none'; }
+            if(app){ app.classList.remove('hidden'); app.style.display=''; }
+
             localStorage.setItem('bv_current',currentUser.email);
             localStorage.removeItem('bv_signed_out');
             sessionStorage.setItem('bv_session','active');
@@ -4322,7 +4438,10 @@ window.addEventListener('error', function(e){
                 if(savedUser && !savedUser.frozen){
                     currentUser=savedUser;
                     if(currentUser.isAdmin){ currentUser=ensureMasterMiningProfile(currentUser); const all=getAllUsers(); all[currentUser.email]=currentUser; setAllUsers(all); }
-                    landing.style.display='none'; auth.style.display='none'; app.classList.remove('hidden');
+                    landing.style.display='none';
+                    auth.style.display='none';
+                    auth.classList.add('hidden');
+                    app.classList.remove('hidden');
                     await initApp();
                     return;
                 }
