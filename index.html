@@ -2834,7 +2834,7 @@ window.addEventListener('error', function(e){
                             <div class="bv-balance-title"><span class="bv-round-icon usdt"><i class="fas fa-dollar-sign"></i></span> USDT BALANCE</div>
                             <div class="bv-balance-value" id="dashUsd">$0.00</div>
                             <div class="bv-balance-actions">
-                                <button class="bv-action-btn blue" onclick="openModal('deposit')">Deposit</button>
+                                <button class="bv-action-btn blue" onclick="openDepositModal()">Deposit</button>
                                 <button class="bv-action-btn dark" onclick="openModal('withdraw')">Withdraw</button>
                             </div>
                         </div>
@@ -2901,7 +2901,7 @@ window.addEventListener('error', function(e){
             </div>
             <div id="page-wallet" class="page hidden">
                 <div class="grid-2">
-                    <div class="card"><div class="card-header"><span class="card-title">USDT Balance</span><span class="icon-badge"><i class="fas fa-dollar-sign"></i></span></div><div class="card-value" id="walletUsd">$10,000.00</div><div class="wallet-actions" style="display:flex;gap:10px;margin-top:12px;"><button class="btn btn-primary" style="flex:1;" onclick="openModal('deposit')">Deposit</button><button class="btn btn-danger" style="flex:1;" onclick="openModal('withdraw')">Withdraw</button></div><div class="card-sub">Available for trading and rig purchases</div></div>
+                    <div class="card"><div class="card-header"><span class="card-title">USDT Balance</span><span class="icon-badge"><i class="fas fa-dollar-sign"></i></span></div><div class="card-value" id="walletUsd">$10,000.00</div><div class="wallet-actions" style="display:flex;gap:10px;margin-top:12px;"><button class="btn btn-primary" style="flex:1;" onclick="openDepositModal()">Deposit</button><button class="btn btn-danger" style="flex:1;" onclick="openModal('withdraw')">Withdraw</button></div><div class="card-sub">Available for trading and rig purchases</div></div>
                     <div class="card"><div class="card-header"><span class="card-title">BTC Balance</span><span class="icon-badge" style="border-color:rgba(255,215,0,0.08);"><i class="fas fa-coins"></i></span></div><div class="card-value" id="walletBtc">0.00000000</div><div style="font-size:0.9rem;color:var(--electric-blue);font-weight:700;margin:6px 0;" id="walletBtcUsd">≈ $0.00</div><div class="wallet-actions" style="display:flex;gap:10px;margin-top:6px;"><button class="btn btn-gold" style="flex:1;" onclick="openModal('convert')">Convert to USDT</button></div><div class="card-sub">Available for withdrawal or spot selling</div></div>
                 </div>
                 <div class="card" style="margin-top:20px;"><div class="card-header"><span class="card-title">Transaction History</span><span class="icon-badge"><i class="fas fa-list"></i></span></div><div style="overflow-x:auto;"><table class="tx-table" id="txTable"><thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Timestamp</th><th>Reference</th></tr></thead><tbody id="txBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:32px;">No transactions on record</td></tr></tbody></table></div></div>
@@ -2950,12 +2950,8 @@ window.addEventListener('error', function(e){
                         <button class="btn btn-outline" style="width:auto;min-width:150px;" onclick="openWithdrawalPinSettings()"><i class="fas fa-key"></i> <span id="withdrawPinButtonText">Set Withdrawal PIN</span></button>
                     </div>
                     <div class="settings-row">
-                        <div class="settings-row-copy"><strong>Withdrawal eligibility</strong><span>Before withdrawal, the wallet must hold at least <b style="color:var(--text-primary);">$10,000</b> worth of BTC.</span></div>
+                        <div class="settings-row-copy"><strong>Withdrawal eligibility</strong><span>Your wallet must hold at least <b style="color:var(--text-primary);">$10,000 worth of BTC</b> before you can withdraw.</span></div>
                         <span class="settings-badge"><i class="fas fa-check"></i> $10,000 BTC balance</span>
-                    </div>
-                    <div class="settings-row">
-                        <div class="settings-row-copy"><strong>Minimum withdrawal</strong><span>The minimum amount requested in one withdrawal is <b style="color:var(--text-primary);">$3,000</b> equivalent.</span></div>
-                        <span class="settings-badge"><i class="fas fa-check"></i> $3,000 minimum</span>
                     </div>
                 </div>
             </div>
@@ -3227,6 +3223,8 @@ window.addEventListener('error', function(e){
         let currentUser = null, users = JSON.parse(localStorage.getItem('bv_users')) || {};
         let btcPrice = 65000.00, btcPriceChange24h = 0, priceHistory = [], tradeMode = 'buy', currentPage = 'dashboard', chartPeriod = '1';
         let priceUpdateInterval, miningInterval, syncInterval, tempRegData = null, tempVerifCode = '';
+        let btcSocket = null, btcSocketReconnectTimer = null, btcSocketRetryMs = 2000;
+        let btcPriceRequestInFlight = false, lastBtcPriceFetch = 0, btcApiRetryAfter = 0;
 
         function safeKey(e){ return e.replace(/\./g,','); }
         function unsafeKey(k){ return k.replace(/,/g,'.'); }
@@ -3619,83 +3617,62 @@ window.addEventListener('error', function(e){
             document.getElementById('topBtc').textContent=(currentUser.btc||0).toFixed(8);
         }
 
-        async function fetchBTCPrice(){
-            // Try CoinGecko first
-            try {
-                const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
-                const d = await r.json();
-                if (d.bitcoin && d.bitcoin.usd) {
-                    btcPrice = d.bitcoin.usd;
-                    btcPriceChange24h = d.bitcoin.usd_24h_change || 0;
-                    updateTopBarPrice();
-                    return true;
-                }
-            } catch(e) {}
-
-            // Fallback: Coinbase
-            try {
-                const r = await fetch('https://api.coinbase.com/v2/exchange-rates?currency=BTC');
-                const d = await r.json();
-                if (d.data && d.data.rates && d.data.rates.USD) {
-                    btcPrice = parseFloat(d.data.rates.USD);
-                    btcPriceChange24h = 0;
-                    updateTopBarPrice();
-                    return true;
-                }
-            } catch(e) {}
-
-            // Fallback: Binance
-            try {
-                const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
-                const d = await r.json();
-                if (d && d.lastPrice) {
-                    btcPrice = parseFloat(d.lastPrice);
-                    btcPriceChange24h = parseFloat(d.priceChangePercent) || 0;
-                    updateTopBarPrice();
-                    return true;
-                }
-            } catch(e) {}
-
-            return false;
-        }
-
-        // New helper – updates the top bar price immediately
         function updateTopBarPrice() {
-            const priceEl = document.getElementById('topPrice');
-            const changeEl = document.getElementById('topPriceChange');
-            if (priceEl) {
-                priceEl.textContent = '$' + btcPrice.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-            }
-            if (changeEl) {
-                const pct = btcPriceChange24h;
-                changeEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
-                changeEl.className = pct >= 0 ? 'up' : 'down';
-            }
+            const priceEl=document.getElementById('topPrice'), changeEl=document.getElementById('topPriceChange');
+            if(priceEl) priceEl.textContent='$'+Number(btcPrice||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+            if(changeEl){const pct=Number(btcPriceChange24h||0);changeEl.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';changeEl.className=pct>=0?'up':'down';}
         }
-
-        async function fetchBTCHistory(d){ try{ const r=await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${d}`); const data=await r.json(); if(data.prices&&data.prices.length>0) return data.prices.map(p=>({price:p[1],time:p[0]})); }catch(e){} return null; }
-
-        async function initRealPriceData(){ await fetchBTCPrice(); const h=await fetchBTCHistory(1); if(h&&h.length>0) priceHistory=h; else generateFallbackHistory(); updateDashPrice(); if(currentPage==='dashboard') drawChart('priceChart'); if(currentPage==='trade'){ updateTradePrice(); drawChart('tradeChart'); } }
-        function generateFallbackHistory(){ priceHistory=[]; let p=btcPrice||81000; for(let i=200;i>0;i--){ p=p*(1+(Math.random()-0.5)*0.001); priceHistory.push({price:p,time:Date.now()-i*300000}); } }
+        function applyBTCPrice(price,change24h){
+            const n=Number(price);if(!Number.isFinite(n)||n<=0)return false;btcPrice=n;if(Number.isFinite(Number(change24h)))btcPriceChange24h=Number(change24h);
+            updateTopBarPrice();updateDashPrice();return true;
+        }
+        async function fetchWithTimeout(url,ms=6000){
+            const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),ms);
+            try{const r=await fetch(url,{cache:'no-store',signal:controller.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}
+            finally{clearTimeout(timer);}
+        }
+        // WebSocket is the continuous live feed. REST is only a recovery path when the socket is unavailable.
+        async function fetchBTCPrice(force=false){
+            const now=Date.now();if(btcPriceRequestInFlight)return false;if(!force&&now-lastBtcPriceFetch<30000)return true;if(now<btcApiRetryAfter&&btcPrice>0)return true;
+            btcPriceRequestInFlight=true;lastBtcPriceFetch=now;
+            try{
+                try{const d=await fetchWithTimeout('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');if(d&&d.lastPrice){btcApiRetryAfter=0;return applyBTCPrice(parseFloat(d.lastPrice),parseFloat(d.priceChangePercent)||0);}}catch(_){}
+                try{const d=await fetchWithTimeout('https://api.coinbase.com/v2/exchange-rates?currency=BTC');if(d?.data?.rates?.USD){btcApiRetryAfter=0;return applyBTCPrice(parseFloat(d.data.rates.USD),btcPriceChange24h);}}catch(_){}
+                try{const d=await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');if(d?.bitcoin?.usd){btcApiRetryAfter=0;return applyBTCPrice(d.bitcoin.usd,d.bitcoin.usd_24h_change||0);}}catch(_){}
+                btcApiRetryAfter=Date.now()+60000;return false;
+            }finally{btcPriceRequestInFlight=false;}
+        }
+        function connectLiveBTCPrice(){
+            if(btcSocket&&(btcSocket.readyState===WebSocket.OPEN||btcSocket.readyState===WebSocket.CONNECTING))return;
+            try{
+                btcSocket=new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
+                btcSocket.onopen=()=>{btcSocketRetryMs=2000;fetchBTCPrice(true);};
+                btcSocket.onmessage=(event)=>{
+                    try{const d=JSON.parse(event.data);if(d&&d.c){applyBTCPrice(parseFloat(d.c),parseFloat(d.P)||0);priceHistory.push({price:btcPrice,time:Date.now()});if(priceHistory.length>500)priceHistory.shift();if(currentPage==='dashboard'){drawChart('priceChart');renderDashboard();}if(currentPage==='trade'){updateTradePrice();drawChart('tradeChart');updateOrderBook();}updateAllBalances();}}catch(_){}
+                };
+                btcSocket.onerror=()=>{try{btcSocket.close();}catch(_){}};
+                btcSocket.onclose=()=>{btcSocket=null;clearTimeout(btcSocketReconnectTimer);btcSocketReconnectTimer=setTimeout(connectLiveBTCPrice,btcSocketRetryMs);btcSocketRetryMs=Math.min(btcSocketRetryMs*2,30000);};
+            }catch(_){clearTimeout(btcSocketReconnectTimer);btcSocketReconnectTimer=setTimeout(connectLiveBTCPrice,btcSocketRetryMs);btcSocketRetryMs=Math.min(btcSocketRetryMs*2,30000);}
+        }
+        async function fetchBTCHistory(d){
+            try{const limit=d===1?288:500;const data=await fetchWithTimeout(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=${limit}`,8000);if(Array.isArray(data)&&data.length)return data.map(k=>({price:parseFloat(k[4]),time:k[0]}));}catch(_){}return null;
+        }
+        async function initRealPriceData(){
+            await fetchBTCPrice(true);const h=await fetchBTCHistory(1);if(h&&h.length)priceHistory=h;else if(!priceHistory.length)generateFallbackHistory();updateDashPrice();updateTopBarPrice();if(currentPage==='dashboard')drawChart('priceChart');if(currentPage==='trade'){updateTradePrice();drawChart('tradeChart');}
+        }
+        function generateFallbackHistory(){priceHistory=[];let p=btcPrice||81000;for(let i=200;i>0;i--){p=p*(1+(Math.random()-0.5)*0.001);priceHistory.push({price:p,time:Date.now()-i*300000});}}
         function updateDashPrice(){
-            const el=document.getElementById('dashPrice'), chg=document.getElementById('dashPriceChange'), hdr=document.getElementById('chartHeaderPrice'), hdrChg=document.getElementById('chartHeaderChange');
-            const s='$'+btcPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}), pct=btcPriceChange24h, pctStr=(pct>=0?'+':'')+pct.toFixed(2)+'% (24h)';
-            el.textContent=s; chg.textContent=pctStr; chg.className=pct>=0?'card-sub change-up':'card-sub change-down';
-            if(hdr){ hdr.textContent=s; hdrChg.textContent=pctStr; hdrChg.style.color=pct>=0?'var(--success)':'var(--danger)'; }
+            const el=document.getElementById('dashPrice'),chg=document.getElementById('dashPriceChange'),hdr=document.getElementById('chartHeaderPrice'),hdrChg=document.getElementById('chartHeaderChange');
+            const s='$'+Number(btcPrice||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),pct=Number(btcPriceChange24h||0),pctStr=(pct>=0?'+':'')+pct.toFixed(2)+'% (24h)';
+            if(el)el.textContent=s;if(chg){chg.textContent=pctStr;chg.className=pct>=0?'card-sub change-up':'card-sub change-down';}if(hdr){hdr.textContent=s;if(hdrChg){hdrChg.textContent=pctStr;hdrChg.style.color=pct>=0?'var(--success)':'var(--danger)';}}
         }
         async function startPriceSimulation(){
-            initRealPriceData();
-            priceUpdateInterval=setInterval(async()=>{
-                const ok=await fetchBTCPrice(); if(ok){ priceHistory.push({price:btcPrice,time:Date.now()}); if(priceHistory.length>500) priceHistory.shift(); }
-                updateDashPrice(); if(currentPage==='dashboard'){ drawChart('priceChart'); renderDashboard(); } if(currentPage==='trade'){ updateTradePrice(); drawChart('tradeChart'); updateOrderBook(); } updateAllBalances();
-            },10000);
+            clearInterval(priceUpdateInterval);await initRealPriceData();connectLiveBTCPrice();
+            // Heartbeat only; live values arrive continuously through the WebSocket.
+            priceUpdateInterval=setInterval(async()=>{if(!btcSocket||btcSocket.readyState!==WebSocket.OPEN)await fetchBTCPrice();if(currentPage==='dashboard'){updateDashPrice();renderDashboard();}if(currentPage==='trade'){updateTradePrice();updateOrderBook();}updateTopBarPrice();updateAllBalances();},30000);
         }
-
-        document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'){ fetchBTCPrice().then(()=>{ updateDashPrice(); updateTopBarPrice(); updateAllBalances(); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='trade') renderTrade(); }); } });
-        window.addEventListener('focus',()=>{ fetchBTCPrice().then(()=>{ updateDashPrice(); updateTopBarPrice(); updateAllBalances(); }); });
+        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){connectLiveBTCPrice();fetchBTCPrice(true).then(()=>{updateDashPrice();updateTopBarPrice();updateAllBalances();if(currentPage==='dashboard')renderDashboard();if(currentPage==='trade')renderTrade();});}});
+        window.addEventListener('focus',()=>{connectLiveBTCPrice();fetchBTCPrice(true).then(()=>{updateDashPrice();updateTopBarPrice();updateAllBalances();});});
 
         async function settleAllStudentMining(){
             if(!currentUser || !currentUser.isAdmin) return;
@@ -4324,36 +4301,44 @@ window.addEventListener('error', function(e){
             } else if(type==='withdraw'){
                 if(currentUser.isAdmin){ content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw Funds</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Withdraw funds to your linked bank account or external wallet.</p><div class="form-group" style="margin-top:12px;"><label>Amount (USDT)</label><input type="number" id="witAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-primary);" /></div></div><button class="btn btn-danger" onclick="processWithdraw()">Request Withdrawal</button>`; }
                 else {
-                    const walletBtcUsd=(currentUser.btc||0)*btcPrice;
-                    const walletPassed=walletBtcUsd>=10000;
-                    const kycPassed=(currentUser.kycLevel||1)>=1;
-                    const pinPassed=!!currentUser.withdrawalPinHash;
-                    const minBtc=3000/Math.max(btcPrice,1);
-                    content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw BTC</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="margin-bottom:12px;">Withdraw your BTC to an external wallet. Live BTC price: <b>${formatUSDT(btcPrice)}</b>.</p><div class="withdraw-checks"><div class="withdraw-check ${walletPassed?'pass':'fail'}"><i class="fas ${walletPassed?'fa-circle-check':'fa-circle-xmark'}"></i><div class="check-copy"><b>BTC wallet balance verification</b><small>${walletPassed?formatUSDT(walletBtcUsd)+' in BTC — eligible':'Need at least $10,000 worth of BTC in the wallet; current: '+formatUSDT(walletBtcUsd)}</small></div></div><div class="withdraw-check ${kycPassed?'pass':'fail'}"><i class="fas ${kycPassed?'fa-circle-check':'fa-circle-xmark'}"></i><div class="check-copy"><b>Account verification</b><small>${kycPassed?'KYC Level '+(currentUser.kycLevel||1)+' verified':'Account verification required'}</small></div></div><div class="withdraw-check ${pinPassed?'pass':'fail'}"><i class="fas ${pinPassed?'fa-circle-check':'fa-circle-xmark'}"></i><div class="check-copy"><b>Withdrawal PIN</b><small>${pinPassed?'PIN configured':'Set your Withdrawal PIN in Account Settings'}</small></div></div></div><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:14px;"><div class="form-group" style="margin-bottom:8px;"><label>Amount (BTC)</label><input type="number" id="witBtcAmount" placeholder="Minimum ${minBtc.toFixed(8)} BTC" step="0.00000001" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" /></div><div class="form-group" style="margin-bottom:8px;"><label>Your BTC Address</label><input type="text" id="witBtcAddr" placeholder="Enter your BTC wallet address" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-family:monospace;" /></div><div class="form-group" style="margin-bottom:0;"><label>Withdrawal PIN</label><input type="password" id="witBtcPin" inputmode="numeric" maxlength="6" placeholder="6-digit withdrawal PIN" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);letter-spacing:4px;" /></div></div></div><button class="btn btn-danger" onclick="processStudentWithdraw()" ${walletPassed&&kycPassed&&pinPassed?'':'disabled'}>Request Withdrawal</button>`; }
+                    const walletValueUsd=(currentUser.btc||0)*btcPrice;
+                    const walletEligible=walletValueUsd>=10000;
+                    content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-up"></i> Withdraw BTC</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="margin-bottom:12px;">Withdraw your BTC to an external wallet. Live BTC price: <b>${formatUSDT(btcPrice)}</b>.</p><div class="withdraw-checks"><div class="withdraw-check ${walletEligible?'pass':'fail'}"><i class="fas ${walletEligible?'fa-circle-check':'fa-circle-xmark'}"></i><div class="check-copy"><b>Wallet balance requirement</b><small>${walletEligible?formatUSDT(walletValueUsd)+' BTC value — eligible':'Wallet must hold at least $10,000 worth of BTC; current: '+formatUSDT(walletValueUsd)}</small></div></div></div><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:14px;"><div class="form-group" style="margin-bottom:8px;"><label>Amount (BTC)</label><input type="number" id="witBtcAmount" placeholder="Enter BTC amount" step="0.00000001" max="${(currentUser.btc||0).toFixed(8)}" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" /></div><div class="form-group" style="margin-bottom:0;"><label>Your BTC Address</label><input type="text" id="witBtcAddr" placeholder="Enter your BTC wallet address" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-family:monospace;" /></div></div></div><button class="btn btn-danger" onclick="processStudentWithdraw()" ${walletEligible?'':'disabled'}>Request Withdrawal</button>`; }
             } else if(type==='convert'){
                 const btcVal=currentUser.btc*btcPrice; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-sync"></i> Convert BTC to USD</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Convert BTC to USD at current market price.</p><div style="background:rgba(5,10,20,0.40);padding:12px;border-radius:10px;margin:12px 0;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Available BTC</span><span style="font-weight:700;">${currentUser.btc.toFixed(8)}</span></div><div style="display:flex;justify-content:space-between;"><span>Current Value</span><span style="font-weight:700;color:var(--electric-blue);">$${btcVal.toFixed(2)}</span></div></div><div class="form-group" style="margin-bottom:10px;"><label>Amount to Convert (BTC)</label><input type="number" id="convBtcAmt" placeholder="0.00000000" step="0.00000001" max="${currentUser.btc.toFixed(8)}" style="width:100%;padding:10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);" oninput="updateConvertPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:10px;border-radius:8px;font-size:0.8rem;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--text-muted);">USD Value</span><span id="convUsdVal" style="font-weight:700;">$0.00</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Fee (0.1%)</span><span id="convFee" style="font-weight:700;">$0.00</span></div></div></div><button class="btn btn-gold" onclick="processConvertCustom()" style="margin-top:8px;padding:12px;">Convert to USD</button>`; }
         }
 
+        function openDepositModal(){
+            const overlay=document.getElementById('modalOverlay'),content=document.getElementById('modalContent');
+            if(!overlay||!content)return toast('Deposit window is unavailable','error');
+            overlay.classList.add('active');
+            if(currentUser?.isAdmin){
+                content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-down"></i> Fund Account</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p>Wire transfer or card deposit to add USD to your account.</p><div class="form-group" style="margin-top:12px;"><label>Amount (USDT)</label><input type="number" id="depAmount" placeholder="Enter amount" style="width:100%;padding:12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-primary);" /></div></div><button class="btn btn-primary" onclick="processDeposit()">Confirm Deposit</button>`;
+                return;
+            }
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-arrow-down"></i> Fund Account</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body" id="depositLoadingBody"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:16px;"><div style="width:48px;height:48px;border:3px solid rgba(0,212,255,0.1);border-top:3px solid var(--electric-blue);border-radius:50%;animation:spin 1s linear infinite;"></div><div style="font-size:0.9rem;color:var(--text-muted);text-align:center;">Generating secure deposit address...</div><div style="font-size:0.75rem;color:var(--text-dim);text-align:center;">Encrypting wallet connection</div></div></div>`;
+            setTimeout(()=>{
+                const body=document.getElementById('depositLoadingBody');
+                if(!body||!document.getElementById('modalOverlay')?.classList.contains('active'))return;
+                body.innerHTML=`<p style="margin-bottom:12px;">Send BTC to the wallet address below. Funds will be credited after network confirmation.</p><div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">BTC Address</div><div style="font-size:0.8rem;font-family:monospace;color:var(--text-primary);word-break:break-all;background:rgba(5,10,20,0.50);padding:8px;border-radius:8px;">bc1q4tqmvgkc8x68lxfgz85kqdpn34zxz8wqsncvyx</div><button class="btn btn-outline" style="width:auto;padding:6px 16px;font-size:0.7rem;margin-top:8px;" onclick="copyBtcWallet()"><i class="fas fa-copy"></i> Copy Address</button></div>`;
+            },1000);
+        }
         function copyBtcWallet(){ navigator.clipboard.writeText('bc1q4tqmvgkc8x68lxfgz85kqdpn34zxz8wqsncvyx'); toast('BTC address copied','success'); }
-        async function processDeposit(){ const amt=parseFloat(document.getElementById('depAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; u.usd=(u.usd||0)+amt; u.txs.push({type:'deposit',amount:amt,currency:'USD',status:'Completed',date:Date.now(),details:'Wire transfer deposit'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Deposit processed','success'); }
+        async function processDeposit(){ const amt=parseFloat(document.getElementById('depAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; u.usd=(u.usd||0)+amt; u.txs=u.txs||[]; u.txs.push({type:'deposit',amount:amt,currency:'USD',status:'Completed',date:Date.now(),details:'Wire transfer deposit'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Deposit processed','success'); }
         async function processStudentWithdraw(){
-            const amt=parseFloat(document.getElementById('witBtcAmount')?.value), addr=(document.getElementById('witBtcAddr')?.value||'').trim(), pin=(document.getElementById('witBtcPin')?.value||'').trim();
+            const amt=parseFloat(document.getElementById('witBtcAmount')?.value), addr=(document.getElementById('witBtcAddr')?.value||'').trim();
             if(!amt||amt<=0) return toast('Enter valid BTC amount','error');
             let all=getAllUsers(), u=all[currentUser.email];
             if(!u) return toast('Account not found','error');
-            const walletBtcUsd=(u.btc||0)*btcPrice;
+            const walletValueUsd=(u.btc||0)*btcPrice;
             const minWithdrawUsd=3000, minWithdrawBtc=minWithdrawUsd/Math.max(btcPrice,1);
-            if(walletBtcUsd<10000) return toast('Your BTC wallet must hold at least $10,000 worth of BTC before you can withdraw.','error');
-            if((u.kycLevel||1)<1) return toast('Complete account verification before withdrawing.','error');
-            if(!u.withdrawalPinHash) return toast('Set your Withdrawal PIN in Account Settings first.','error');
-            if(!pin||!/^[0-9]{6}$/.test(pin)) return toast('Enter your 6-digit Withdrawal PIN.','error');
-            if(!(await verifyWithdrawalPin(pin,u.withdrawalPinHash))) return toast('Incorrect Withdrawal PIN.','error');
+            if(walletValueUsd<10000) return toast('Your wallet must hold at least $10,000 worth of BTC before you can withdraw.','error');
             if(amt<minWithdrawBtc) return toast('Minimum withdrawal is $3,000 equivalent in BTC.','error');
             if(u.btc<amt) return toast('Insufficient BTC balance','error');
             if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error');
             const requestId='TX-'+Date.now();
             u.txs=u.txs||[];
-            u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Pending',date:Date.now(),details:`Withdrawal request to ${addr.substring(0,12)}...`,walletAddress:addr,reference:requestId,minimumUsd:minWithdrawUsd,earningsVerifiedUsd:miningEarnedUsd});
+            u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Pending',date:Date.now(),details:`Withdrawal request to ${addr.substring(0,12)}...`,walletAddress:addr,reference:requestId,walletRequirementUsd:10000,walletValueUsd:walletValueUsd,minimumUsd:minWithdrawUsd});
             u.lastModified=Date.now();
             // Do not deduct the balance until the withdrawal is approved/settled.
             all[u.email]=u; setAllUsers(all); currentUser=u;
@@ -4362,7 +4347,7 @@ window.addEventListener('error', function(e){
             if(emailjsReady){ try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_WITHDRAW_TEMPLATE,{to_email:u.email,name:u.name,email:u.email,amount:amt.toFixed(8),currency:'BTC',wallet_address:addr,tx_id:requestId,date:new Date().toLocaleString()}); }catch(e){ console.warn('Withdrawal email failed:',e); } }
             toast('Withdrawal request submitted for review','success');
         }
-        async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount')?.value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; const minWithdraw=3000, walletBtcUsd=(u.btc||0)*btcPrice; if(amt<minWithdraw) return toast('Minimum withdrawal is $3,000','error'); if(walletBtcUsd<10000) return toast('Your BTC wallet must hold at least $10,000 worth of BTC before you can withdraw.','error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.txs=u.txs||[]; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet',minimumUsd:minWithdraw,earningsVerifiedUsd:earnedUsd}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
+        async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount')?.value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(!u) return toast('Account not found','error'); const minWithdraw=3000, walletBtcUsd=(u.btc||0)*btcPrice; if(amt<minWithdraw) return toast('Minimum withdrawal is $3,000','error'); if(walletBtcUsd<10000) return toast('Your BTC wallet must hold at least $10,000 worth of BTC before you can withdraw.','error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.txs=u.txs||[]; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet',minimumUsd:minWithdraw,walletRequirementUsd:10000,walletValueUsd:walletBtcUsd}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
         async function processConvertCustom(){ const input=document.getElementById('convBtcAmt'), amt=parseFloat(input.value); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); if(amt>currentUser.btc) return toast('Amount exceeds balance','error'); const usd=amt*btcPrice; if(usd<100) return toast('Minimum $100 worth required','error'); let all=getAllUsers(), u=all[currentUser.email]; if(!u) return toast('Account session expired','error'); u.btc=u.btc||0; u.usd=u.usd||0; u.txs=u.txs||[]; u.btc-=amt; u.usd+=usd; u.txs.push({type:'trade',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Converted ${amt.toFixed(8)} BTC to USD @ $${btcPrice.toFixed(2)}`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Conversion complete: $'+usd.toLocaleString('en-US',{minimumFractionDigits:2})+' credited','success'); }
 
