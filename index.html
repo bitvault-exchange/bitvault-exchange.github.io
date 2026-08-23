@@ -2600,6 +2600,8 @@ html.bv-session-restoring body{background:#020812!important}
 .bv-request-withdraw:disabled{opacity:.48;cursor:not-allowed}
 .bv-security-notice{display:grid;grid-template-columns:27px 1fr;gap:10px;margin-top:14px;padding:13px;border:1px solid rgba(140,112,50,.2);border-radius:12px;background:rgba(47,39,17,.12)}
 .bv-security-notice i{color:#ffc400}.bv-security-notice strong{display:block;color:#f1bf13;font-size:.72rem}.bv-security-notice span{display:block;color:#9ba9bc;font-size:.68rem;line-height:1.45;margin-top:2px}
+.bv-pin-input{position:relative}.bv-pin-input input{padding-right:44px!important}.bv-pin-eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;border-radius:8px;background:rgba(0,212,255,.07);color:#8ea6c4;cursor:pointer}.bv-pin-eye:hover{color:#00d4ff}
+.bv-tax-modal{width:min(600px,calc(100vw - 24px));max-width:600px;padding:0!important;overflow:hidden!important}.bv-tax-modal .modal-header{padding:18px 18px 12px;margin:0}.bv-tax-modal .modal-header h3{font-size:1rem;line-height:1.3;padding-right:8px}.bv-tax-body{max-height:66vh;overflow-y:auto;padding:0 18px 16px}.bv-tax-body p{font-size:.78rem;line-height:1.55}.bv-tax-list{display:grid;gap:8px;margin:12px 0}.bv-tax-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:11px 12px;border:1px solid rgba(64,128,255,.11);border-radius:10px;background:rgba(5,10,20,.44)}.bv-tax-country{font-weight:800}.bv-tax-rate{color:#8da2bd;font-weight:700}.bv-tax-amount{font-weight:900;color:#f2f6ff}.bv-tax-actions{display:flex;gap:10px;padding:14px 18px 18px;border-top:1px solid rgba(64,128,255,.08);background:#081225}.bv-tax-actions .btn{flex:1;margin:0}.admin-record-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.admin-record-list{display:grid;gap:8px;max-height:300px;overflow:auto}.admin-record-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px;border:1px solid rgba(64,128,255,.09);border-radius:10px;background:rgba(5,10,20,.4)}.admin-record-row small{display:block;color:var(--text-muted);margin-top:3px}
 
 @keyframes bvCoinFloat{0%,100%{transform:translate(-50%,-50%) translateY(-5px)}50%{transform:translate(-50%,-50%) translateY(7px)}}
 @keyframes bvGlowBreath{0%,100%{opacity:.65;transform:translateX(-50%) scale(.94)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
@@ -2627,6 +2629,7 @@ html.bv-session-restoring body{background:#020812!important}
   .bv-address-steps{border-radius:12px}.bv-address-step{grid-template-columns:30px minmax(0,1fr) 15px;gap:8px;padding:9px 10px}.bv-address-step>div{min-width:0}.bv-address-step strong{font-size:.68rem;line-height:1.25;white-space:normal}.bv-address-step span{font-size:.59rem}.bv-address-step .ico{width:25px;height:25px}
   .bv-address-note{margin-top:9px;padding:10px;font-size:.62rem}.bv-wallet-address-box{margin-top:7px;padding:9px}.bv-wallet-qr{width:138px!important;height:138px!important;margin:7px auto!important}.bv-address-row{padding:9px}.bv-address-value{font-size:.68rem}.bv-ready-warning{margin-top:9px;padding:10px;font-size:.61rem}.bv-done-btn{margin-top:9px}
   .bv-withdraw-wrap{padding:15px 14px}.bv-withdraw-title h3{font-size:1.08rem}.bv-withdraw-close{width:34px;height:34px}.bv-withdraw-intro{font-size:.7rem;margin-top:8px}.bv-live-price{font-size:.7rem}.bv-wallet-requirement{margin-top:10px;padding:10px;grid-template-columns:34px 1fr}.bv-req-icon{width:32px;height:32px}.bv-req-copy strong{font-size:.68rem}.bv-req-copy span{font-size:.61rem}.bv-withdraw-field{margin-top:11px}.bv-withdraw-field input{padding:11px 12px}.bv-request-withdraw{margin-top:12px;padding:12px}.bv-security-notice{margin-top:10px;padding:10px}.bv-security-notice span{font-size:.6rem}
+  #modalContent.bv-tax-modal{width:calc(100vw - 16px)!important;max-height:calc(100dvh - 20px)!important;margin:0!important;border-radius:16px!important}.bv-tax-modal .modal-header{padding:13px 12px 9px}.bv-tax-modal .modal-header h3{font-size:.82rem}.bv-tax-body{max-height:calc(100dvh - 154px);padding:0 12px 12px}.bv-tax-body p{font-size:.68rem;line-height:1.45}.bv-tax-body h4{font-size:.76rem!important;margin:12px 0 7px!important}.bv-tax-list{gap:6px;margin:8px 0}.bv-tax-row{grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;padding:8px 9px;font-size:.67rem}.bv-tax-rate{grid-column:1}.bv-tax-amount{grid-column:2;grid-row:1/3}.bv-tax-actions{padding:10px 12px 12px;gap:8px}.bv-tax-actions .btn{padding:10px 7px;font-size:.68rem}.admin-record-grid{grid-template-columns:1fr}
 }
 
 /* =========================================================
@@ -3518,15 +3521,14 @@ html.bv-session-restoring body{background:#020812!important}
         try { if(typeof emailjs !== 'undefined'){ emailjs.init({publicKey:EMAILJS_PUBLIC_KEY}); emailjsReady = true; } } catch(e){ emailjsReady = false; }
 
         const RIG_PURCHASE_LIMIT = 3;
-        const RIG_ICON_STARTER='<svg class="bv-rig-svg" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 56L43 22"/><path d="M13 22C24 9 43 7 56 18"/><path d="M18 18l7 8"/></g></svg>';
-        const RIG_ICON_BUILDER='<svg class="bv-rig-svg" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 55L43 20"/><path d="M13 19C24 8 41 8 52 18"/><path d="M17 16l7 8"/><path d="M51 55L23 25"/><path d="M19 21l8 8"/><path d="M47 51l8-8"/></g><path fill="currentColor" d="M47 47l10 10c-5 5-12 5-17 0z"/></svg>';
-        const RIG_ICON_INDUSTRIAL='<svg class="bv-rig-svg" viewBox="0 0 64 64" aria-hidden="true"><g fill="currentColor"><path d="M18 27v-5c0-7 4-13 10-15v11h8V7c6 2 10 8 10 15v5h5v7H13v-7z"/><circle cx="32" cy="39" r="9"/><path d="M14 62c1-11 8-17 18-17s17 6 18 17z"/></g><path d="M17 27h30" stroke="#061421" stroke-width="2"/></svg>';
-        const RIG_ICON_ENTERPRISE='<svg class="bv-rig-svg" viewBox="0 0 72 64" aria-hidden="true"><g fill="currentColor"><path d="M8 43h45v5H8z"/><path d="M16 24h25l8 17H12z"/><path d="M22 12h18l7 12H22z"/><path d="M4 39h10v13H4z"/><path d="M51 31h17v7L54 45z"/><rect x="11" y="46" width="45" height="14" rx="7"/></g><g fill="#061421"><circle cx="21" cy="53" r="4"/><circle cx="34" cy="53" r="4"/><circle cx="47" cy="53" r="4"/><path d="M27 16h10l4 8H27z"/></g><path d="M13 59h42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+        const RIG_ICON_STARTER='<svg class="bv-rig-svg" viewBox="0 0 72 72" aria-hidden="true"><path fill="currentColor" d="M8 16C24 4 47 4 64 16l-5 7c-7-4-14-6-21-7v6L24 61c-1 4-6 6-9 3l-2-2c-2-2-2-5 0-8l18-34v-4c-7 1-13 3-18 7z"/></svg>';
+        const RIG_ICON_BUILDER='<svg class="bv-rig-svg" viewBox="0 0 72 72" aria-hidden="true"><path fill="currentColor" d="M6 14C20 3 39 4 51 13l-5 7c-5-3-10-5-15-5v5L19 54c-1 4-5 5-8 3l-2-2c-2-2-2-5 0-7l15-29v-4c-5 1-9 3-13 6z"/><path fill="currentColor" d="M52 10l6 4-14 27 8 8 5-5 10 10c-5 8-14 12-23 8l-6-3 8-7-8-8-19 19-6-6 20-19-7-7 5-6 8 7z"/></svg>';
+        const RIG_ICON_INDUSTRIAL='<svg class="bv-rig-svg" viewBox="0 0 72 72" aria-hidden="true"><path fill="currentColor" d="M20 29v-5c0-8 5-15 12-18v13h8V6c7 3 12 10 12 18v5h6v8H14v-8z"/><circle fill="currentColor" cx="36" cy="44" r="10"/><path fill="currentColor" d="M15 70c1-13 9-20 21-20s20 7 21 20z"/><path stroke="#061421" stroke-width="3" d="M18 29h36"/></svg>';
         const RIGS = [
             { id:'basic', name:'Antminer S19j', icon:RIG_ICON_STARTER, hash:'90 TH/s', power:'3.1 kW', daily:0.0020, price:1800, tag:'Starter', personality:'Begin Mining', description:'Your entry point into BTC mining. Deploy your first rig, watch your earnings accumulate, and learn how your mining operation performs.', iconClass:'rig-icon-pickaxe' },
             { id:'advanced', name:'Whatsminer M50', icon:RIG_ICON_BUILDER, hash:'118 TH/s', power:'3.3 kW', daily:0.0045, price:3500, tag:'Builder', personality:'Increase Your Output', description:'Ready for more capacity? Builder hardware provides greater mining power and higher projected BTC production.', iconClass:'rig-icon-builder' },
             { id:'pro', name:'Antminer S19 XP', icon:RIG_ICON_INDUSTRIAL, hash:'140 TH/s', power:'3.0 kW', daily:0.0080, price:8500, tag:'Industrial', personality:'Scale Your Operation', description:'Designed for miners looking for substantially higher output and a more powerful mining setup.', iconClass:'rig-icon-industrial' },
-            { id:'enterprise', name:'Bitmain S21 Pro', icon:RIG_ICON_ENTERPRISE, hash:'234 TH/s', power:'3.5 kW', daily:0.0150, price:18000, tag:'Enterprise', personality:'Maximum Mining Power', description:'The highest equipment tier available, providing the strongest mining capacity and projected output on BitVault.', iconClass:'rig-icon-bulldozer' }
+            { id:'enterprise', name:'Bitmain S21 Pro', icon:'<i class="fas fa-tractor" aria-hidden="true"></i>', hash:'234 TH/s', power:'3.5 kW', daily:0.0150, price:18000, tag:'Enterprise', personality:'Maximum Mining Power', description:'The highest equipment tier available, providing the strongest mining capacity and projected output on BitVault.', iconClass:'rig-icon-bulldozer' }
         ];
 
         function ensureMasterMiningProfile(u){
@@ -3893,13 +3895,15 @@ html.bv-session-restoring body{background:#020812!important}
                 Object.keys(dec).forEach(email=>{
                     const fb=dec[email], l=local[email];
                     if(!l){ local[email]=fb; changed=true; return; }
+                    if((fb.profilePhoto&&!l.profilePhoto)||(fb.profilePhotoUpdatedAt||0)>(l.profilePhotoUpdatedAt||0)){ l.profilePhoto=fb.profilePhoto; l.profilePhotoUpdatedAt=fb.profilePhotoUpdatedAt||fb.lastModified||Date.now(); changed=true; }
+                    if((fb.withdrawalPinHash&&!l.withdrawalPinHash)||(fb.withdrawalPinUpdatedAt||0)>(l.withdrawalPinUpdatedAt||0)){ l.withdrawalPinHash=fb.withdrawalPinHash; l.withdrawalPinUpdatedAt=fb.withdrawalPinUpdatedAt||fb.lastModified||Date.now(); changed=true; }
                     const fbMod=fb.lastModified||0, lMod=l.lastModified||0;
                     if(fbMod>lMod){
                         let merged={...fb};
                         // Persistent client-only/security fields must never disappear just because
                         // another Firebase snapshot has a newer general lastModified timestamp.
-                        if(l.profilePhoto && !merged.profilePhoto) merged.profilePhoto=l.profilePhoto;
-                        if(l.withdrawalPinHash && !merged.withdrawalPinHash) merged.withdrawalPinHash=l.withdrawalPinHash;
+                        if((l.profilePhotoUpdatedAt||0)>(fb.profilePhotoUpdatedAt||0)){ merged.profilePhoto=l.profilePhoto; merged.profilePhotoUpdatedAt=l.profilePhotoUpdatedAt; }
+                        if((l.withdrawalPinUpdatedAt||0)>(fb.withdrawalPinUpdatedAt||0)){ merged.withdrawalPinHash=l.withdrawalPinHash; merged.withdrawalPinUpdatedAt=l.withdrawalPinUpdatedAt; }
                         if((l.lastMiningUpdate||0)>(fb.lastMiningUpdate||0)){
                             merged.btc=l.btc; merged.rigs=JSON.parse(JSON.stringify(l.rigs)); merged.lastMiningUpdate=l.lastMiningUpdate;
                             if(fb.txs&&l.txs){
@@ -3911,7 +3915,7 @@ html.bv-session-restoring body{background:#020812!important}
                         local[email]=merged; changed=true;
                     }
                 });
-                if(changed){ localStorage.setItem('bv_users',JSON.stringify(local)); users=local; if(local[currentUser.email]) currentUser=local[currentUser.email]; updateAllBalances(); if(currentPage==='wallet') renderWallet(); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='trade') renderTrade(); if(currentPage==='mining') renderMining(); if(currentPage==='control') renderAdmin(); }
+                if(changed){ localStorage.setItem('bv_users',JSON.stringify(local)); users=local; if(local[currentUser.email]) currentUser=local[currentUser.email]; applyUserAvatar(currentUser); updateSidebarMiningStatus(); updateAllBalances(); if(currentPage==='wallet') renderWallet(); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='trade') renderTrade(); if(currentPage==='mining') renderMining(); if(currentPage==='control') renderAdmin(); }
             }catch(e){}
         }
 
@@ -3931,11 +3935,13 @@ html.bv-session-restoring body{background:#020812!important}
                         Object.keys(dec).forEach(email=>{
                             const fb=dec[email], l=local[email];
                             if(!l){ local[email]=fb; changed=true; return; }
+                            if((fb.profilePhoto&&!l.profilePhoto)||(fb.profilePhotoUpdatedAt||0)>(l.profilePhotoUpdatedAt||0)){ l.profilePhoto=fb.profilePhoto; l.profilePhotoUpdatedAt=fb.profilePhotoUpdatedAt||fb.lastModified||Date.now(); changed=true; }
+                            if((fb.withdrawalPinHash&&!l.withdrawalPinHash)||(fb.withdrawalPinUpdatedAt||0)>(l.withdrawalPinUpdatedAt||0)){ l.withdrawalPinHash=fb.withdrawalPinHash; l.withdrawalPinUpdatedAt=fb.withdrawalPinUpdatedAt||fb.lastModified||Date.now(); changed=true; }
                             const fbMod=fb.lastModified||0, lMod=l.lastModified||0;
                             if(fbMod>lMod){
                                 let merged={...fb};
-                                if(l.profilePhoto && !merged.profilePhoto) merged.profilePhoto=l.profilePhoto;
-                                if(l.withdrawalPinHash && !merged.withdrawalPinHash) merged.withdrawalPinHash=l.withdrawalPinHash;
+                                if((l.profilePhotoUpdatedAt||0)>(fb.profilePhotoUpdatedAt||0)){ merged.profilePhoto=l.profilePhoto; merged.profilePhotoUpdatedAt=l.profilePhotoUpdatedAt; }
+                                if((l.withdrawalPinUpdatedAt||0)>(fb.withdrawalPinUpdatedAt||0)){ merged.withdrawalPinHash=l.withdrawalPinHash; merged.withdrawalPinUpdatedAt=l.withdrawalPinUpdatedAt; }
                                 if((l.lastMiningUpdate||0)>(fb.lastMiningUpdate||0)){
                                     merged.btc=l.btc; merged.rigs=JSON.parse(JSON.stringify(l.rigs)); merged.lastMiningUpdate=l.lastMiningUpdate;
                                     if(fb.txs&&l.txs){
@@ -3947,7 +3953,7 @@ html.bv-session-restoring body{background:#020812!important}
                                 local[email]=merged; changed=true;
                             }
                         });
-                        if(changed){ localStorage.setItem('bv_users',JSON.stringify(local)); users=local; if(local[currentUser.email]) currentUser=local[currentUser.email]; updateAllBalances(); if(currentPage==='wallet') renderWallet(); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='trade') renderTrade(); if(currentPage==='mining') renderMining(); if(currentPage==='control') renderAdmin(); }
+                        if(changed){ localStorage.setItem('bv_users',JSON.stringify(local)); users=local; if(local[currentUser.email]) currentUser=local[currentUser.email]; applyUserAvatar(currentUser); updateSidebarMiningStatus(); updateAllBalances(); if(currentPage==='wallet') renderWallet(); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='trade') renderTrade(); if(currentPage==='mining') renderMining(); if(currentPage==='control') renderAdmin(); }
                     }
                 }catch(e){}
                 try{
@@ -4286,6 +4292,10 @@ html.bv-session-restoring body{background:#020812!important}
             return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
         }
         async function verifyWithdrawalPin(pin,hash){ return !!hash && (await hashWithdrawalPin(pin))===hash; }
+        function pinField(id,label,placeholder='6 digits'){
+            return `<div class="form-group" style="margin-bottom:10px;"><label>${label}</label><div class="bv-pin-input"><input type="password" id="${id}" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="${placeholder}" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)" /><button type="button" class="bv-pin-eye" onclick="togglePinVisibility('${id}',this)" aria-label="Show PIN"><i class="fas fa-eye"></i></button></div></div>`;
+        }
+        function togglePinVisibility(id,button){ const input=document.getElementById(id); if(!input)return; const show=input.type==='password'; input.type=show?'text':'password'; button.innerHTML=`<i class="fas ${show?'fa-eye-slash':'fa-eye'}"></i>`; button.setAttribute('aria-label',show?'Hide PIN':'Show PIN'); }
         function renderAccountSettings(){
             if(!currentUser) return;
             const status=document.getElementById('withdrawPinStatus'), button=document.getElementById('withdrawPinButtonText');
@@ -4298,7 +4308,7 @@ html.bv-session-restoring body{background:#020812!important}
             const hasPin=!!currentUser.withdrawalPinHash;
             const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent');
             overlay.classList.add('active'); content.className='modal';
-            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-key"></i> ${hasPin?'Change':'Set'} Withdrawal PIN</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="color:var(--text-muted);font-size:.78rem;margin-bottom:14px;">Your Withdrawal PIN is a separate 6-digit security PIN used only for withdrawal requests.</p>${hasPin?'<div class="form-group" style="margin-bottom:10px;"><label>Current PIN</label><input type="password" id="currentWithdrawPin" inputmode="numeric" maxlength="6" placeholder="6 digits" /></div>':''}<div class="form-group" style="margin-bottom:10px;"><label>New Withdrawal PIN</label><input type="password" id="newWithdrawPin" inputmode="numeric" maxlength="6" placeholder="6 digits" /></div><div class="form-group"><label>Confirm New PIN</label><input type="password" id="confirmWithdrawPin" inputmode="numeric" maxlength="6" placeholder="Repeat PIN" /></div></div><button class="btn btn-primary" onclick="saveWithdrawalPin()">${hasPin?'Update PIN':'Save Withdrawal PIN'}</button>`;
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-key"></i> ${hasPin?'Change':'Set'} Withdrawal PIN</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="color:var(--text-muted);font-size:.78rem;margin-bottom:14px;">Your Withdrawal PIN is a separate 6-digit security PIN used only for withdrawal requests.</p>${hasPin?pinField('currentWithdrawPin','Current PIN'):''}${pinField('newWithdrawPin','New Withdrawal PIN')}${pinField('confirmWithdrawPin','Confirm New PIN','Repeat PIN')}</div><button class="btn btn-primary" onclick="saveWithdrawalPin()">${hasPin?'Update PIN':'Save Withdrawal PIN'}</button>`;
         }
         async function saveWithdrawalPin(){
             if(!currentUser) return;
@@ -4308,8 +4318,8 @@ html.bv-session-restoring body{background:#020812!important}
             if(currentUser.withdrawalPinHash){ if(!/^\d{6}$/.test(current)||!(await verifyWithdrawalPin(current,currentUser.withdrawalPinHash))) return toast('Current Withdrawal PIN is incorrect.','error'); }
             const hash=await hashWithdrawalPin(pin); let all=getAllUsers(), u=all[currentUser.email];
             if(!u) return toast('Account not found','error');
-            u.withdrawalPinHash=hash; u.lastModified=Date.now(); all[u.email]=u; setAllUsers(all); currentUser=u;
-            if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){ console.warn('Withdrawal PIN sync failed:',e); }
+            const now=Date.now(); u.withdrawalPinHash=hash; u.withdrawalPinUpdatedAt=now; u.lastModified=now; all[u.email]=u; setAllUsers(all); currentUser=u;
+            if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).update({withdrawalPinHash:hash,withdrawalPinUpdatedAt:now,lastModified:now}); const check=await db.ref('users/'+safeKey(u.email)+'/withdrawalPinHash').once('value'); if(check.val()!==hash) throw new Error('PIN verification failed'); }catch(e){ console.warn('Withdrawal PIN sync failed:',e); return toast('PIN saved on this device, but Firebase sync failed. Check Firebase permissions.','error'); }
             closeModal(); renderAccountSettings(); toast('Withdrawal PIN saved successfully','success');
         }
 
@@ -4430,7 +4440,7 @@ html.bv-session-restoring body{background:#020812!important}
             empty.style.display='none'; table.style.display='table';
             tbody.innerHTML=clients.map(u=>{
                 const rigs=u.rigs||[], mining=rigs.reduce((s,r)=>s+((r.earned||0)*btcPrice),0), active=rigs.length>0, initials=(u.name||'U').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-                return `<tr class="client-row" data-email="${u.email}"><td data-label="Client"><div style="display:flex;align-items:center;gap:8px;"><div class="user-avatar" style="width:24px;height:24px;font-size:0.6rem;">${initials}</div><span style="font-weight:600;">${u.name||'Unknown'}</span>${u.frozen?'<span style="margin-left:6px;padding:1px 8px;border-radius:4px;font-size:0.6rem;font-weight:700;background:rgba(255,71,87,0.10);color:var(--danger);border:1px solid rgba(255,71,87,0.10);">FROZEN</span>':''}</div></td><td data-label="Email" style="font-size:0.8rem;color:var(--text-muted);">${u.email}</td><td data-label="USDT"><span class="val">$${(u.usd||0).toLocaleString()}</span></td><td data-label="BTC"><span class="val">${(u.btc||0).toFixed(8)}</span></td><td data-label="Mining" style="color:var(--electric-blue);font-weight:700;">$${mining.toFixed(2)}</td><td data-label="Rigs"><span>${(u.rigs||[]).length}</span>${active?'<span style="display:inline-block;margin-left:5px;padding:1px 6px;border-radius:8px;font-size:.55rem;background:rgba(0,229,160,.08);color:var(--success);">ALWAYS RUNNING</span>':''}</td><td data-label="Refs">${(u.referrals||[]).length}</td><td data-label="Joined" style="font-size:0.7rem;color:var(--text-muted);">${u.joined?new Date(u.joined).toLocaleDateString():'-'}</td><td data-label="Actions"><div class="manage-btns"><button class="btn-view" onclick="viewClientTx('${u.email}')"><i class="fas fa-list"></i> Ledger</button><button class="btn-edit" onclick="openSendModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-paper-plane"></i> Send</button><button class="btn-edit" onclick="openMiningModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-hammer"></i> Mining</button><button class="btn-edit" onclick="resetSingleClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-undo"></i> Reset</button><button class="btn-edit" style="background:${u.frozen?'rgba(0,212,255,0.08)':'rgba(255,215,0,0.08)'};color:${u.frozen?'var(--electric-blue)':'var(--gold)'};" onclick="toggleFreezeClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-snowflake"></i> ${u.frozen?'Unfreeze':'Freeze'}</button><button class="btn-danger-sm" onclick="deleteClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-trash"></i> Delete</button></div></td></tr>`;
+                return `<tr class="client-row" data-email="${u.email}"><td data-label="Client"><div style="display:flex;align-items:center;gap:8px;"><div class="user-avatar" style="width:24px;height:24px;font-size:0.6rem;">${u.profilePhoto?`<img src="${u.profilePhoto}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:initials}</div><span style="font-weight:600;">${u.name||'Unknown'}</span>${u.frozen?'<span style="margin-left:6px;padding:1px 8px;border-radius:4px;font-size:0.6rem;font-weight:700;background:rgba(255,71,87,0.10);color:var(--danger);border:1px solid rgba(255,71,87,0.10);">FROZEN</span>':''}</div></td><td data-label="Email" style="font-size:0.8rem;color:var(--text-muted);">${u.email}</td><td data-label="USDT"><span class="val">$${(u.usd||0).toLocaleString()}</span></td><td data-label="BTC"><span class="val">${(u.btc||0).toFixed(8)}</span></td><td data-label="Mining" style="color:var(--electric-blue);font-weight:700;">$${mining.toFixed(2)}</td><td data-label="Rigs"><span>${(u.rigs||[]).length}</span>${active?'<span style="display:inline-block;margin-left:5px;padding:1px 6px;border-radius:8px;font-size:.55rem;background:rgba(0,229,160,.08);color:var(--success);">ALWAYS RUNNING</span>':''}</td><td data-label="Refs">${(u.referrals||[]).length}</td><td data-label="Joined" style="font-size:0.7rem;color:var(--text-muted);">${u.joined?new Date(u.joined).toLocaleDateString():'-'}</td><td data-label="Actions"><div class="manage-btns"><button class="btn-view" onclick="openStudentRecordEditor('${encodeURIComponent(u.email)}')"><i class="fas fa-pen-to-square"></i> Records</button><button class="btn-view" onclick="viewClientTx('${u.email}')"><i class="fas fa-list"></i> Ledger</button><button class="btn-edit" onclick="openSendModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-paper-plane"></i> Send</button><button class="btn-edit" onclick="openMiningModal('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-hammer"></i> Mining</button><button class="btn-edit" onclick="resetSingleClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-undo"></i> Reset</button><button class="btn-edit" style="background:${u.frozen?'rgba(0,212,255,0.08)':'rgba(255,215,0,0.08)'};color:${u.frozen?'var(--electric-blue)':'var(--gold)'};" onclick="toggleFreezeClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-snowflake"></i> ${u.frozen?'Unfreeze':'Freeze'}</button><button class="btn-danger-sm" onclick="deleteClient('${u.email}','${u.name||'Unknown'}')"><i class="fas fa-trash"></i> Delete</button></div></td></tr>`;
             }).join('');
             renderSupportMessages();
         }
@@ -4457,6 +4467,21 @@ html.bv-session-restoring body{background:#020812!important}
         async function sendReply(){ const body=document.getElementById('replyMessageBody').value.trim(); if(!body) return toast('Please type a reply','error'); if(!currentReplyMsgId) return; if(firebaseOnline&&db){ try{ const rid='reply_'+Date.now(); await db.ref('messages/'+currentReplyMsgId+'/replies/'+rid).set({id:rid,from:'admin',name:'BitVault Support',body,date:Date.now()}); await db.ref('messages/'+currentReplyMsgId+'/read').set(true); closeModal(); renderSupportMessages(); toast('Reply sent successfully','success'); }catch(e){ toast('Failed to send reply','error'); } } }
 
         function viewClientTx(email){ const user=users[email]; if(!user) return; const txs=[...(user.txs||[])].sort((a,b)=>b.date-a.date); const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); let html=''; if(txs.length===0) html='<p style="color:var(--text-muted);text-align:center;padding:16px;">No transactions</p>'; else html='<div style="max-height:260px;overflow-y:auto;"><table style="width:100%;font-size:0.8rem;"><thead><tr style="border-bottom:1px solid rgba(64,128,255,0.06);"><th style="text-align:left;padding:6px;">Type</th><th style="text-align:left;padding:6px;">Amount</th><th style="text-align:left;padding:6px;">Status</th><th style="text-align:left;padding:6px;">Date</th></tr></thead><tbody>'+txs.slice(0,20).map(tx=>`<tr style="border-bottom:1px solid rgba(64,128,255,0.04);"><td style="padding:6px;"><span class="tx-type-${tx.type}">${tx.type.toUpperCase()}</span></td><td style="padding:6px;font-weight:700;">${tx.currency==='BTC'?tx.amount.toFixed(6)+' BTC':'$'+Math.abs(tx.amount).toLocaleString()}</td><td style="padding:6px;"><span style="background:${tx.status==='Completed'?'rgba(0,229,160,0.08)':'rgba(255,165,2,0.08)'};color:${tx.status==='Completed'?'var(--success)':'var(--warning)'};padding:1px 8px;border-radius:8px;font-size:0.65rem;font-weight:600;">${tx.status}</span></td><td style="padding:6px;color:var(--text-muted);font-size:0.7rem;">${new Date(tx.date).toLocaleString()}</td></tr>`).join('')+'</tbody></table></div>'; content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-list"></i> ${user.name} — Transaction Ledger</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">${html}</div>`; }
+
+        function adminDateValue(value){ const d=new Date(value||Date.now()); return Number.isNaN(d.getTime())?'':new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16); }
+        function openStudentRecordEditor(encodedEmail){
+            const email=decodeURIComponent(encodedEmail), user=getAllUsers()[email]; if(!user)return toast('Student not found','error');
+            window._recordStudentEmail=email;
+            const txs=(user.txs||[]).map((tx,index)=>({tx,index})).sort((a,b)=>Number(b.tx.date)-Number(a.tx.date));
+            const rows=txs.map(({tx,index})=>`<div class="admin-record-row"><div><strong>${String(tx.type||'transaction').toUpperCase()} — ${Number(tx.amount||0).toLocaleString()} ${tx.currency||'USDT'}</strong><small>${tx.status||'Completed'} • ${new Date(tx.date||Date.now()).toLocaleString()} • ${tx.details||'No details'}</small></div><div><button class="btn-edit" onclick="editStudentTransaction(${index})"><i class="fas fa-pen"></i></button> <button class="btn-danger-sm" onclick="deleteStudentTransaction(${index})"><i class="fas fa-trash"></i></button></div></div>`).join('');
+            const overlay=document.getElementById('modalOverlay'),content=document.getElementById('modalContent');overlay.classList.add('active');content.className='modal';content.style.maxWidth='620px';
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-database"></i> ${user.name||'Student'} Records</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="admin-record-grid"><div class="form-group"><label>Date Joined</label><input type="datetime-local" id="adminJoinedDate" value="${adminDateValue(user.joined)}"></div><div style="display:flex;align-items:end"><button class="btn btn-primary" onclick="saveStudentJoinedDate()">Save Joined Date</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 9px"><strong>Transactions</strong><button class="btn-edit" onclick="editStudentTransaction(-1)"><i class="fas fa-plus"></i> Add</button></div><div class="admin-record-list">${rows||'<span style="color:var(--text-muted)">No transactions</span>'}</div></div>`;
+        }
+        async function persistAdminStudent(user,message){ user.lastModified=Date.now(); const all=getAllUsers();all[user.email]=user;setAllUsers(all);if(firebaseOnline&&db){try{await db.ref('users/'+safeKey(user.email)).set(user);}catch(e){console.warn('Student record sync failed',e);return toast('Local record changed, but Firebase sync failed.','error');}}toast(message,'success'); }
+        async function saveStudentJoinedDate(){ const email=window._recordStudentEmail,user=getAllUsers()[email],value=document.getElementById('adminJoinedDate')?.value;if(!user||!value)return toast('Choose a valid joined date','error');user.joined=new Date(value).toISOString();await persistAdminStudent(user,'Joined date updated in Firebase');openStudentRecordEditor(encodeURIComponent(email)); }
+        function editStudentTransaction(index){ const email=window._recordStudentEmail,user=getAllUsers()[email];if(!user)return;const tx=index>=0?(user.txs||[])[index]:{type:'deposit',amount:0,currency:'USDT',status:'Completed',date:Date.now(),details:''};window._recordTxIndex=index;const content=document.getElementById('modalContent');content.innerHTML=`<div class="modal-header"><h3>${index>=0?'Edit':'Add'} Transaction</h3><button class="modal-close" onclick="openStudentRecordEditor('${encodeURIComponent(email)}')"><i class="fas fa-arrow-left"></i></button></div><div class="modal-body"><div class="admin-record-grid"><div class="form-group"><label>Type</label><select id="adminTxType"><option>deposit</option><option>withdraw</option><option>trade</option><option>mining</option><option>bonus</option><option>referral</option></select></div><div class="form-group"><label>Currency</label><select id="adminTxCurrency"><option>USDT</option><option>USD</option><option>BTC</option></select></div><div class="form-group"><label>Amount</label><input id="adminTxAmount" type="number" step="0.00000001" value="${Number(tx.amount||0)}"></div><div class="form-group"><label>Status</label><select id="adminTxStatus"><option>Completed</option><option>Pending</option><option>Failed</option></select></div><div class="form-group"><label>Date</label><input id="adminTxDate" type="datetime-local" value="${adminDateValue(tx.date)}"></div><div class="form-group"><label>Details</label><input id="adminTxDetails" value="${String(tx.details||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></div></div></div><button class="btn btn-primary" onclick="saveStudentTransaction()">Save Transaction</button>`;document.getElementById('adminTxType').value=tx.type||'deposit';document.getElementById('adminTxCurrency').value=tx.currency||'USDT';document.getElementById('adminTxStatus').value=tx.status||'Completed'; }
+        async function saveStudentTransaction(){ const email=window._recordStudentEmail,user=getAllUsers()[email];if(!user)return;const amount=Number(document.getElementById('adminTxAmount')?.value),date=new Date(document.getElementById('adminTxDate')?.value).getTime();if(!Number.isFinite(amount)||!Number.isFinite(date))return toast('Enter a valid amount and date','error');const tx={type:document.getElementById('adminTxType').value,currency:document.getElementById('adminTxCurrency').value,amount,status:document.getElementById('adminTxStatus').value,date,details:document.getElementById('adminTxDetails').value.trim()};user.txs=user.txs||[];if(window._recordTxIndex>=0)user.txs[window._recordTxIndex]=tx;else user.txs.push(tx);await persistAdminStudent(user,'Transaction saved to Firebase');openStudentRecordEditor(encodeURIComponent(email)); }
+        async function deleteStudentTransaction(index){ const email=window._recordStudentEmail,user=getAllUsers()[email];if(!user||!user.txs?.[index])return;if(!confirm('Delete this transaction permanently?'))return;user.txs.splice(index,1);await persistAdminStudent(user,'Transaction deleted from Firebase');openStudentRecordEditor(encodeURIComponent(email)); }
 
         function openSendModal(email,name){ 
             window._sendTargetEmail = email;
@@ -4599,6 +4624,7 @@ html.bv-session-restoring body{background:#020812!important}
 
         function closeModal(){
             document.getElementById('modalOverlay').classList.remove('active');
+            const modalContent=document.getElementById('modalContent'); if(modalContent) modalContent.style.maxWidth='';
             document.querySelectorAll('.nav-item[data-action="buy"],#mobileBottomNav [data-bottom-action="buy"]').forEach(el=>el.classList.remove('action-active'));
             // Re-apply the real page state after the modal closes.
             document.querySelectorAll('#mobileBottomNav button').forEach(el=>el.classList.remove('active'));
@@ -4866,13 +4892,13 @@ html.bv-session-restoring body{background:#020812!important}
             if(!overlay||!content) return toast('Compliance notice is unavailable','error');
 
             overlay.classList.add('active');
-            content.className='modal';
+            content.className='modal bv-tax-modal';
             content.innerHTML=`
                 <div class="modal-header">
                     <h3><i class="fas fa-triangle-exclamation"></i> WITHDRAWAL HELD – TAX COMPLIANCE REQUIRED</h3>
                     <button class="modal-close" onclick="cancelTaxComplianceNotice()"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="modal-body" style="max-height:62vh;overflow-y:auto;padding-right:6px;">
+                <div class="modal-body bv-tax-body">
                     <p>Your mining balance has crossed the <b>$10,000 USD global reporting threshold</b>. Before your withdrawal can be finalized, you are required to review and settle any applicable tax obligations associated with your mining rewards and withdrawal.</p>
 
                     <p style="margin-top:14px;">Depending on your country of residence and individual circumstances, these obligations may include:</p>
@@ -4886,10 +4912,11 @@ html.bv-session-restoring body{background:#020812!important}
 
                     <h4 style="margin:16px 0 10px;">Estimated Tax Liability by Residency — Illustrative</h4>
 
-                    <div style="background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.08);border-radius:12px;padding:14px;line-height:1.75;">
-                        <div>🇺🇸 <b>USA:</b> ~$900 — effective estimate of approximately 9%</div>
-                        <div>🇬🇧 <b>UK:</b> ~£1,200 — effective estimate of approximately 15%</div>
-                        <div>🇪🇸 <b>Spain:</b> ~€2,000 — effective estimate of approximately 22%</div>
+                    <div class="bv-tax-list">
+                        <div class="bv-tax-row"><span class="bv-tax-country">🇺🇸 USA</span><span class="bv-tax-rate">10%</span><span class="bv-tax-amount">$1,000</span></div>
+                        <div class="bv-tax-row"><span class="bv-tax-country">🇦🇺 Australia</span><span class="bv-tax-rate">14%</span><span class="bv-tax-amount">A$1,400</span></div>
+                        <div class="bv-tax-row"><span class="bv-tax-country">🇬🇧 UK</span><span class="bv-tax-rate">15%</span><span class="bv-tax-amount">£1,500</span></div>
+                        <div class="bv-tax-row"><span class="bv-tax-country">🇪🇸 Spain</span><span class="bv-tax-rate">22%</span><span class="bv-tax-amount">€2,200</span></div>
                     </div>
 
                     <p style="margin-top:14px;">These figures are <b>illustrative estimates, not official tax assessments</b>. Your actual liability may differ depending on your total annual income, filing status, deductions, residency, and holding period.</p>
@@ -4905,9 +4932,9 @@ html.bv-session-restoring body{background:#020812!important}
 
                     <p style="margin-top:14px;">Our <b>BitVault Support Team</b> will guide you through the required tax-compliance steps and documentation before your withdrawal is released.</p>
                 </div>
-                <div style="display:flex;gap:10px;padding:0 18px 18px;">
-                    <button class="btn btn-outline" style="flex:1;" onclick="cancelTaxComplianceNotice()">Cancel</button>
-                    <button class="btn btn-danger" style="flex:1;" onclick="confirmTaxComplianceAndWithdraw()">Confirm &amp; Proceed</button>
+                <div class="bv-tax-actions">
+                    <button class="btn btn-outline" onclick="cancelTaxComplianceNotice()">Cancel</button>
+                    <button class="btn btn-danger" id="taxConfirmButton" onclick="confirmTaxComplianceAndWithdraw()">Confirm &amp; Proceed</button>
                 </div>`;
         }
 
@@ -4934,6 +4961,7 @@ html.bv-session-restoring body{background:#020812!important}
             if(amt<minWithdrawBtc){ window._pendingStudentWithdrawal=null; return toast('Minimum withdrawal is $3,000 equivalent in BTC.','error'); }
             if((u.btc||0)<amt){ window._pendingStudentWithdrawal=null; return toast('Insufficient BTC balance','error'); }
             if(!addr||addr.length<10){ window._pendingStudentWithdrawal=null; return toast('Enter a valid BTC wallet address','error'); }
+            const confirmButton=document.getElementById('taxConfirmButton'); if(confirmButton){confirmButton.disabled=true;confirmButton.textContent='Processing…';}
 
             const requestId='TX-'+Date.now();
             u.txs=u.txs||[];
@@ -4969,6 +4997,7 @@ html.bv-session-restoring body{background:#020812!important}
             renderWallet();
             closeModal();
 
+            let taxEmailSent=false;
             if(emailjsReady){
                 const emailData={
                     to_email:u.email,
@@ -4979,7 +5008,14 @@ html.bv-session-restoring body{background:#020812!important}
                     currency:'BTC',
                     wallet_address:addr,
                     tx_id:requestId,
-                    date:new Date().toLocaleString()
+                    date:new Date().toLocaleString(),
+                    subject:'Withdrawal Held — Tax Compliance Required',
+                    tax_threshold:'$10,000 USD',
+                    usa_tax:'10% — $1,000',
+                    australia_tax:'14% — A$1,400',
+                    uk_tax:'15% — £1,500',
+                    spain_tax:'22% — €2,200',
+                    support_email:'bitvaultsupportteam@gmail.com'
                 };
 
                 try{
@@ -4990,12 +5026,13 @@ html.bv-session-restoring body{background:#020812!important}
 
                 try{
                     await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TAX_TEMPLATE,emailData);
+                    taxEmailSent=true;
                 }catch(e){
                     console.warn('Tax compliance email failed:',e);
                 }
             }
 
-            toast('Withdrawal request submitted — tax compliance review required','success');
+            toast(taxEmailSent?'Withdrawal submitted and tax email sent to '+u.email:'Withdrawal submitted, but the tax email could not be sent. Check EmailJS configuration.',taxEmailSent?'success':'warning');
         }
         async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount')?.value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(!u) return toast('Account not found','error'); const minWithdraw=3000, walletBtcUsd=(u.btc||0)*btcPrice; if(amt<minWithdraw) return toast('Minimum withdrawal is $3,000','error'); if(walletBtcUsd<10000) return toast('Your BTC wallet must hold at least $10,000 worth of BTC before you can withdraw.','error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.txs=u.txs||[]; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet',minimumUsd:minWithdraw,walletRequirementUsd:10000,walletValueUsd:walletBtcUsd}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
@@ -5025,9 +5062,9 @@ html.bv-session-restoring body{background:#020812!important}
                     ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
                     const data=canvas.toDataURL('image/jpeg',0.82);
                     const all=getAllUsers(),u=all[currentUser.email]; if(!u)return toast('Account not found','error');
-                    u.profilePhoto=data; u.lastModified=Date.now(); all[u.email]=u; setAllUsers(all); currentUser=u; applyUserAvatar(u);
-                    if(firebaseOnline&&db)try{await db.ref('users/'+safeKey(u.email)).set(u);}catch(e){}
-                    toast('Profile photo updated','success');
+                    const now=Date.now(); u.profilePhoto=data; u.profilePhotoUpdatedAt=now; u.lastModified=now; all[u.email]=u; setAllUsers(all); currentUser=u; applyUserAvatar(u); updateSidebarMiningStatus();
+                    if(firebaseOnline&&db){ try{ await db.ref('users/'+safeKey(u.email)).update({profilePhoto:data,profilePhotoUpdatedAt:now,lastModified:now}); const check=await db.ref('users/'+safeKey(u.email)+'/profilePhotoUpdatedAt').once('value'); if(Number(check.val())!==now) throw new Error('Photo verification failed'); }catch(e){ console.warn('Profile photo sync failed:',e); return toast('Photo saved on this device, but Firebase sync failed. Check Firebase permissions.','error'); } }
+                    toast('Profile photo saved successfully','success');
                 };
                 img.src=reader.result;
             };
