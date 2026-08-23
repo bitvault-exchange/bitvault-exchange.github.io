@@ -2661,9 +2661,9 @@ html.bv-session-restoring body{background:#020812!important}
 .bv-tier-card{display:grid;grid-template-columns:110px minmax(180px,1.4fr) minmax(170px,1fr) 150px;align-items:center;gap:16px;padding:14px 16px;border:1px solid rgba(45,111,158,.28);border-left:4px solid var(--tier,#00cfff);border-radius:15px;background:linear-gradient(100deg,rgba(7,23,39,.98),rgba(3,12,22,.96));box-shadow:0 10px 32px rgba(0,0,0,.18);cursor:pointer;transition:.2s}
 .bv-tier-card:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--tier) 55%,#24435f);box-shadow:0 12px 34px rgba(0,0,0,.26)}
 .bv-tier-card.starter{--tier:#ff4662}.bv-tier-card.builder{--tier:#f4ca19}.bv-tier-card.industrial{--tier:#00cdec}.bv-tier-card.enterprise{--tier:#ee4c93}
-.bv-tier-icon{height:94px;display:grid;place-items:center;border-right:1px solid rgba(92,139,180,.13);font-size:3.15rem;color:#f5f8ff}.bv-tier-icon .rig-cross-tools{transform:scale(1.35)}
-.bv-google-rig-icon{font-family:'Noto Emoji',sans-serif;font-weight:700;font-style:normal;font-size:70px;line-height:1;white-space:nowrap;color:#f5f8ff;-webkit-font-smoothing:antialiased;filter:grayscale(1) brightness(4) drop-shadow(0 0 8px rgba(255,255,255,.08))}
-.bv-google-crossed-tools{position:relative;width:78px;height:78px;display:block;filter:grayscale(1) brightness(4) drop-shadow(0 0 8px rgba(255,255,255,.08))}.bv-google-crossed-tools .bv-google-rig-icon{position:absolute;left:50%;top:50%;font-size:52px;transform-origin:center;filter:none}.bv-google-crossed-tools .pickaxe{transform:translate(-58%,-52%) rotate(-38deg)}.bv-google-crossed-tools .shovel{transform:translate(-42%,-48%) rotate(38deg)}
+.bv-tier-icon{height:94px;display:grid;place-items:center;border-right:1px solid rgba(92,139,180,.13);font-size:3.15rem;color:#f5f8ff;overflow:hidden;padding:8px}.bv-tier-icon .rig-cross-tools{transform:scale(1.35)}
+.bv-google-rig-icon{font-family:'Noto Emoji',sans-serif;font-weight:700;font-style:normal;font-size:62px;line-height:1;white-space:nowrap;color:#f5f8ff;-webkit-font-smoothing:antialiased;filter:grayscale(1) brightness(4) drop-shadow(0 0 8px rgba(255,255,255,.08));display:block;transform:translateX(-2px)}
+.bv-approved-rig-svg{width:70px;height:70px;display:block;color:#f5f8ff;filter:drop-shadow(0 0 8px rgba(255,255,255,.08));overflow:visible}.bv-approved-rig-svg *{vector-effect:non-scaling-stroke}
 .bv-rig-svg{width:76px;height:76px;display:block;color:#f5f8ff;filter:drop-shadow(0 0 8px rgba(255,255,255,.08))}.bv-rig-svg *{vector-effect:non-scaling-stroke}
 .rig-pickaxe-symbol{display:inline-block;font-family:"Segoe UI Symbol","Noto Sans Symbols 2",sans-serif;font-weight:700;color:#f5f8ff;filter:grayscale(1) brightness(2.3)}
 .rig-cross-tools{position:relative;display:inline-block;width:58px;height:58px}.rig-cross-tools .tool-pickaxe{position:absolute;left:9px;top:3px;display:block;font-family:"Segoe UI Symbol","Noto Sans Symbols 2",sans-serif;font-size:2.55rem;line-height:1;color:#f5f8ff;filter:grayscale(1) brightness(2.3);transform:rotate(-35deg)}.rig-cross-tools .tool-shovel{position:absolute;left:28px;top:7px;width:6px;height:42px;border-radius:5px;background:#f5f8ff;transform:rotate(42deg);transform-origin:center}.rig-cross-tools .tool-shovel:before{content:'';position:absolute;left:-5px;top:-7px;width:16px;height:8px;border:3px solid #f5f8ff;border-bottom:0;border-radius:8px 8px 0 0}.rig-cross-tools .tool-shovel:after{content:'';position:absolute;left:-5px;bottom:-9px;width:16px;height:16px;background:#f5f8ff;border-radius:3px 3px 10px 10px}
@@ -2693,7 +2693,7 @@ html.bv-session-restoring body{background:#020812!important}
   .bv-mining-intro{padding:14px}.bv-mining-intro h2{font-size:1rem}.bv-mining-intro p{font-size:.68rem}
   .bv-rig-market-command{gap:8px;margin-top:10px}
   .bv-tier-card{grid-template-columns:58px minmax(92px,1fr) 72px 82px;gap:6px;min-height:126px;padding:9px 8px;border-radius:12px}
-  .bv-tier-icon{height:92px;font-size:2.25rem;border-right:1px solid rgba(92,139,180,.16)}.bv-tier-icon .bv-rig-svg{width:54px;height:54px}.bv-tier-icon>.bv-google-rig-icon{font-size:54px}.bv-google-crossed-tools{width:56px;height:56px}.bv-google-crossed-tools .bv-google-rig-icon{font-size:42px}
+  .bv-tier-icon{height:92px;font-size:2.25rem;border-right:1px solid rgba(92,139,180,.16);padding:6px}.bv-tier-icon .bv-rig-svg{width:54px;height:54px}.bv-tier-icon>.bv-google-rig-icon{font-size:43px;transform:translateX(-1px)}.bv-tier-icon .bv-approved-rig-svg{width:50px;height:50px}
   .bv-tier-icon .rig-cross-tools{transform:scale(.92)}
   .bv-tier-copy h3{font-size:.61rem;line-height:1.18;margin:5px 0 4px}
   .bv-tier-copy .rig-model{font-size:.59rem;line-height:1.15}
@@ -2717,7 +2717,7 @@ html.bv-session-restoring body{background:#020812!important}
 .bv-wallet-qr{width:172px;height:172px;display:block;object-fit:contain;margin:12px auto;padding:7px;border-radius:13px;background:#fff;border:1px solid rgba(0,229,160,.3);box-shadow:0 0 24px rgba(0,212,255,.12)}
 @media(max-width:390px){
   .bv-tier-card{grid-template-columns:52px minmax(84px,1fr) 67px 76px;gap:5px;padding:8px 6px}
-  .bv-tier-icon{font-size:2rem}.bv-tier-icon .bv-rig-svg{width:49px;height:49px}.bv-tier-icon>.bv-google-rig-icon{font-size:49px}.bv-google-crossed-tools{width:51px;height:51px}.bv-google-crossed-tools .bv-google-rig-icon{font-size:38px}.bv-tier-copy h3{font-size:.56rem}.bv-tier-copy .rig-model{font-size:.55rem}.bv-tier-output strong{font-size:.5rem}.bv-tier-price{font-size:.74rem}.bv-tier-card .btn{font-size:.48rem}
+  .bv-tier-icon{font-size:2rem}.bv-tier-icon .bv-rig-svg{width:49px;height:49px}.bv-tier-icon>.bv-google-rig-icon{font-size:40px}.bv-tier-icon .bv-approved-rig-svg{width:47px;height:47px}.bv-tier-copy h3{font-size:.56rem}.bv-tier-copy .rig-model{font-size:.55rem}.bv-tier-output strong{font-size:.5rem}.bv-tier-price{font-size:.74rem}.bv-tier-card .btn{font-size:.48rem}
 }
 </style>
 
@@ -3532,8 +3532,8 @@ html.bv-session-restoring body{background:#020812!important}
 
         const RIG_PURCHASE_LIMIT = 3;
         const RIG_ICON_STARTER='<span class="bv-google-rig-icon" aria-hidden="true">⛏</span>';
-        const RIG_ICON_BUILDER='<span class="bv-google-crossed-tools" aria-hidden="true"><span class="bv-google-rig-icon pickaxe">⛏</span><span class="bv-google-rig-icon shovel">🪏</span></span>';
-        const RIG_ICON_INDUSTRIAL='<span class="bv-google-rig-icon" aria-hidden="true">👷</span>';
+        const RIG_ICON_BUILDER='<svg class="bv-approved-rig-svg" viewBox="0 0 80 80" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 16c14-10 31-10 44 0"/><path d="M39 13 20 66"/><path d="M63 12 25 61"/><path d="M57 9c5 0 10 3 13 7l-8 8"/></g><path fill="currentColor" d="M17 55 7 70c8 6 19 4 25-3l3-4z"/><circle cx="20" cy="66" r="3" fill="#061421"/></svg>';
+        const RIG_ICON_INDUSTRIAL='<svg class="bv-approved-rig-svg" viewBox="0 0 80 80" aria-hidden="true"><path fill="currentColor" d="M18 35v-5c0-11 7-20 17-23v14h10V7c10 3 17 12 17 23v5h7v9H11v-9z"/><path fill="currentColor" fill-rule="evenodd" d="M23 45h34v8c0 10-8 18-17 18s-17-8-17-18zm9 4v5c0 5 4 9 8 9s8-4 8-9v-5z"/><path fill="currentColor" d="M12 80c1-13 12-23 28-23s27 10 28 23z"/><path fill="#061421" d="M32 61h16l-8 10z"/></svg>';
         const RIGS = [
             { id:'basic', name:'Antminer S19j', icon:RIG_ICON_STARTER, hash:'90 TH/s', power:'3.1 kW', daily:0.0020, price:1800, tag:'Starter', personality:'Begin Mining', description:'Your entry point into BTC mining. Deploy your first rig, watch your earnings accumulate, and learn how your mining operation performs.', iconClass:'rig-icon-pickaxe' },
             { id:'advanced', name:'Whatsminer M50', icon:RIG_ICON_BUILDER, hash:'118 TH/s', power:'3.3 kW', daily:0.0045, price:3500, tag:'Builder', personality:'Increase Your Output', description:'Ready for more capacity? Builder hardware provides greater mining power and higher projected BTC production.', iconClass:'rig-icon-builder' },
