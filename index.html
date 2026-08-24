@@ -2724,11 +2724,12 @@ html.bv-session-restoring body{background:#020812!important}
 /* Approved Global Network + Live Transaction Feed redesign */
 .country-stats-section,.live-feed-section{background:linear-gradient(145deg,rgba(5,19,34,.98),rgba(3,12,23,.98))!important;border:1px solid rgba(48,126,181,.28)!important;border-radius:16px!important;padding:20px!important;box-shadow:0 14px 40px rgba(0,0,0,.18)!important}
 .country-stats-header{margin-bottom:12px!important}.country-stats-header h2,.live-feed-section h2{font-size:1.16rem!important;letter-spacing:-.02em}.country-stats-header h2 i,.live-feed-section h2 i{color:#00cfff!important}.country-stats-header .sub,.live-feed-section .sub{font-size:.72rem!important;color:#8fa5c1!important;margin:4px 0 0!important}.country-stats-header button,.bv-feed-view{border:0!important;background:transparent!important;color:#00cfff!important;font-size:.72rem!important;font-weight:650!important;padding:6px!important;white-space:nowrap;cursor:pointer}
-.bv-network-map{height:260px;display:grid;place-items:center;position:relative;overflow:hidden;margin:4px 0 14px;border-radius:12px;background:radial-gradient(circle at 54% 42%,rgba(0,174,255,.08),transparent 36%),rgba(2,10,19,.32)}.bv-map-stage{height:100%;max-width:100%;aspect-ratio:1832/859;position:relative}.bv-world-map{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;object-position:center;opacity:.82;filter:drop-shadow(0 0 9px rgba(0,145,220,.2));pointer-events:none}.bv-map-marker{position:absolute;width:12px;height:12px;border:2px solid #9cecff;border-radius:50%;background:#29c8ff;box-shadow:0 0 0 6px rgba(0,190,255,.15),0 0 18px #00bfff;transform:translate(-50%,-50%);transition:left .8s ease,top .8s ease;animation:bvMapPulse 2.4s ease-in-out infinite}.bv-map-marker[data-region="uk"]{animation-delay:0s}.bv-map-marker[data-region="germany"]{animation-delay:.8s}.bv-map-marker[data-region="spain"]{animation-delay:1.6s}@keyframes bvMapPulse{0%,100%{transform:translate(-50%,-50%) scale(.72);opacity:.62;box-shadow:0 0 0 3px rgba(0,190,255,.12),0 0 10px #00bfff}45%,55%{transform:translate(-50%,-50%) scale(1.14);opacity:1;box-shadow:0 0 0 10px rgba(0,190,255,0),0 0 24px #55ddff}}
+.bv-network-map{height:260px;display:grid;place-items:center;position:relative;overflow:hidden;margin:4px 0 14px;border-radius:12px;background:radial-gradient(circle at 54% 42%,rgba(0,174,255,.08),transparent 36%),rgba(2,10,19,.32)}.bv-map-stage{height:100%;max-width:100%;aspect-ratio:1832/859;position:relative}.bv-world-map{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;object-position:center;opacity:.82;filter:drop-shadow(0 0 9px rgba(0,145,220,.2));pointer-events:none}.bv-map-tracker{position:absolute;display:grid;place-items:center;width:23px;height:23px;color:#ffe55c;font-size:17px;line-height:1;text-shadow:0 0 5px #fff5a0,0 0 12px #ffd400,0 0 24px #00cfff;transform:translate(-50%,-50%);transition:left .85s ease,top .85s ease;animation:bvTrackerPulse 1.45s ease-in-out infinite;z-index:2}.bv-map-tracker::after{content:"";position:absolute;inset:-6px;border:1px solid rgba(0,207,255,.46);border-radius:50%;animation:bvTrackerRing 1.45s ease-out infinite}@keyframes bvTrackerPulse{0%,100%{opacity:.62;transform:translate(-50%,-50%) scale(.82)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}@keyframes bvTrackerRing{0%{opacity:.7;transform:scale(.45)}100%{opacity:0;transform:scale(1.45)}}
 .country-stats-section .country-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px!important;max-height:none!important;overflow:visible!important}.country-stats-section:not(.expanded) .country-row:nth-child(n+6){display:none!important}.country-stats-section .country-row{display:grid!important;grid-template-columns:30px 1fr!important;gap:6px 8px!important;align-items:center!important;margin:0!important;padding:11px!important;border:1px solid rgba(58,123,172,.25)!important;border-radius:10px!important;background:rgba(3,12,23,.68)!important;transform:none!important}.country-stats-section .country-row::before{left:0;right:0;top:auto;height:2px;width:auto;border-radius:0 0 10px 10px}.country-stats-section .country-rank{grid-column:1;width:auto!important;min-width:0!important;text-align:left!important;font-size:.72rem!important}.country-stats-section .country-flag{grid-column:1;width:30px!important;height:21px!important}.country-stats-section .country-info{grid-column:2;grid-row:1 / span 2}.country-stats-section .country-info .name{font-size:.67rem!important;white-space:normal!important;line-height:1.15}.country-stats-section .country-info .users{font-size:.55rem!important;margin-top:3px;white-space:normal!important}.country-stats-section .country-bar-area{grid-column:1 / -1;width:100%!important;min-width:0!important;max-width:none!important;align-items:stretch!important}.country-stats-section .country-share{order:-1;text-align:left!important;font-size:.68rem!important;margin-bottom:4px}.country-stats-section .country-bar-wrap{height:4px!important;margin:0!important}
 .bv-feed-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}.bv-feed-heading h2{margin:0!important}.bv-feed-tools{display:flex;align-items:center;gap:10px}.bv-live-indicator{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid rgba(0,229,143,.48);border-radius:999px;color:#00e58f;font-size:.62rem;font-weight:800}.bv-live-indicator i{width:7px;height:7px;border-radius:50%;background:#00e58f;box-shadow:0 0 10px #00e58f;animation:bvLivePulse 1.3s ease-in-out infinite}@keyframes bvLivePulse{50%{opacity:.35;transform:scale(.72)}}.live-feed{max-height:none!important;overflow:visible!important;border:0!important;background:transparent!important;padding:0!important;border-radius:0!important}.live-feed .feed-item{display:grid!important;grid-template-columns:30px minmax(92px,1fr) minmax(72px,.72fr) minmax(70px,.72fr) 8px minmax(42px,.42fr)!important;gap:10px!important;min-height:48px;padding:9px 2px!important;border-bottom:1px solid rgba(55,114,159,.18)!important}.live-feed .feed-item:last-child{border-bottom:0!important}.live-feed .feed-item .avatar{width:30px!important;height:30px!important;font-size:.58rem!important}.live-feed .feed-item .name{font-size:.68rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.live-feed .feed-item .action{font-size:.62rem;white-space:nowrap}.live-feed .feed-item .amount{font-size:.68rem;white-space:nowrap}.live-feed .feed-item .status-dot{width:7px;height:7px;border-radius:50%;background:#00e58f;box-shadow:0 0 7px currentColor}.live-feed .feed-item .status-dot.red{background:#ff405d}.live-feed .feed-item .time{font-size:.58rem!important;margin:0!important;text-align:right;white-space:nowrap}
 @media(max-width:760px){.country-stats-section,.live-feed-section{padding:14px!important}.country-stats-header h2,.live-feed-section h2{font-size:1rem!important}.bv-network-map{height:170px;margin-bottom:10px}.country-stats-section .country-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.bv-feed-heading{align-items:center}.bv-feed-tools{gap:5px}.bv-feed-view{font-size:.62rem!important}.bv-live-indicator{font-size:.54rem;padding:4px 7px}.live-feed .feed-item{grid-template-columns:28px minmax(68px,1fr) minmax(58px,.7fr) minmax(60px,.72fr) 7px!important;gap:7px!important}.live-feed .feed-item .time{display:none!important}.live-feed .feed-item .name{max-width:none!important}}
 @media(max-width:430px){.country-stats-section .country-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.country-stats-section .country-row:nth-child(5){grid-column:1 / -1}.bv-network-map{height:150px}.country-stats-header{align-items:flex-start!important;flex-wrap:nowrap!important}.country-stats-header button{font-size:.6rem!important}.live-feed .feed-item{grid-template-columns:26px minmax(58px,1fr) minmax(52px,.68fr) minmax(55px,.7fr) 6px!important;gap:6px!important}.live-feed .feed-item .avatar{width:26px!important;height:26px!important}.live-feed .feed-item .name,.live-feed .feed-item .amount{font-size:.61rem}.live-feed .feed-item .action{font-size:.55rem}}
+.bv-reviews{margin:20px 0;background:linear-gradient(145deg,rgba(5,19,34,.98),rgba(3,12,23,.98));border:1px solid rgba(48,126,181,.28);border-radius:16px;padding:20px}.bv-reviews-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px}.bv-reviews h2{font-size:1.16rem;margin:0}.bv-reviews-note{font-size:.62rem;color:#6f87a6;border:1px solid rgba(64,128,255,.16);padding:5px 8px;border-radius:999px;white-space:nowrap}.bv-reviews-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.bv-review{background:rgba(3,12,23,.7);border:1px solid rgba(58,123,172,.22);border-radius:11px;padding:14px}.bv-review-stars{color:#ffd400;letter-spacing:2px;font-size:.72rem}.bv-review p{margin:9px 0 12px;color:#b4c2d5;font-size:.7rem;line-height:1.55}.bv-review strong{font-size:.68rem}.bv-review span{display:block;color:#65809f;font-size:.57rem;margin-top:2px}@media(max-width:760px){.bv-reviews{padding:14px}.bv-reviews-grid{grid-template-columns:1fr 1fr}.bv-reviews-head{align-items:center}.landing-wrapper .top-bar{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px 10px!important}.landing-wrapper .top-bar .ticker{display:grid!important;grid-column:1/-1;grid-template-columns:1fr 1fr 1fr;width:100%;gap:5px!important;order:3}.landing-wrapper .top-bar .ticker>span{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;padding:7px 5px;border:1px solid rgba(64,128,255,.1);border-radius:8px;background:rgba(5,17,30,.72);font-size:.58rem;white-space:nowrap}.landing-wrapper .top-bar .actions{width:auto!important}.landing-wrapper .top-bar .logo{font-size:1.08rem!important}}@media(max-width:430px){.bv-reviews-grid{grid-template-columns:1fr}.bv-reviews-head{display:block}.bv-reviews-note{display:inline-block;margin-top:8px}.landing-wrapper .top-bar .ticker>span{font-size:.52rem;padding-inline:3px}.landing-wrapper .top-bar .actions a{padding:7px 8px!important;font-size:.6rem!important}}
 
 /* Supplied Builder/Industrial PNGs: same visible scale as Starter */
 .bv-tier-png-icon{max-width:none;max-height:none;width:76px;height:76px}.bv-deployed-icon .bv-tier-png-icon{width:39px;height:39px}
@@ -2750,7 +2751,7 @@ html.bv-session-restoring body{background:#020812!important}
 <div class="ticker">
 <span>BTC/USD <span class="price" id="topPrice">$65,000.00</span> <span class="up" id="topPriceChange">+0.0%</span></span>
 <span><i class="fas fa-bolt" style="color:var(--electric-blue);"></i> Hashrate: <span class="hash" id="topHashrate">2.4 EH/s</span></span>
-<span><i class="fas fa-users" style="color:var(--gold);"></i> Miners: <span class="gold" id="topMiners">1,247</span></span>
+<span><i class="fas fa-users" style="color:var(--gold);"></i> Miners: <span class="gold" id="topMiners">0</span></span>
 </div>
 <div class="actions">
 <a class="btn-signin" onclick="showAuth('login')">Sign In</a>
@@ -2784,22 +2785,20 @@ html.bv-session-restoring body{background:#020812!important}
 <div class="stat"><i class="fas fa-cubes" style="color:var(--success);"></i> <span class="num green" id="statBlock">#845,212</span> Current Block</div>
 <div class="stat"><i class="fas fa-chart-line" style="color:var(--info);"></i> <span class="num blue" id="statDiff">87.5T</span> Difficulty</div>
 <div class="stat"><i class="fas fa-users" style="color:var(--gold);"></i> <span class="num gold" id="statClients">183,247</span> Miners</div>
-<div class="stat"><i class="fas fa-clock" style="color:var(--success);"></i> <span class="num green">99.9%</span> Uptime</div>
+<div class="stat"><i class="fas fa-clock" style="color:var(--success);"></i> <span class="num green" id="statUptime">99.9%</span> Uptime</div>
 </div>
 <section class="country-stats-section">
 <div class="country-stats-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
 <div>
 <h2><i class="fas fa-globe" style="color:var(--electric-blue);"></i> Global Network</h2>
-<div class="sub">Active miners by region — live institutional distribution</div>
+<div class="sub">Animated platform activity distribution</div>
 </div>
 <button id="globalToggleBtn" onclick="toggleGlobalNetwork()" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,0.20);background:rgba(0,212,255,0.08);color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">View Full Network</button>
 </div>
-<div class="bv-network-map" aria-label="Live European mining activity map">
+<div class="bv-network-map" aria-label="Animated mining activity map">
 <div class="bv-map-stage">
-<img class="bv-world-map" src="assets/world-map-dotted.png" alt="Dotted world map showing live European mining activity">
-<div class="bv-map-marker" data-region="uk" title="United Kingdom"></div>
-<div class="bv-map-marker" data-region="spain" title="Spain"></div>
-<div class="bv-map-marker" data-region="germany" title="Germany"></div>
+<img class="bv-world-map" src="assets/world-map-dotted.png" alt="Dotted world map showing platform activity">
+<div class="bv-map-tracker" id="bvMapTracker" aria-label="Activity tracker" title="United States">⚡</div>
 </div>
 </div>
 <div class="country-grid" id="countryGrid"></div>
@@ -2862,6 +2861,17 @@ html.bv-session-restoring body{background:#020812!important}
 </div>
 </div>
 </div>
+<section class="bv-reviews" aria-labelledby="reviewTitle">
+<div class="bv-reviews-head"><div><h2 id="reviewTitle"><i class="fas fa-star" style="color:#ffd400;margin-right:8px"></i>Community Preview Feedback</h2><div class="sub">Sample presentation copy for the 2026 platform preview</div></div><span class="bv-reviews-note">SAMPLE FEEDBACK</span></div>
+<div class="bv-reviews-grid">
+<article class="bv-review"><div class="bv-review-stars">★★★★★</div><p>“I did not expect the BitVault 2026 update to return this strong after the earlier 2015 platform. The new experience feels focused and modern.”</p><strong>Preview Participant A.</strong><span>Platform preview</span></article>
+<article class="bv-review"><div class="bv-review-stars">★★★★★</div><p>“The dashboard is clear, the mining operation is easy to follow, and the activity panels make the platform feel responsive.”</p><strong>Preview Participant L.</strong><span>Platform preview</span></article>
+<article class="bv-review"><div class="bv-review-stars">★★★★★</div><p>“The 2026 redesign is a major step forward. Wallet information and mining performance are much easier to understand.”</p><strong>Preview Participant S.</strong><span>Platform preview</span></article>
+<article class="bv-review"><div class="bv-review-stars">★★★★★</div><p>“I remember the earlier BitVault era. I honestly did not believe the comeback would feel this polished.”</p><strong>Preview Participant O.</strong><span>Platform preview</span></article>
+<article class="bv-review"><div class="bv-review-stars">★★★★★</div><p>“The interface works well on mobile and gives every important value a clear place without feeling crowded.”</p><strong>Preview Participant T.</strong><span>Platform preview</span></article>
+<article class="bv-review"><div class="bv-review-stars">★★★★★</div><p>“The Global Network and transaction presentation bring energy to the Start Menu while keeping the layout professional.”</p><strong>Preview Participant P.</strong><span>Platform preview</span></article>
+</div>
+</section>
 <div class="footer">
 <div class="links">
 <a href="#" onclick="showAuth('login')">Sign In</a>
@@ -5310,31 +5320,12 @@ html.bv-session-restoring body{background:#020812!important}
             return '';
         }
 
+        let networkStats = COUNTRIES.map((c,index) => ({...c, users:c.baseUsers + index * 137}));
         function generateCountryStats() {
             const grid = document.getElementById('countryGrid');
             if(!grid) return;
-
-            let stats = COUNTRIES.map(c => ({
-                ...c,
-                share: Math.floor(Math.random() * (c.maxShare - c.minShare) + c.minShare),
-                users: c.baseUsers + Math.floor(Math.random() * 2000 - 1000)
-            }));
-
-            // USA always #1
-            stats[0].share = Math.max(stats[0].share, stats[1].share + 8, stats[2].share + 10);
-            stats[0].users = Math.max(stats[0].users, stats[1].users * 2);
-
-            // UK vs Spain competition for #2
-            const ukIdx = 1, spainIdx = 2;
-            if(Math.random() > 0.55) {
-                stats[spainIdx].share = stats[ukIdx].share + Math.floor(Math.random() * 3 + 1);
-                stats[spainIdx].users = stats[ukIdx].users + Math.floor(Math.random() * 800 + 200);
-            } else {
-                stats[ukIdx].share = stats[spainIdx].share + Math.floor(Math.random() * 4 + 2);
-                stats[ukIdx].users = stats[spainIdx].users + Math.floor(Math.random() * 1000 + 500);
-            }
-
-            stats.sort((a,b) => b.share - a.share);
+            const total = networkStats.reduce((sum,c)=>sum+c.users,0);
+            let stats = networkStats.map(c=>({...c,share:Math.max(1,Math.round(c.users/total*100))})).sort((a,b)=>b.users-a.users);
             const maxShare = stats[0].share;
 
             grid.innerHTML = stats.map((c, i) => `
@@ -5356,26 +5347,25 @@ html.bv-session-restoring body{background:#020812!important}
         }
 
         generateCountryStats();
-        function updateEuropeanMapMarkers(){
-            const positions = {
-                uk:[{left:47.8,top:29.5},{left:48.6,top:28.4},{left:47.2,top:31.0}],
-                spain:[{left:47.0,top:40.8},{left:45.9,top:42.0},{left:48.0,top:39.6}],
-                germany:[{left:54.8,top:32.4},{left:56.0,top:33.5},{left:53.8,top:31.2}]
-            };
-            const sevenHours = 7 * 60 * 60 * 1000;
-            const cycle = Math.floor(Date.now() / sevenHours);
-            document.querySelectorAll('.bv-map-marker').forEach((marker,index)=>{
-                const region = marker.dataset.region;
-                const choices = positions[region] || positions.germany;
-                const point = choices[(cycle + index) % choices.length];
-                marker.style.left = point.left + '%';
-                marker.style.top = point.top + '%';
-            });
+        function updateMapTracker(){
+            const tracker=document.getElementById('bvMapTracker');if(!tracker)return;
+            const locations=[{name:'United States',left:24.2,top:42.2},{name:'United Kingdom',left:47.7,top:30.4},{name:'Spain',left:47.0,top:41.8}];
+            const fiveHours=5*60*60*1000,index=Math.floor(Date.now()/fiveHours)%locations.length,point=locations[index];
+            tracker.style.left=point.left+'%';tracker.style.top=point.top+'%';tracker.title=point.name;tracker.setAttribute('aria-label','Activity tracker: '+point.name);
         }
-        updateEuropeanMapMarkers();
-        setInterval(updateEuropeanMapMarkers, 7 * 60 * 60 * 1000);
+        function updateSynchronizedNetworkStats(){
+            const tick=Math.floor(Date.now()/4000);
+            networkStats=networkStats.map((c,index)=>({...c,users:Math.max(c.baseUsers,c.users+1+((tick+index)%3===0?1:0))}));
+            const miners=networkStats.reduce((sum,c)=>sum+c.users,0),rigs=Math.round(miners*.119),hash=(rigs*.00011).toFixed(2)+' EH/s';
+            const block=845212+Math.floor((Date.now()-1767225600000)/600000),difficulty=(87.5+((tick%80)/100)).toFixed(2)+'T',uptime=(99.90+((tick%3)*.01)).toFixed(2)+'%';
+            const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value};
+            set('topMiners',miners.toLocaleString());set('statClients',miners.toLocaleString());set('statRigs',rigs.toLocaleString());set('topHashrate',hash);set('statHash',hash);set('statBlock','#'+block.toLocaleString());set('statDiff',difficulty);set('statUptime',uptime);generateCountryStats();
+        }
+        updateMapTracker();
+        updateSynchronizedNetworkStats();
+        setInterval(updateMapTracker,60*1000);
+        setInterval(updateSynchronizedNetworkStats,4000);
         selectPlan(0);
-        setInterval(generateCountryStats, 6 * 60 * 60 * 1000);
 
         setInterval(()=>{
             const vol=document.getElementById('fakeVolume'); if(vol) vol.textContent='$'+(Math.floor(Math.random()*200+100)).toLocaleString()+'M+';
