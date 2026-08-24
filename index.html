@@ -2720,6 +2720,20 @@ html.bv-session-restoring body{background:#020812!important}
   .bv-tier-card{grid-template-columns:52px minmax(84px,1fr) 67px 76px;gap:5px;padding:8px 6px}
   .bv-tier-icon{font-size:2rem;padding:7px}.bv-tier-icon .bv-rig-svg{width:49px;height:49px}.bv-tier-icon>.bv-google-rig-icon{font-size:34px}.bv-tier-icon>.bv-tier-png-icon{width:43px;height:43px}.bv-tier-icon .bv-approved-rig-svg{width:47px;height:47px}.bv-tier-copy h3{font-size:.56rem}.bv-tier-copy .rig-model{font-size:.55rem}.bv-tier-output strong{font-size:.5rem}.bv-tier-price{font-size:.74rem}.bv-tier-card .btn{font-size:.48rem}
 }
+
+/* Approved Global Network + Live Transaction Feed redesign */
+.country-stats-section,.live-feed-section{background:linear-gradient(145deg,rgba(5,19,34,.98),rgba(3,12,23,.98))!important;border:1px solid rgba(48,126,181,.28)!important;border-radius:16px!important;padding:20px!important;box-shadow:0 14px 40px rgba(0,0,0,.18)!important}
+.country-stats-header{margin-bottom:12px!important}.country-stats-header h2,.live-feed-section h2{font-size:1.16rem!important;letter-spacing:-.02em}.country-stats-header h2 i,.live-feed-section h2 i{color:#00cfff!important}.country-stats-header .sub,.live-feed-section .sub{font-size:.72rem!important;color:#8fa5c1!important;margin:4px 0 0!important}.country-stats-header button,.bv-feed-view{border:0!important;background:transparent!important;color:#00cfff!important;font-size:.72rem!important;font-weight:650!important;padding:6px!important;white-space:nowrap;cursor:pointer}
+.bv-network-map{height:260px;position:relative;overflow:hidden;margin:4px 0 14px;border-radius:12px;background:radial-gradient(circle at 54% 42%,rgba(0,174,255,.08),transparent 36%),rgba(2,10,19,.32)}.bv-world-map{width:100%;height:100%;display:block;filter:drop-shadow(0 0 9px rgba(0,145,220,.12))}.bv-map-marker{position:absolute;width:12px;height:12px;border:2px solid #9cecff;border-radius:50%;background:#29c8ff;box-shadow:0 0 0 6px rgba(0,190,255,.15),0 0 18px #00bfff;transform:translate(-50%,-50%);transition:left .8s ease,top .8s ease;animation:bvMapPulse 1.8s ease-in-out infinite}.bv-map-marker:nth-of-type(2){animation-delay:.35s}.bv-map-marker:nth-of-type(3){animation-delay:.7s}@keyframes bvMapPulse{0%,100%{transform:translate(-50%,-50%) scale(.78);box-shadow:0 0 0 3px rgba(0,190,255,.12),0 0 10px #00bfff}50%{transform:translate(-50%,-50%) scale(1.12);box-shadow:0 0 0 10px rgba(0,190,255,0),0 0 24px #55ddff}}
+.country-stats-section .country-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px!important;max-height:none!important;overflow:visible!important}.country-stats-section:not(.expanded) .country-row:nth-child(n+6){display:none!important}.country-stats-section .country-row{display:grid!important;grid-template-columns:30px 1fr!important;gap:6px 8px!important;align-items:center!important;margin:0!important;padding:11px!important;border:1px solid rgba(58,123,172,.25)!important;border-radius:10px!important;background:rgba(3,12,23,.68)!important;transform:none!important}.country-stats-section .country-row::before{left:0;right:0;top:auto;height:2px;width:auto;border-radius:0 0 10px 10px}.country-stats-section .country-rank{grid-column:1;width:auto!important;min-width:0!important;text-align:left!important;font-size:.72rem!important}.country-stats-section .country-flag{grid-column:1;width:30px!important;height:21px!important}.country-stats-section .country-info{grid-column:2;grid-row:1 / span 2}.country-stats-section .country-info .name{font-size:.67rem!important;white-space:normal!important;line-height:1.15}.country-stats-section .country-info .users{font-size:.55rem!important;margin-top:3px;white-space:normal!important}.country-stats-section .country-bar-area{grid-column:1 / -1;width:100%!important;min-width:0!important;max-width:none!important;align-items:stretch!important}.country-stats-section .country-share{order:-1;text-align:left!important;font-size:.68rem!important;margin-bottom:4px}.country-stats-section .country-bar-wrap{height:4px!important;margin:0!important}
+.bv-feed-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}.bv-feed-heading h2{margin:0!important}.bv-feed-tools{display:flex;align-items:center;gap:10px}.bv-live-indicator{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid rgba(0,229,143,.48);border-radius:999px;color:#00e58f;font-size:.62rem;font-weight:800}.bv-live-indicator i{width:7px;height:7px;border-radius:50%;background:#00e58f;box-shadow:0 0 10px #00e58f;animation:bvLivePulse 1.3s ease-in-out infinite}@keyframes bvLivePulse{50%{opacity:.35;transform:scale(.72)}}.live-feed{max-height:none!important;overflow:visible!important;border:0!important;background:transparent!important;padding:0!important;border-radius:0!important}.live-feed .feed-item{display:grid!important;grid-template-columns:30px minmax(92px,1fr) minmax(72px,.72fr) minmax(70px,.72fr) 8px minmax(42px,.42fr)!important;gap:10px!important;min-height:48px;padding:9px 2px!important;border-bottom:1px solid rgba(55,114,159,.18)!important}.live-feed .feed-item:last-child{border-bottom:0!important}.live-feed .feed-item .avatar{width:30px!important;height:30px!important;font-size:.58rem!important}.live-feed .feed-item .name{font-size:.68rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.live-feed .feed-item .action{font-size:.62rem;white-space:nowrap}.live-feed .feed-item .amount{font-size:.68rem;white-space:nowrap}.live-feed .feed-item .status-dot{width:7px;height:7px;border-radius:50%;background:#00e58f;box-shadow:0 0 7px currentColor}.live-feed .feed-item .status-dot.red{background:#ff405d}.live-feed .feed-item .time{font-size:.58rem!important;margin:0!important;text-align:right;white-space:nowrap}
+@media(max-width:760px){.country-stats-section,.live-feed-section{padding:14px!important}.country-stats-header h2,.live-feed-section h2{font-size:1rem!important}.bv-network-map{height:170px;margin-bottom:10px}.country-stats-section .country-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.bv-feed-heading{align-items:center}.bv-feed-tools{gap:5px}.bv-feed-view{font-size:.62rem!important}.bv-live-indicator{font-size:.54rem;padding:4px 7px}.live-feed .feed-item{grid-template-columns:28px minmax(68px,1fr) minmax(58px,.7fr) minmax(60px,.72fr) 7px!important;gap:7px!important}.live-feed .feed-item .time{display:none!important}.live-feed .feed-item .name{max-width:none!important}}
+@media(max-width:430px){.country-stats-section .country-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.country-stats-section .country-row:nth-child(5){grid-column:1 / -1}.bv-network-map{height:150px}.country-stats-header{align-items:flex-start!important;flex-wrap:nowrap!important}.country-stats-header button{font-size:.6rem!important}.live-feed .feed-item{grid-template-columns:26px minmax(58px,1fr) minmax(52px,.68fr) minmax(55px,.7fr) 6px!important;gap:6px!important}.live-feed .feed-item .avatar{width:26px!important;height:26px!important}.live-feed .feed-item .name,.live-feed .feed-item .amount{font-size:.61rem}.live-feed .feed-item .action{font-size:.55rem}}
+
+/* Supplied Builder/Industrial PNGs: same visible scale as Starter */
+.bv-tier-png-icon{max-width:none;max-height:none;width:76px;height:76px}.bv-deployed-icon .bv-tier-png-icon{width:39px;height:39px}
+@media(max-width:760px){.bv-tier-icon>.bv-tier-png-icon{width:54px;height:54px}.bv-deployed-icon .bv-tier-png-icon{width:32px;height:32px}}
+@media(max-width:390px){.bv-tier-icon>.bv-tier-png-icon{width:51px;height:51px}}
 </style>
 
 </head>
@@ -2772,11 +2786,6 @@ html.bv-session-restoring body{background:#020812!important}
 <div class="stat"><i class="fas fa-users" style="color:var(--gold);"></i> <span class="num gold" id="statClients">183,247</span> Miners</div>
 <div class="stat"><i class="fas fa-clock" style="color:var(--success);"></i> <span class="num green">99.9%</span> Uptime</div>
 </div>
-<section class="live-feed-section">
-<h2><i class="fas fa-sync"></i> Live Transaction Feed</h2>
-<div class="sub">Network activity and account events</div>
-<div class="live-feed" id="liveFeed"></div>
-</section>
 <section class="country-stats-section">
 <div class="country-stats-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
 <div>
@@ -2785,7 +2794,26 @@ html.bv-session-restoring body{background:#020812!important}
 </div>
 <button id="globalToggleBtn" onclick="toggleGlobalNetwork()" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,0.20);background:rgba(0,212,255,0.08);color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">View Full Network</button>
 </div>
+<div class="bv-network-map" aria-label="Live European mining activity map">
+<svg class="bv-world-map" viewBox="0 0 1000 430" role="img" aria-label="World map with live European tracking points">
+<defs><pattern id="bvMapDots" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2.3" cy="2.3" r="1.8" fill="#028bd1"/></pattern></defs>
+<g fill="url(#bvMapDots)" opacity=".76">
+<path d="M54 111 91 73l65-23 76 6 37 28 52 8 25 39-31 30-21 50-51 8-24 45-38-18-30-41-55-13-31-35z"/>
+<path d="m244 233 45 22 28 44-6 57-31 57-27-27-11-54-27-43z"/>
+<path d="m416 95 42-28 63 1 35 27 47-6 41 17 67-25 97 8 78 36 85 4 28 42-45 37-66 5-32 31-77-7-46 24-52-18-41 23-45-18-23 21-51-11-30-37-43-5-34-34 19-42z"/>
+<path d="m480 218 47 9 43 39 34 67-24 89-56-9-38-56-19-83z"/>
+<path d="m786 302 48-25 68 19 38 50-42 41-78-9-50-41z"/>
+</g>
+</svg>
+<div class="bv-map-marker" data-region="uk" title="United Kingdom"></div>
+<div class="bv-map-marker" data-region="spain" title="Spain"></div>
+<div class="bv-map-marker" data-region="germany" title="Germany"></div>
+</div>
 <div class="country-grid" id="countryGrid"></div>
+</section>
+<section class="live-feed-section">
+<div class="bv-feed-heading"><div><h2><i class="fas fa-sync"></i> Live Transaction Feed</h2><div class="sub">Network activity and account events</div></div><div class="bv-feed-tools"><span class="bv-live-indicator"><i></i> LIVE</span><button type="button" class="bv-feed-view" onclick="toggleLandingFeed()">View All <span aria-hidden="true">›</span></button></div></div>
+<div class="live-feed" id="liveFeed"></div>
 </section>
 <section class="calc-section">
 <div>
@@ -5174,6 +5202,7 @@ html.bv-session-restoring body{background:#020812!important}
             { type: 'Deployed Rigs', color: 'blue', icon: 'fa-server', min: 1800, max: 30000 }
         ];
         let fakeFeedData = [];
+        let landingFeedExpanded = false;
 
         function pickCountry() {
             const r = Math.random();
@@ -5199,22 +5228,29 @@ html.bv-session-restoring body{background:#020812!important}
             }
             fakeFeedData.sort((a,b) => b.date - a.date);
 
-            feed.innerHTML = fakeFeedData.map(tx => {
+            const visibleFeed = landingFeedExpanded ? fakeFeedData : fakeFeedData.slice(0,5);
+            feed.innerHTML = visibleFeed.map(tx => {
                 const initial = tx.name.substring(0,1).toUpperCase();
                 const timeStr = timeAgo(tx.date);
                 const actionText = tx.action.type === 'Withdraw' ? 'Withdraw' :
                                    tx.action.type === 'Deposited' ? 'Deposited' : 'Deploy Rigs';
-                const detail = tx.action.type === 'Deployed Rigs'
-                    ? `${tx.name} deploy ${tx.amount.toLocaleString()}$ Rigs`
-                    : `${tx.name} ${actionText.toLowerCase()} ${tx.amount.toLocaleString()}$`;
+                const amountPrefix = tx.action.type === 'Withdraw' ? '-':tx.action.type === 'Deposited' ? '+':'';
                 return `<div class="feed-item" style="animation:fadeIn 0.3s ease;">
                     <div class="avatar">${initial}</div>
                     <span class="name">${tx.name}</span>
                     <span class="action">${actionText}</span>
-                    <span class="amount ${tx.action.color}">$${tx.amount.toLocaleString()}</span>
+                    <span class="amount ${tx.action.color}">${amountPrefix}$${tx.amount.toLocaleString()}</span>
+                    <span class="status-dot ${tx.action.color}" aria-hidden="true"></span>
                     <span class="time">${timeStr}</span>
                 </div>`;
             }).join('');
+        }
+
+        function toggleLandingFeed(){
+            landingFeedExpanded = !landingFeedExpanded;
+            const btn = document.querySelector('.bv-feed-view');
+            if(btn) btn.innerHTML = landingFeedExpanded ? 'Show Less <span aria-hidden="true">›</span>' : 'View All <span aria-hidden="true">›</span>';
+            generateFakeFeed();
         }
 
         function updateLiveFeed(){
@@ -5327,6 +5363,24 @@ html.bv-session-restoring body{background:#020812!important}
         }
 
         generateCountryStats();
+        function updateEuropeanMapMarkers(){
+            const positions = {
+                uk:[{left:46.8,top:36.5},{left:47.6,top:34.6},{left:46.1,top:38.2}],
+                spain:[{left:46.9,top:47.2},{left:45.7,top:49.2},{left:48.2,top:46.1}],
+                germany:[{left:52.4,top:39.8},{left:53.7,top:41.5},{left:51.6,top:37.7}]
+            };
+            const sevenHours = 7 * 60 * 60 * 1000;
+            const cycle = Math.floor(Date.now() / sevenHours);
+            document.querySelectorAll('.bv-map-marker').forEach((marker,index)=>{
+                const region = marker.dataset.region;
+                const choices = positions[region] || positions.germany;
+                const point = choices[(cycle + index) % choices.length];
+                marker.style.left = point.left + '%';
+                marker.style.top = point.top + '%';
+            });
+        }
+        updateEuropeanMapMarkers();
+        setInterval(updateEuropeanMapMarkers, 7 * 60 * 60 * 1000);
         selectPlan(0);
         setInterval(generateCountryStats, 6 * 60 * 60 * 1000);
 
