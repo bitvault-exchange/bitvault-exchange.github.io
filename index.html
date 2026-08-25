@@ -2333,7 +2333,68 @@
 @media(max-width:520px){
   .page{padding-left:8px!important;padding-right:8px!important}.bv-equity-card{padding:17px 15px}.bv-equity-value{font-size:1.35rem}.bv-equity-chart{height:76px;width:37%;flex-basis:37%}.bv-balance-grid{gap:8px}.bv-balance-card{padding:14px 11px}.bv-balance-title{font-size:.68rem;gap:6px}.bv-round-icon{width:31px;height:31px;flex-basis:31px;font-size:.9rem}.bv-balance-value{font-size:.9rem}.bv-action-btn,.bv-convert-btn{height:40px;font-size:.76rem}.bv-overview-grid-v2>div{padding:0 2px}.bv-overview-grid-v2 strong{font-size:.67rem}.bv-overview-grid-v2 span{font-size:.58rem}.modern-rig-row{grid-template-columns:39px minmax(91px,1fr) 65px 70px!important}.modern-rig-icon{width:36px;height:36px;font-size:1.25rem}.modern-rig-bar{display:none}.modern-rig-name{font-size:.7rem}.modern-rig-meta{font-size:.61rem}.modern-rig-total strong{font-size:.68rem}.modern-rig-total span{font-size:.59rem}.modern-activity-row{grid-template-columns:38px minmax(0,1fr) auto!important;gap:8px!important}.modern-activity-icon{width:34px;height:34px}.modern-activity-right{min-width:91px!important}.modern-activity-right strong{font-size:.68rem!important}.modern-activity-right span{font-size:.62rem!important}
 }
-</style>
+        .admin-table-scroll {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (min-width: 769px) {
+            #page-control {
+                box-sizing: border-box;
+                min-width: 0;
+                max-width: 100%;
+                overflow-x: hidden;
+                padding-bottom: 100px !important;
+            }
+
+            #page-control .grid-4 {
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            }
+
+            #page-control .grid-4 .card {
+                min-width: 0 !important;
+                overflow: hidden;
+            }
+
+            #page-control .grid-4 .card-value {
+                font-size: clamp(.78rem, 1.1vw, 1.15rem) !important;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            #page-control .admin-table-scroll {
+                max-width: 100%;
+                border-radius: 10px;
+            }
+
+            #page-control .admin-table {
+                width: 100%;
+                min-width: 1120px;
+                table-layout: auto;
+            }
+
+            #page-control .admin-table th,
+            #page-control .admin-table td {
+                white-space: nowrap;
+            }
+
+            #page-control .manage-btns {
+                min-width: 300px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            body:has(#page-control:not(.hidden)) #mobileBottomNav {
+                left: calc(330px + (100vw - 330px) / 2) !important;
+                width: min(720px, calc(100vw - 370px)) !important;
+                min-width: 0 !important;
+            }
+        }
+    </style>
 <base target="_blank">
 <base target="_blank">
 <style id="bitvault-bottom-nav-override">
@@ -2735,28 +2796,6 @@ html.bv-session-restoring body{background:#020812!important}
 .bv-tier-png-icon{max-width:none;max-height:none;width:76px;height:76px}.bv-deployed-icon .bv-tier-png-icon{width:39px;height:39px}
 @media(max-width:760px){.bv-tier-icon>.bv-tier-png-icon{width:54px;height:54px}.bv-deployed-icon .bv-tier-png-icon{width:32px;height:32px}}
 @media(max-width:390px){.bv-tier-icon>.bv-tier-png-icon{width:51px;height:51px}}
-/* Admin Control Center desktop containment */
-#page-control{width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:hidden!important;padding-bottom:110px!important}
-#page-control .admin-table-shell{display:block;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;padding-bottom:8px}
-#page-control .admin-table{width:max-content!important;min-width:100%!important;table-layout:auto!important}
-#page-control .admin-table th,#page-control .admin-table td{white-space:nowrap!important}
-#page-control .manage-btns{min-width:420px;max-width:520px;display:flex;flex-wrap:wrap;gap:4px}
-#page-control .grid-4>*{min-width:0}
-#page-control .card-value{overflow-wrap:anywhere}
-@media(min-width:761px){
- .control-center-open .main-content{overflow-x:hidden!important}
- .control-center-open #mobileBottomNav{left:calc(330px + (100vw - 330px)/2)!important;right:auto!important;transform:translateX(-50%)!important;width:min(720px,calc(100vw - 370px))!important;min-width:0!important;max-width:calc(100vw - 370px)!important}
-}
-@media(min-width:761px) and (max-width:1100px){
- #page-control .grid-4{grid-template-columns:repeat(2,minmax(0,1fr))!important}
- #page-control .admin-table{font-size:.68rem!important}
-}
-@media(min-width:1101px){#page-control .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
-@media(max-width:760px){
- #page-control .admin-table-shell{overflow:visible}
- #page-control .admin-table{width:100%!important;min-width:0!important}
- #page-control .manage-btns{min-width:0;max-width:none}
-}
 </style>
 
 </head>
@@ -3323,7 +3362,7 @@ html.bv-session-restoring body{background:#020812!important}
                         <div class="trade-input"><label>Quantity (BTC)</label><input type="number" id="tradeAmount" placeholder="0.00" step="0.0001" oninput="updateTradePreview()" /></div>
                         <div class="trade-input"><label>Notional (USD)</label><input type="number" id="tradeUsdAmount" placeholder="0.00" step="1" oninput="updateTradePreview('usd')" /></div>
                         <div class="trade-info"><div class="trade-info-row"><span>Mark Price</span><span id="previewPrice">$0.00</span></div><div class="trade-info-row"><span>Exchange Fee (0.1%)</span><span id="previewFee">$0.00</span></div><div class="trade-info-row"><span>Total Settlement</span><span id="previewTotal">$0.00</span></div></div>
-                        <button class="btn btn-primary" id="tradeBtn" onclick="executeTrade()">Convert to BTC</button>
+                        <button class="btn btn-primary" id="tradeBtn" onclick="executeTrade()">Convert USDT to BTC</button>
                         <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(64,128,255,0.06);"><div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Available for Settlement</div><div style="font-size:0.9rem;font-weight:700;" id="tradeBalance">$10,000.00 USD</div></div>
                     </div>
                 </div>
@@ -3362,7 +3401,7 @@ html.bv-session-restoring body{background:#020812!important}
                     <div class="card"><div class="card-header"><span class="card-title">Total Mining</span><span class="icon-badge"><i class="fas fa-hammer"></i></span></div><div class="card-value change-up" id="adminTotalMining">$0.00</div></div>
                 </div>
                 <div class="card" style="margin-bottom:20px;"><div class="card-header" style="flex-wrap:wrap;gap:10px;"><span class="card-title">Client Registry</span><input type="text" placeholder="Search by name or email..." style="padding:6px 12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.8rem;outline:none;min-width:160px;font-family:'Inter',sans-serif;" oninput="filterAdminUsers(this.value)" /></div>
-                <div class="admin-table-shell"><table class="admin-table" id="adminClientsTable"><thead><tr><th>Client</th><th>Email</th><th>USDT</th><th>BTC</th><th>Mining</th><th>Rigs</th><th>Refs</th><th>Joined</th><th>Manage</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
+                <div class="admin-table-scroll"><table class="admin-table" id="adminClientsTable"><thead><tr><th>Client</th><th>Email</th><th>USDT</th><th>BTC</th><th>Mining</th><th>Rigs</th><th>Refs</th><th>Joined</th><th>Manage</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
                 <div id="adminEmptyState" class="empty-state" style="display:none;padding:32px;"><div class="icon"><i class="fas fa-users"></i></div><h3>No clients yet</h3><p>Clients will appear here when they create accounts</p></div></div>
                 <div class="card" style="margin-bottom:20px;"><div class="card-header"><span class="card-title">Support Messages</span><span class="badge badge-pro" id="supportBadge" style="display:none;background:rgba(0,212,255,0.10);color:var(--electric-blue);padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:600;">0 New</span><span class="icon-badge"><i class="fas fa-envelope"></i></span></div>
                 <div id="supportMessagesList" style="max-height:350px;overflow-y:auto;"><div class="empty-state" style="padding:24px;"><div class="icon"><i class="fas fa-inbox"></i></div><h3 style="font-size:0.9rem;">No support messages</h3><p style="font-size:0.8rem;">Client messages will appear here</p></div></div></div>
@@ -3663,8 +3702,8 @@ html.bv-session-restoring body{background:#020812!important}
         let currentUser = null, users = JSON.parse(localStorage.getItem('bv_users')) || {};
         let balancesHidden = false;
         let btcPrice = 65000.00, btcPriceChange24h = 0, priceHistory = [], tradeMode = 'buy', currentPage = 'dashboard', chartPeriod = '1';
-let priceUpdateInterval, miningInterval, syncInterval, tempRegData = null, tempVerifCode = '';
-let cloudSyncInFlight = false, cloudSyncListenersBound = false;
+        let priceUpdateInterval, miningInterval, syncInterval, tempRegData = null, tempVerifCode = '';
+        let secureSyncInFlight = false, secureSyncListenersBound = false;
         let btcSocket = null, btcSocketReconnectTimer = null, btcSocketRetryMs = 2000;
         let btcPriceRequestInFlight = false, lastBtcPriceFetch = 0, btcApiRetryAfter = 0;
 
@@ -3884,9 +3923,8 @@ let cloudSyncInFlight = false, cloudSyncListenersBound = false;
             updateAllBalances();
         }
 
-async function navigate(p){
-    currentPage=p;
-    document.body.classList.toggle('control-center-open',p==='control');
+        async function navigate(p){
+            currentPage=p;
             if(currentUser) localStorage.setItem('bv_last_page',p);
             // Primary navigation always dismisses the shared modal first. This prevents
             // Buy BTC (or any other modal) from remaining above the newly selected page.
@@ -3915,7 +3953,7 @@ async function navigate(p){
             document.getElementById('sidebar').classList.remove('open');
             if(p==='dashboard'){ renderDashboard(); syncFromFirebase(); }
             if(p==='wallet'){ renderWallet(); syncFromFirebase(); }
-    if(p==='mining'){ renderMining(); if(secureSessionToken) syncSecureAccountView(); }
+            if(p==='mining'){ await syncSecureUserNow(); renderMining(); }
             if(p==='trade') renderTrade();
             if(p==='referral') renderReferral();
             if(p==='account-settings') renderAccountSettings();
@@ -3929,42 +3967,7 @@ async function navigate(p){
             if(ov) ov.classList.toggle('active');
         }
 
-        async function syncSecureAccountView(){
-            if(!secureSessionToken||!currentUser||cloudSyncInFlight) return currentUser;
-            cloudSyncInFlight=true;
-            try{
-                const beforeFrozen=!!currentUser.frozen;
-                await refreshSecureUser();
-                if(currentUser.frozen&&!beforeFrozen){
-                    toast('Account frozen by administrator. Logging out.','error');
-                    logout();
-                    return null;
-                }
-                applyUserAvatar(currentUser);
-                updateSidebarMiningStatus();
-                updateAllBalances();
-                if(currentPage==='wallet') renderWallet();
-                if(currentPage==='dashboard') renderDashboard();
-                if(currentPage==='trade') renderTrade();
-                if(currentPage==='mining') renderMining();
-                if(currentPage==='control'&&currentUser.isAdmin) renderAdmin();
-                return currentUser;
-            }catch(e){
-                if(/session|authentication/i.test(e.message||'')) logout();
-                else console.warn('Secure account sync failed:',e);
-                return currentUser;
-            }finally{
-                cloudSyncInFlight=false;
-            }
-        }
-
         async function syncFromFirebase(){
-            // Authenticated accounts use the Worker as their authoritative source.
-            // This prevents a stale browser cache from restoring or erasing rig data.
-            if(secureSessionToken&&currentUser){
-                await syncSecureAccountView();
-                return;
-            }
             if(!firebaseOnline||!db) return;
             try{
                 const s=await db.ref('users').once('value'), d=s.val();
@@ -3998,16 +4001,47 @@ async function navigate(p){
             }catch(e){}
         }
 
-        function startCloudSync(){
-            if(syncInterval){ clearInterval(syncInterval); syncInterval=null; }
-            if(!secureSessionToken) return;
-            syncSecureAccountView();
-            syncInterval=setInterval(syncSecureAccountView,5000);
-            if(!cloudSyncListenersBound){
-                cloudSyncListenersBound=true;
-                window.addEventListener('focus',()=>{ if(secureSessionToken) syncSecureAccountView(); });
-                document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&secureSessionToken) syncSecureAccountView(); });
+        async function syncSecureUserNow(){
+            if(!secureSessionToken||!currentUser||secureSyncInFlight) return;
+            secureSyncInFlight=true;
+            try{
+                const beforeFrozen=!!currentUser.frozen;
+                await refreshSecureUser();
+                if(currentUser.frozen&&!beforeFrozen){
+                    toast('Account frozen by administrator. Logging out.','error');
+                    logout();
+                    return;
+                }
+                applyUserAvatar(currentUser);
+                updateSidebarMiningStatus();
+                updateAllBalances();
+                if(currentPage==='wallet') renderWallet();
+                if(currentPage==='dashboard') renderDashboard();
+                if(currentPage==='trade') renderTrade();
+                if(currentPage==='mining') renderMining();
+                if(currentPage==='control') renderAdmin();
+            }catch(e){
+                if(/session|authentication/i.test(e.message||'')) logout();
+            }finally{
+                secureSyncInFlight=false;
             }
+        }
+
+        function bindSecureSyncRefresh(){
+            if(secureSyncListenersBound) return;
+            secureSyncListenersBound=true;
+            window.addEventListener('focus',syncSecureUserNow);
+            document.addEventListener('visibilitychange',()=>{
+                if(document.visibilityState==='visible') syncSecureUserNow();
+            });
+        }
+
+        async function startCloudSync(){
+            clearInterval(syncInterval);
+            if(!secureSessionToken) return;
+            bindSecureSyncRefresh();
+            await syncSecureUserNow();
+            syncInterval=setInterval(syncSecureUserNow,10000);
         }
 
         function updateAllBalances(){
@@ -4452,7 +4486,7 @@ async function navigate(p){
 
         async function buyRig(rid){ const rig=RIGS.find(r=>r.id===rid);if(!rig)return toast('Rig not found','error');try{const result=await secureApi('/actions/deploy-rig',{method:'POST',body:{rigId:rid}});acceptSecureUser(result.user);updateAllBalances();renderMining();toast(rig.name+' deployed successfully','success');}catch(e){toast(e.message,'error');} }
 
-        function setTradeMode(m){ tradeMode=m; document.querySelectorAll('.trade-tab').forEach(t=>t.classList.remove('active')); document.querySelector(m==='buy'?'.buy-tab':'.sell-tab').classList.add('active'); document.getElementById('tradeBtn').textContent=m==='buy'?'Convert to BTC':'Convert to USDT'; document.getElementById('tradeBtn').className='btn '+(m==='buy'?'btn-primary':'btn-danger'); document.getElementById('tradeAmount').value=''; document.getElementById('tradeUsdAmount').value=''; renderTrade(); }
+        function setTradeMode(m){ tradeMode=m; document.querySelectorAll('.trade-tab').forEach(t=>t.classList.remove('active')); document.querySelector(m==='buy'?'.buy-tab':'.sell-tab').classList.add('active'); document.getElementById('tradeBtn').textContent=m==='buy'?'Convert USDT to BTC':'Convert BTC to USDT'; document.getElementById('tradeBtn').className='btn '+(m==='buy'?'btn-primary':'btn-danger'); document.getElementById('tradeAmount').value=''; document.getElementById('tradeUsdAmount').value=''; renderTrade(); }
 
         function updateTradePreview(s){ const a=document.getElementById('tradeAmount'), u=document.getElementById('tradeUsdAmount'); let amt=parseFloat(a.value)||0, usd=parseFloat(u.value)||0; if(s==='usd'&&usd>0){ amt=usd/btcPrice; a.value=amt.toFixed(8); }else if(amt>0){ usd=amt*btcPrice; u.value=usd.toFixed(2); } const fee=usd*0.001, total=usd+(tradeMode==='buy'?fee:-fee); document.getElementById('previewPrice').textContent='$'+btcPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); document.getElementById('previewFee').textContent='$'+fee.toFixed(2); document.getElementById('previewTotal').textContent='$'+Math.abs(total).toFixed(2); }
 
