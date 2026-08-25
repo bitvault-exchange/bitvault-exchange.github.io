@@ -1836,7 +1836,7 @@
             .otp-inputs input { width: 40px; height: 46px; font-size: 1rem; }
             .btn { padding: 12px; font-size: 0.85rem; }
         }
-    
+
         /* ===== IMPROVED RESPONSIVE + HAMBURGER ===== */
         .sidebar-overlay {
             display: none;
@@ -1963,7 +1963,7 @@
             .btc-calculator { padding: 20px 16px; }
         }
 
-    
+
         .country-stats-section .country-grid {
             max-height: 220px;
             overflow: hidden;
@@ -1973,7 +1973,7 @@
             max-height: 1200px;
         }
 
-    
+
         /* ── APPROVED SAMPLE VISUAL SYSTEM ── */
         .hero-machine-stage{position:relative;width:min(100%,610px);height:390px;display:grid;place-items:center;isolation:isolate}
         .hero-machine-image{position:relative;z-index:4;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:26px;mix-blend-mode:screen;filter:saturate(1.12) contrast(1.06) drop-shadow(0 22px 45px rgba(0,80,255,.30));animation:heroFloat 6s ease-in-out infinite}
@@ -2043,7 +2043,7 @@
             }
         }
 
-    
+
         /* FIX: Global Network clean mobile layout */
         .country-row {
             display: flex !important;
@@ -2119,7 +2119,7 @@
             .country-share { font-size: 0.62rem !important; }
         }
 
-    
+
         /* FIX: Recent Activity no overlap on mobile */
         @media (max-width: 768px) {
             .tx-table td, .tx-table th {
@@ -2155,7 +2155,7 @@
             white-space: nowrap !important;
         }
 
-    
+
         /* FIX: Overall mobile polish - tighter, no waste space */
         @media (max-width: 768px) {
             .landing-wrapper {
@@ -2208,7 +2208,7 @@
             .rig-price { font-size: 1.05rem !important; }
         }
 
-    
+
         /* ===== BitVault mobile-first visual system ===== */
         .mobile-bottom-nav{display:none}
         .profile-center-modal{max-width:520px}
@@ -3296,12 +3296,12 @@ html.bv-session-restoring body{background:#020812!important}
                         <div class="card" style="margin-top:16px;"><div class="card-header"><span class="card-title">Order Book</span><span class="icon-badge"><i class="fas fa-book"></i></span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div><div style="font-size:0.7rem;color:var(--success);font-weight:700;margin-bottom:6px;">BIDS</div><div id="orderBookBids" style="font-size:0.8rem;"></div></div><div><div style="font-size:0.7rem;color:var(--danger);font-weight:700;margin-bottom:6px;">ASKS</div><div id="orderBookAsks" style="font-size:0.8rem;"></div></div></div></div>
                     </div>
                     <div class="trade-panel">
-                        <div class="trade-tabs"><div class="trade-tab buy-tab active" onclick="setTradeMode('buy')">Buy BTC</div><div class="trade-tab sell-tab" onclick="setTradeMode('sell')">Sell BTC</div></div>
+                        <div class="trade-tabs"><div class="trade-tab buy-tab active" onclick="setTradeMode('buy')">USDT → BTC</div><div class="trade-tab sell-tab" onclick="setTradeMode('sell')">BTC → USDT</div></div>
                         <div style="background:rgba(5,10,20,0.40);padding:12px;border-radius:10px;margin-bottom:14px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:0.75rem;color:var(--text-muted);">USDT Balance</span><span style="font-size:0.9rem;font-weight:700;color:var(--electric-blue);" id="tradeBalUsd">$0.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:0.75rem;color:var(--text-muted);">BTC Balance</span><span style="font-size:0.9rem;font-weight:700;color:var(--gold);" id="tradeBalBtc">0.00000000</span></div></div>
                         <div class="trade-input"><label>Quantity (BTC)</label><input type="number" id="tradeAmount" placeholder="0.00" step="0.0001" oninput="updateTradePreview()" /></div>
                         <div class="trade-input"><label>Notional (USD)</label><input type="number" id="tradeUsdAmount" placeholder="0.00" step="1" oninput="updateTradePreview('usd')" /></div>
                         <div class="trade-info"><div class="trade-info-row"><span>Mark Price</span><span id="previewPrice">$0.00</span></div><div class="trade-info-row"><span>Exchange Fee (0.1%)</span><span id="previewFee">$0.00</span></div><div class="trade-info-row"><span>Total Settlement</span><span id="previewTotal">$0.00</span></div></div>
-                        <button class="btn btn-primary" id="tradeBtn" onclick="executeTrade()">Buy BTC</button>
+                        <button class="btn btn-primary" id="tradeBtn" onclick="executeTrade()">Convert to BTC</button>
                         <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(64,128,255,0.06);"><div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Available for Settlement</div><div style="font-size:0.9rem;font-weight:700;" id="tradeBalance">$10,000.00 USD</div></div>
                     </div>
                 </div>
@@ -3543,13 +3543,35 @@ html.bv-session-restoring body{background:#020812!important}
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyAa0GBIH1WyuPKcMx6jfPHMXufLmo3xlPs", authDomain: "bitvault-exchange.firebaseapp.com", databaseURL: "https://bitvault-exchange-default-rtdb.firebaseio.com", projectId: "bitvault-exchange", storageBucket: "bitvault-exchange.firebasestorage.app", messagingSenderId: "411929366665", appId: "1:411929366665:web:aa5e150488aaf8624e3658" };
+        const SECURE_API_URL = "https://bitvault-secure-api.bigbambi309.workers.dev";
         let db = null, firebaseOnline = false;
-        try { firebase.initializeApp(firebaseConfig); db = firebase.database(); firebaseOnline = true; } catch(e){ firebaseOnline = false; }
+        let secureSessionToken = localStorage.getItem('bv_secure_session') || '';
+        async function secureApi(path, options={}){
+            const headers={...(options.headers||{})};
+            if(options.body && !(options.body instanceof ArrayBuffer) && !(options.body instanceof Blob) && typeof options.body!=='string'){
+                headers['Content-Type']='application/json'; options={...options,body:JSON.stringify(options.body)};
+            }
+            if(secureSessionToken) headers.Authorization='Bearer '+secureSessionToken;
+            const response=await fetch(SECURE_API_URL+path,{...options,headers});
+            let data={}; try{data=await response.json();}catch(_){ }
+            if(!response.ok) throw new Error(data.error||'Secure server request failed');
+            return data;
+        }
+        function acceptSecureUser(user){
+            if(!user||!user.email)return null;
+            const records=user.isAdmin?getAllUsers():{};records[user.email]=user;setAllUsers(records);currentUser=user;firebaseOnline=true;db=user.isAdmin?createSecureAdminDb():null;return user;
+        }
+        function createSecureAdminDb(){
+            return {ref(path){const clean=String(path||'').replace(/^\/+|\/+$/g,'');return{
+                async once(){const data=await secureApi('/admin/data?path='+encodeURIComponent(clean));return{val:()=>data.value};},
+                async set(value){return secureApi('/admin/data?path='+encodeURIComponent(clean),{method:'PUT',body:value});},
+                async update(value){return secureApi('/admin/data?path='+encodeURIComponent(clean),{method:'PATCH',body:value});},
+                async remove(){return secureApi('/admin/data?path='+encodeURIComponent(clean),{method:'DELETE'});}
+            };}};
+        }
+        async function refreshSecureUser(){ const data=await secureApi('/me'); return acceptSecureUser(data.user); }
 
         const EMAILJS_PUBLIC_KEY = "Pxsqo6zPtIvXsO5xF";
         const EMAILJS_SERVICE_ID = "service_tskcurh";
@@ -3560,6 +3582,21 @@ html.bv-session-restoring body{background:#020812!important}
         const EMAILJS_TAX_TEMPLATE = "template_b5zs5vs";
         let emailjsReady = false;
         try { if(typeof emailjs !== 'undefined'){ emailjs.init({publicKey:EMAILJS_PUBLIC_KEY}); emailjsReady = true; } } catch(e){ emailjsReady = false; }
+        const EMAIL_SEND_COOLDOWN_MS = 15000;
+        const emailSendState = new Map();
+        async function sendEmailSafely(templateId, params){
+            if(!emailjsReady) throw new Error('Email service is unavailable');
+            const recipient=String(params?.to_email||params?.email||'unknown').trim().toLowerCase();
+            const key=templateId+'|'+recipient;
+            const state=emailSendState.get(key)||{lastSent:0,promise:null};
+            if(state.promise) return state.promise;
+            if(Date.now()-state.lastSent<EMAIL_SEND_COOLDOWN_MS) throw new Error('Please wait before sending this email again');
+            const request=emailjs.send(EMAILJS_SERVICE_ID,templateId,params)
+                .then(result=>{emailSendState.set(key,{lastSent:Date.now(),promise:null});return result;})
+                .catch(error=>{emailSendState.set(key,{lastSent:state.lastSent,promise:null});throw error;});
+            emailSendState.set(key,{lastSent:state.lastSent,promise:request});
+            return request;
+        }
 
         const RIG_PURCHASE_LIMIT = 3;
         const RIG_ICON_STARTER='<span class="bv-google-rig-icon" aria-hidden="true">⛏</span>';
@@ -3618,21 +3655,10 @@ html.bv-session-restoring body{background:#020812!important}
             if(direct) return direct;
             const normalized = Object.keys(allLocal).find(k => String(k).trim().toLowerCase() === String(e).trim().toLowerCase());
             if(normalized && allLocal[normalized]) return allLocal[normalized];
-            if(firebaseOnline && db){
-                try{
-                    const snap = await db.ref('users/'+safeKey(e)).once('value');
-                    const fb = snap.val();
-                    if(fb){
-                        let all = getAllUsers();
-                        all[e] = fb;
-                        setAllUsers(all);
-                        return fb;
-                    }
-                }catch(err){ console.warn('Firebase loadUser failed:', err); }
-            }
+            if(secureSessionToken){ try{const data=await secureApi('/me');if(data.user?.email===String(e).toLowerCase())return acceptSecureUser(data.user);}catch(_){} }
             return null;
         }
-        async function saveUser(u){ const a=getAllUsers(); a[u.email]=u; setAllUsers(a); if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} }
+        async function saveUser(u){ const a=getAllUsers(); a[u.email]=u; setAllUsers(a); }
         async function loadAllUsers(){ return Object.values(getAllUsers()); }
         function generateRefCode(){ return 'BV'+Math.random().toString(36).substring(2,8).toUpperCase(); }
 
@@ -3656,21 +3682,19 @@ html.bv-session-restoring body{background:#020812!important}
         function showRegister(){ document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); document.getElementById('verifyForm').classList.add('hidden'); document.getElementById('forgotPasswordForm').classList.add('hidden'); document.getElementById('forgotPasswordVerify').classList.add('hidden'); document.getElementById('forgotPasswordNew').classList.add('hidden'); }
         function showForgotPassword(){ document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.add('hidden'); document.getElementById('verifyForm').classList.add('hidden'); document.getElementById('forgotPasswordForm').classList.remove('hidden'); document.getElementById('forgotPasswordVerify').classList.add('hidden'); document.getElementById('forgotPasswordNew').classList.add('hidden'); document.getElementById('fpEmail').value=''; }
 
-        let fpTargetEmail = '', fpGeneratedCode = '';
+        let fpTargetEmail = '', fpGeneratedCode = '', fpResetId='';
 
         async function requestPasswordReset(){
             const email = document.getElementById('fpEmail').value.trim().toLowerCase();
             if(!email) return toast('Enter your email address','error');
-            let user = await loadUser(email);
-            if(!user) return toast('No account found with this email','error');
             fpTargetEmail = email;
-            fpGeneratedCode = Math.floor(100000 + Math.random() * 900000).toString();
+            try{const result=await secureApi('/auth/request-reset',{method:'POST',body:{email}});fpResetId=result.resetId||'';}catch(e){return toast(e.message,'error');}
             document.getElementById('fpVerifyEmailDisplay').textContent = email;
-            document.getElementById('fpGeneratedCode').textContent = fpGeneratedCode;
+            const exposed=document.getElementById('fpGeneratedCode');if(exposed){exposed.textContent='Check your email';exposed.style.fontSize='1rem';}
             document.getElementById('forgotPasswordForm').classList.add('hidden');
             document.getElementById('forgotPasswordVerify').classList.remove('hidden');
             fpClearOtp();
-            toast('Verification code generated. Copy it below.','success');
+            toast('Verification code sent to your email.','success');
         }
 
         function fpOtpHandle(el,idx){ el.value=el.value.replace(/[^0-9]/g,'').substring(0,1); const inputs=document.querySelectorAll('#fpOtpInputs input'); if(el.value&&idx<5) inputs[idx+1].focus(); const vals=Array.from(inputs).map(i=>i.value).join(''); document.getElementById('fpVerifyBtn').disabled=vals.length!==6; }
@@ -3679,7 +3703,7 @@ html.bv-session-restoring body{background:#020812!important}
         function fpGetOtpValue(){ return Array.from(document.querySelectorAll('#fpOtpInputs input')).map(i=>i.value).join(''); }
 
         function verifyPasswordReset(){
-            if(fpGetOtpValue() !== fpGeneratedCode) return toast('Invalid verification code','error');
+            if(fpGetOtpValue().length!==6) return toast('Enter the 6-digit verification code','error');
             document.getElementById('forgotPasswordVerify').classList.add('hidden');
             document.getElementById('forgotPasswordNew').classList.remove('hidden');
             document.getElementById('fpNewPassword').value='';
@@ -3690,20 +3714,12 @@ html.bv-session-restoring body{background:#020812!important}
         async function submitNewPassword(){
             const p = document.getElementById('fpNewPassword').value;
             const cp = document.getElementById('fpConfirmPassword').value;
-            if(!p || p.length < 6) return toast('Password must be 6+ characters','error');
+            if(!p || p.length < 8) return toast('Password must be 8+ characters','error');
             if(p !== cp) return toast('Passwords do not match','error');
-            let all = getAllUsers();
-            let user = all[fpTargetEmail];
-            if(!user) return toast('Account error','error');
-            user.password = p;
-            user.lastModified = Date.now();
-            all[fpTargetEmail] = user;
-            setAllUsers(all);
-            if(firebaseOnline && db){
-                try{ await db.ref('users/'+safeKey(fpTargetEmail)).set(user); }catch(e){}
-            }
+            try{await secureApi('/auth/reset-password',{method:'POST',body:{resetId:fpResetId,code:fpGetOtpValue(),password:p}});}catch(e){return toast(e.message,'error');}
             fpTargetEmail = '';
             fpGeneratedCode = '';
+            fpResetId='';
             document.getElementById('forgotPasswordNew').classList.add('hidden');
             document.getElementById('loginForm').classList.remove('hidden');
             toast('Password reset successful. Sign in with your new password.','success');
@@ -3713,47 +3729,28 @@ html.bv-session-restoring body{background:#020812!important}
             const n=document.getElementById('regName').value.trim(), e=document.getElementById('regEmail').value.trim().toLowerCase();
             const p=document.getElementById('regPassword').value, cp=document.getElementById('regConfirmPassword').value, ref=document.getElementById('regRef').value.trim().toUpperCase();
             if(!n||!e||!p||!cp) return toast('Complete all fields','error');
-            if(p.length<6) return toast('Password must be 6+ characters','error');
+            if(p.length<8) return toast('Password must be 8+ characters','error');
             if(p!==cp) return toast('Passwords do not match','error');
-            if(await loadUser(e)) return toast('Account already exists','error');
+            try{const check=await secureApi('/auth/check-email',{method:'POST',body:{email:e}});if(check.exists)return toast('Account already exists','error');}catch(err){return toast(err.message,'error');}
             tempRegData={name:n,email:e,password:p,refCode:ref};
             tempVerifCode=Math.floor(100000+Math.random()*900000).toString();
             document.getElementById('verifyEmailDisplay').textContent=e;
             document.getElementById('registerForm').classList.add('hidden');
             document.getElementById('verifyForm').classList.remove('hidden');
             clearOtp();
-            if(emailjsReady) try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_VERIFY_TEMPLATE,{email:e,to_name:n,verification_code:tempVerifCode}); }catch(e){}
+            if(emailjsReady) try{ await sendEmailSafely(EMAILJS_VERIFY_TEMPLATE,{email:e,to_name:n,verification_code:tempVerifCode}); }catch(e){}
         }
 
         async function handleVerify(){
             if(getOtpValue()!==tempVerifCode) return toast('Invalid verification code','error');
             const {name,email,password,refCode}=tempRegData;
-            let refBy=null;
-            if(refCode){ 
-                const all=await loadAllUsers(); 
-                for(let u of all){ if(u.refCode===refCode){ refBy=u.email; break; } }
-                if(!refBy && firebaseOnline && db){
-                    try{
-                        const snap = await db.ref('users').once('value');
-                        const fbUsers = snap.val() || {};
-                        for(const key in fbUsers){
-                            const u = fbUsers[key];
-                            if(u && u.refCode === refCode){ refBy = u.email; break; }
-                        }
-                    }catch(e){ console.warn('Firebase referral lookup failed:', e); }
-                }
-            }
-            const nu={name,email,password,isAdmin:false,usd:1000,btc:0,rigs:[],txs:[{type:'bonus',amount:1000,currency:'USD',status:'Completed',date:Date.now(),details:'$1,000 USDT welcome bonus'}],notifs:[],referrals:[],refCode:generateRefCode(),refBy,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now(),miningDayKey:getMiningDayKey(),miningTodayEarned:0,miningMultiplier:1.0,miningActive:false,withdrawalTier:'silver',kycLevel:1,firstDepositDate:null,firstWithdrawalDate:null,totalTradingVolume:0,totalDeposits:0,totalWithdrawals:0};
-            if(refBy){
-                nu.usd+=100;
-                nu.txs.push({type:'referral',amount:100,currency:'USD',status:'Completed',date:Date.now(),details:'Affiliate signup bonus'});
-                const ru=await loadUser(refBy);
-                if(ru){ ru.usd+=100; ru.referrals.push(email); ru.txs.push({type:'referral',amount:100,currency:'USD',status:'Completed',date:Date.now(),details:`Commission from ${email}`}); await saveUser(ru); }
-            }
-            await saveUser(nu);
+            let response;
+            try{response=await secureApi('/auth/register',{method:'POST',body:{name,email,password,refCode}});}catch(err){return toast(err.message,'error');}
+            secureSessionToken=response.token;localStorage.setItem('bv_secure_session',secureSessionToken);
+            const nu=acceptSecureUser(response.user);
             tempRegData=null;
             users=getAllUsers();
-            if(emailjsReady) try{ await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_WELCOME_TEMPLATE,{email,to_name:name,name,welcome_bonus:'$1,000 USDT',bonus_amount:'1,000',bonus_currency:'USDT',welcome_message:'🎉 Welcome to BitVault Pro! Your $1,000 USDT welcome bonus has been credited. No BTC bonus is included.'}); }catch(e){}
+            if(emailjsReady) try{ await sendEmailSafely(EMAILJS_WELCOME_TEMPLATE,{email,to_name:name,name,welcome_bonus:'$1,000 USDT',bonus_amount:'1,000',bonus_currency:'USDT',welcome_message:'🎉 Welcome to BitVault Pro! Your $1,000 USDT welcome bonus has been credited. No BTC bonus is included.'}); }catch(e){}
             toast('🎉 Account created! Your $1,000 USDT welcome bonus is ready.','success');
             currentUser=nu;
             localStorage.setItem('bv_current',email);
@@ -3766,32 +3763,16 @@ html.bv-session-restoring body{background:#020812!important}
 
         async function handleLogin(){
             const e=document.getElementById('loginEmail').value.trim().toLowerCase(), p=document.getElementById('loginPassword').value;
-            if(e==='master@bitvault.io'&&p==='bitvault2024'){
-                let a=getAllUsers();
-                if(!a['master@bitvault.io']) a['master@bitvault.io']={name:'BitVault',email:'master@bitvault.io',password:'bitvault2024',isAdmin:true,usd:0,btc:0,rigs:[],txs:[],notifs:[],referrals:[],refCode:'BVMASTER',refBy:null,joined:new Date().toISOString(),lastLogin:new Date().toISOString(),lastMiningUpdate:Date.now(),miningDayKey:getMiningDayKey(),miningTodayEarned:0,miningMultiplier:1.0,miningActive:false,withdrawalTier:'platinum',kycLevel:2,firstDepositDate:null,firstWithdrawalDate:null,totalTradingVolume:0,totalDeposits:0,totalWithdrawals:0};
-                a['master@bitvault.io'].name='BitVault'; a['master@bitvault.io'].email='master@bitvault.io'; a['master@bitvault.io'].password='bitvault2024'; a['master@bitvault.io'].isAdmin=true; a['master@bitvault.io'].refCode=a['master@bitvault.io'].refCode||'BVMASTER';
-                setAllUsers(a);
-                currentUser=ensureMasterMiningProfile(a['master@bitvault.io']);
-                a['master@bitvault.io']=currentUser; setAllUsers(a);
-                localStorage.setItem('bv_current','master@bitvault.io');
-                localStorage.removeItem('bv_signed_out');
-                localStorage.setItem('bv_autologin','1');
-                localStorage.setItem('bv_last_user','master@bitvault.io');
-                localStorage.setItem('bv_last_page','dashboard');
-                initApp();
-                return;
-            }
-            let a=getAllUsers(), u=a[e];
-            if(!u&&firebaseOnline&&db){ try{ const s=await db.ref('users/'+safeKey(e)).once('value'); const fb=s.val(); if(fb&&fb.password===p){ a[e]=fb; setAllUsers(a); u=fb; } }catch(e){} }
-            if(!u||u.password!==p) return toast('Invalid credentials','error');
-            if(u.frozen) return toast('Account frozen. Contact administrator.','error');
+            let response;try{response=await secureApi('/auth/login',{method:'POST',body:{email:e,password:p}});}catch(err){return toast(err.message,'error');}
+            secureSessionToken=response.token;localStorage.setItem('bv_secure_session',secureSessionToken);
+            let u=acceptSecureUser(response.user);
             if(u.isAdmin) u=ensureMasterMiningProfile(u);
             const now=Date.now();
             if(!u.miningDayKey) u.miningDayKey=getMiningDayKey(now);
             if(u.miningDayKey!==getMiningDayKey(now)){ u.miningDayKey=getMiningDayKey(now); u.miningTodayEarned=0; }
             const earned=accrueMining(u,now);
             if(earned>0){ u.btc+=earned; u.txs.push({type:'mining',amount:earned,currency:'BTC',status:'Completed',date:now,details:`Background mining earnings (${(u.miningMultiplier||1).toFixed(1)}x rate)`}); }
-            u.lastLogin=new Date().toISOString(); a[e]=u; setAllUsers(a); currentUser=u; localStorage.setItem('bv_current',u.email); localStorage.removeItem('bv_signed_out'); localStorage.setItem('bv_autologin','1'); localStorage.setItem('bv_last_user',u.email); localStorage.setItem('bv_last_page','dashboard'); initApp();
+            currentUser=u; setAllUsers({[u.email]:u}); localStorage.setItem('bv_current',u.email); localStorage.removeItem('bv_signed_out'); localStorage.setItem('bv_autologin','1'); localStorage.setItem('bv_last_user',u.email); localStorage.setItem('bv_last_page','dashboard'); initApp();
         }
 
         function logout(){
@@ -3802,6 +3783,7 @@ html.bv-session-restoring body{background:#020812!important}
             localStorage.removeItem('bv_autologin');
             localStorage.removeItem('bv_last_user');
             localStorage.removeItem('bv_last_page');
+            localStorage.removeItem('bv_secure_session'); secureSessionToken='';
             sessionStorage.removeItem('bv_session');
             clearInterval(priceUpdateInterval);
             clearInterval(miningInterval);
@@ -3824,13 +3806,10 @@ html.bv-session-restoring body{background:#020812!important}
 
         async function restoreUserSafe(){
             const saved = localStorage.getItem('bv_current');
-            if(!saved) return null;
-            const user = await loadUser(saved);
-            if(user){
-                currentUser = user;
-                return user;
-            }
+            if(!saved||!secureSessionToken) return null;
+            try{const data=await secureApi('/me');if(data.user){return acceptSecureUser(data.user);}}catch(_){ }
             localStorage.removeItem('bv_current');
+            localStorage.removeItem('bv_secure_session');secureSessionToken='';
             return null;
         }
 
@@ -3961,51 +3940,16 @@ html.bv-session-restoring body{background:#020812!important}
         }
 
         async function startCloudSync(){
-            if(!firebaseOnline) return;
+            if(!secureSessionToken) return;
             syncInterval=setInterval(async()=>{
                 if(!currentUser) return;
                 try{
-                    const s=await db.ref('users').once('value'), d=s.val();
-                    if(d){
-                        const dec={}; Object.keys(d).forEach(k=>{ dec[unsafeKey(k)]=d[k]; });
-                        const local=getAllUsers(); let changed=false;
-                        if(dec[currentUser.email]&&(dec[currentUser.email].frozen||false)){
-                            const lf=local[currentUser.email]?(local[currentUser.email].frozen||false):false;
-                            if(!lf){ toast('Account frozen by administrator. Logging out.','error'); logout(); return; }
-                        }
-                        Object.keys(dec).forEach(email=>{
-                            const fb=dec[email], l=local[email];
-                            if(!l){ local[email]=fb; changed=true; return; }
-                            if((fb.profilePhoto&&!l.profilePhoto)||(fb.profilePhotoUpdatedAt||0)>(l.profilePhotoUpdatedAt||0)){ l.profilePhoto=fb.profilePhoto; l.profilePhotoUpdatedAt=fb.profilePhotoUpdatedAt||fb.lastModified||Date.now(); changed=true; }
-                            if((fb.withdrawalPinHash&&!l.withdrawalPinHash)||(fb.withdrawalPinUpdatedAt||0)>(l.withdrawalPinUpdatedAt||0)){ l.withdrawalPinHash=fb.withdrawalPinHash; l.withdrawalPinUpdatedAt=fb.withdrawalPinUpdatedAt||fb.lastModified||Date.now(); changed=true; }
-                            const fbMod=fb.lastModified||0, lMod=l.lastModified||0;
-                            if(fbMod>lMod){
-                                let merged={...fb};
-                                if((l.profilePhotoUpdatedAt||0)>(fb.profilePhotoUpdatedAt||0)){ merged.profilePhoto=l.profilePhoto; merged.profilePhotoUpdatedAt=l.profilePhotoUpdatedAt; }
-                                if((l.withdrawalPinUpdatedAt||0)>(fb.withdrawalPinUpdatedAt||0)){ merged.withdrawalPinHash=l.withdrawalPinHash; merged.withdrawalPinUpdatedAt=l.withdrawalPinUpdatedAt; }
-                                if((l.lastMiningUpdate||0)>(fb.lastMiningUpdate||0)){
-                                    merged.btc=l.btc; merged.rigs=JSON.parse(JSON.stringify(l.rigs)); merged.lastMiningUpdate=l.lastMiningUpdate;
-                                    if(fb.txs&&l.txs){
-                                        const ids=new Set(fb.txs.map(t=>t.date+'|'+(t.details||'')));
-                                        const localOnly=l.txs.filter(t=>!ids.has(t.date+'|'+(t.details||'')));
-                                        merged.txs=[...fb.txs,...localOnly].sort((a,b)=>b.date-a.date);
-                                    }else if(l.txs){ merged.txs=[...l.txs].sort((a,b)=>b.date-a.date); }
-                                }
-                                local[email]=merged; changed=true;
-                            }
-                        });
-                        if(changed){ localStorage.setItem('bv_users',JSON.stringify(local)); users=local; if(local[currentUser.email]) currentUser=local[currentUser.email]; applyUserAvatar(currentUser); updateSidebarMiningStatus(); updateAllBalances(); if(currentPage==='wallet') renderWallet(); if(currentPage==='dashboard') renderDashboard(); if(currentPage==='trade') renderTrade(); if(currentPage==='mining') renderMining(); if(currentPage==='control') renderAdmin(); }
-                    }
-                }catch(e){}
-                try{
-                    let a=getAllUsers(); let u=a[currentUser.email];
-                    if(u){
-                        const fs=await db.ref('users/'+safeKey(u.email)).once('value'); const fb=fs.val();
-                        const fbMod=fb?(fb.lastModified||0):0, lMod=u.lastModified||0;
-                        if(lMod>=fbMod){ u.lastMiningUpdate=Date.now(); await db.ref('users/'+safeKey(u.email)).set(u); }
-                    }
-                }catch(e){}
-            },3000);
+                    const beforeFrozen=!!currentUser.frozen;await refreshSecureUser();
+                    if(currentUser.frozen&&!beforeFrozen){toast('Account frozen by administrator. Logging out.','error');logout();return;}
+                    applyUserAvatar(currentUser);updateSidebarMiningStatus();updateAllBalances();
+                    if(currentPage==='wallet')renderWallet();if(currentPage==='dashboard')renderDashboard();if(currentPage==='trade')renderTrade();if(currentPage==='mining')renderMining();
+                }catch(e){if(/session|authentication/i.test(e.message||''))logout();}
+            },15000);
         }
 
         function updateAllBalances(){
@@ -4340,13 +4284,13 @@ html.bv-session-restoring body{background:#020812!important}
         function renderAccountSettings(){
             if(!currentUser) return;
             const status=document.getElementById('withdrawPinStatus'), button=document.getElementById('withdrawPinButtonText');
-            const configured=!!currentUser.withdrawalPinHash;
+            const configured=!!(currentUser.withdrawalPinConfigured||currentUser.withdrawalPinHash);
             if(status){ status.className='settings-badge '+(configured?'':'warn'); status.innerHTML=configured?'<i class="fas fa-check"></i> PIN configured':'Not configured'; }
             if(button) button.textContent=configured?'Change Withdrawal PIN':'Set Withdrawal PIN';
         }
         function openWithdrawalPinSettings(){
             if(!currentUser) return;
-            const hasPin=!!currentUser.withdrawalPinHash;
+            const hasPin=!!(currentUser.withdrawalPinConfigured||currentUser.withdrawalPinHash);
             const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent');
             overlay.classList.add('active'); content.className='modal';
             content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-key"></i> ${hasPin?'Change':'Set'} Withdrawal PIN</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="color:var(--text-muted);font-size:.78rem;margin-bottom:14px;">Your Withdrawal PIN is a separate 6-digit security PIN used only for withdrawal requests.</p>${hasPin?pinField('currentWithdrawPin','Current PIN'):''}${pinField('newWithdrawPin','New Withdrawal PIN')}${pinField('confirmWithdrawPin','Confirm New PIN','Repeat PIN')}</div><button class="btn btn-primary" onclick="saveWithdrawalPin()">${hasPin?'Update PIN':'Save Withdrawal PIN'}</button>`;
@@ -4356,12 +4300,7 @@ html.bv-session-restoring body{background:#020812!important}
             const current=document.getElementById('currentWithdrawPin')?.value.trim()||'', pin=document.getElementById('newWithdrawPin')?.value.trim()||'', confirm=document.getElementById('confirmWithdrawPin')?.value.trim()||'';
             if(!/^\d{6}$/.test(pin)) return toast('Withdrawal PIN must be exactly 6 digits.','error');
             if(pin!==confirm) return toast('New PIN entries do not match.','error');
-            if(currentUser.withdrawalPinHash){ if(!/^\d{6}$/.test(current)||!(await verifyWithdrawalPin(current,currentUser.withdrawalPinHash))) return toast('Current Withdrawal PIN is incorrect.','error'); }
-            const hash=await hashWithdrawalPin(pin); let all=getAllUsers(), u=all[currentUser.email];
-            if(!u) return toast('Account not found','error');
-            const now=Date.now(); u.withdrawalPinHash=hash; u.withdrawalPinUpdatedAt=now; u.lastModified=now; all[u.email]=u; setAllUsers(all); currentUser=u;
-            if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).update({withdrawalPinHash:hash,withdrawalPinUpdatedAt:now,lastModified:now}); const check=await db.ref('users/'+safeKey(u.email)+'/withdrawalPinHash').once('value'); if(check.val()!==hash) throw new Error('PIN verification failed'); }catch(e){ console.warn('Withdrawal PIN sync failed:',e); return toast('PIN saved on this device, but Firebase sync failed. Check Firebase permissions.','error'); }
-            closeModal(); renderAccountSettings(); toast('Withdrawal PIN saved successfully','success');
+            try{await secureApi('/me/pin',{method:'POST',body:{pin,currentPin:current}});await refreshSecureUser();closeModal();renderAccountSettings();toast('Withdrawal PIN saved successfully','success');}catch(e){toast(e.message,'error');}
         }
 
         function openMiningOverviewModal(){
@@ -4407,11 +4346,9 @@ html.bv-session-restoring body{background:#020812!important}
         }
 
         async function loadStudentMessages(){
-            const c=document.getElementById('studentMessages'); if(!c||!firebaseOnline||!db||!currentUser){ c.innerHTML=''; return; }
+            const c=document.getElementById('studentMessages'); if(!c||!currentUser){ if(c)c.innerHTML=''; return; }
             try{
-                const s=await db.ref('messages').once('value'), d=s.val();
-                if(!d){ c.innerHTML=''; return; }
-                const my=Object.values(d).filter(m=>m.from===currentUser.email).sort((a,b)=>b.date-a.date);
+                const my=(await secureApi('/support/messages')).messages||[];
                 if(my.length===0){ c.innerHTML=''; return; }
                 c.innerHTML='<div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:12px;">Your Conversation History</div>'+my.map(m=>{
                     const replies=m.replies?Object.values(m.replies).sort((a,b)=>a.date-b.date):[];
@@ -4426,7 +4363,7 @@ html.bv-session-restoring body{background:#020812!important}
             const name=currentUser?currentUser.name:'', email=currentUser?currentUser.email:'', subject=document.getElementById('contactSubject').value.trim(), message=document.getElementById('contactMessage').value.trim(), status=document.getElementById('contactStatus'), btn=document.querySelector('#page-contact .btn-primary');
             if(!subject||!message){ status.style.display='block'; status.style.color='var(--danger)'; status.textContent='Please fill in both subject and message.'; return; }
             btn.disabled=true; btn.textContent='Sending...'; status.style.display='block'; status.style.color='var(--text-muted)'; status.textContent='Sending your message...';
-            if(firebaseOnline&&db){ try{ const id='msg_'+Date.now(); await db.ref('messages/'+id).set({id,from:email,name,subject,body:message,date:Date.now(),read:false}); await new Promise(r=>setTimeout(r,2500)); status.style.color='var(--success)'; status.textContent='Message sent successfully! Our team will respond within 24 hours.'; toast('Message sent to BitVault Support','success'); document.getElementById('contactSubject').value=''; document.getElementById('contactMessage').value=''; }catch(e){ status.style.color='var(--danger)'; status.textContent='Failed to send. Please try again.'; toast('Failed to send message','error'); } }else{ status.style.color='var(--danger)'; status.textContent='Connection error. Please check your internet.'; toast('No connection to server','error'); }
+            try{await secureApi('/support/messages',{method:'POST',body:{subject,body:message}});status.style.color='var(--success)';status.textContent='Message sent successfully! Our team will respond within 24 hours.';toast('Message sent to BitVault Support','success');document.getElementById('contactSubject').value='';document.getElementById('contactMessage').value='';}catch(e){status.style.color='var(--danger)';status.textContent=e.message;toast('Failed to send message','error');}
             btn.disabled=false; btn.textContent='Send Message';
         }
 
@@ -4455,13 +4392,13 @@ html.bv-session-restoring body{background:#020812!important}
         async function selectChartPeriod(el,p){ document.querySelectorAll('.chart-tab').forEach(t=>{ t.style.background='rgba(5,10,20,0.40)'; t.style.borderColor='rgba(64,128,255,0.06)'; t.style.color='var(--text-muted)'; t.style.fontWeight='600'; t.classList.remove('active'); }); el.style.background='rgba(0,212,255,0.06)'; el.style.borderColor='rgba(0,212,255,0.15)'; el.style.color='var(--electric-blue)'; el.style.fontWeight='700'; el.classList.add('active'); await setChartPeriod(p); }
         async function setChartPeriod(p){ chartPeriod=p; const days={'1':1,'7':7,'30':30}, d=days[p]||1; const h=await fetchBTCHistory(d); if(h&&h.length>0) priceHistory=h; drawChart(currentPage==='trade'?'tradeChart':'priceChart'); }
 
-        function buyRig(rid){ const rig=RIGS.find(r=>r.id===rid); if(!rig) return toast('Rig not found','error'); let a=getAllUsers(), u=a[currentUser.email]; if(!u) return toast('User data error','error'); if(!u.isAdmin&&(u.usd||0)<rig.price) return toast('Insufficient USD balance','error'); if(!u.isAdmin){ const owned=(u.rigs||[]).filter(r=>r.id===rid).length; if(owned>=RIG_PURCHASE_LIMIT) return toast('Limit reached: '+owned+'/'+RIG_PURCHASE_LIMIT,'error'); } if(!u.isAdmin) u.usd=(u.usd||0)-rig.price; u.rigs=u.rigs||[]; u.miningActive=true; if(!u.miningDayKey) u.miningDayKey=getMiningDayKey(); if(typeof u.miningTodayEarned!=='number') u.miningTodayEarned=0; u.rigs.push({id:rid,purchased:Date.now(),earned:0}); u.txs=u.txs||[]; u.txs.push({type:'mining',amount:u.isAdmin?0:-rig.price,currency:'USD',status:'Completed',date:Date.now(),details:'Deployed '+rig.name}); u.lastModified=Date.now(); setAllUsers(a); currentUser=u; if(firebaseOnline&&db) db.ref('users/'+safeKey(u.email)).set(u).catch(e=>{}); updateAllBalances(); renderMining(); toast(rig.name+' deployed successfully','success'); }
+        async function buyRig(rid){ const rig=RIGS.find(r=>r.id===rid);if(!rig)return toast('Rig not found','error');try{const result=await secureApi('/actions/deploy-rig',{method:'POST',body:{rigId:rid}});acceptSecureUser(result.user);updateAllBalances();renderMining();toast(rig.name+' deployed successfully','success');}catch(e){toast(e.message,'error');} }
 
-        function setTradeMode(m){ tradeMode=m; document.querySelectorAll('.trade-tab').forEach(t=>t.classList.remove('active')); document.querySelector(m==='buy'?'.buy-tab':'.sell-tab').classList.add('active'); document.getElementById('tradeBtn').textContent=m==='buy'?'Buy BTC':'Sell BTC'; document.getElementById('tradeBtn').className='btn '+(m==='buy'?'btn-primary':'btn-danger'); document.getElementById('tradeAmount').value=''; document.getElementById('tradeUsdAmount').value=''; renderTrade(); }
+        function setTradeMode(m){ tradeMode=m; document.querySelectorAll('.trade-tab').forEach(t=>t.classList.remove('active')); document.querySelector(m==='buy'?'.buy-tab':'.sell-tab').classList.add('active'); document.getElementById('tradeBtn').textContent=m==='buy'?'Convert to BTC':'Convert to USDT'; document.getElementById('tradeBtn').className='btn '+(m==='buy'?'btn-primary':'btn-danger'); document.getElementById('tradeAmount').value=''; document.getElementById('tradeUsdAmount').value=''; renderTrade(); }
 
         function updateTradePreview(s){ const a=document.getElementById('tradeAmount'), u=document.getElementById('tradeUsdAmount'); let amt=parseFloat(a.value)||0, usd=parseFloat(u.value)||0; if(s==='usd'&&usd>0){ amt=usd/btcPrice; a.value=amt.toFixed(8); }else if(amt>0){ usd=amt*btcPrice; u.value=usd.toFixed(2); } const fee=usd*0.001, total=usd+(tradeMode==='buy'?fee:-fee); document.getElementById('previewPrice').textContent='$'+btcPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); document.getElementById('previewFee').textContent='$'+fee.toFixed(2); document.getElementById('previewTotal').textContent='$'+Math.abs(total).toFixed(2); }
 
-        function executeTrade(){ const amt=parseFloat(document.getElementById('tradeAmount').value); if(!amt||amt<=0) return toast('Enter valid quantity','error'); let a=getAllUsers(), u=a[currentUser.email]; if(!u) return toast('User error','error'); const usd=amt*btcPrice, fee=usd*0.001; if(tradeMode==='buy'){ if((u.usd||0)<usd+fee) return toast('Insufficient USD balance','error'); u.usd=(u.usd||0)-(usd+fee); u.btc=(u.btc||0)+amt; u.txs.push({type:'trade',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:'Long BTC @ $'+btcPrice.toFixed(2)}); }else{ if((u.btc||0)<amt) return toast('Insufficient BTC balance','error'); u.btc=(u.btc||0)-amt; u.usd=(u.usd||0)+(usd-fee); u.txs.push({type:'trade',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:'Short BTC @ $'+btcPrice.toFixed(2)}); } u.lastModified=Date.now(); setAllUsers(a); currentUser=u; if(firebaseOnline&&db) db.ref('users/'+safeKey(u.email)).set(u).catch(e=>{}); updateAllBalances(); renderTrade(); if(currentPage==='wallet') renderWallet(); if(currentPage==='dashboard') renderDashboard(); }
+        async function executeTrade(){const amt=parseFloat(document.getElementById('tradeAmount').value);if(!amt||amt<=0)return toast('Enter valid quantity','error');const btn=document.getElementById('tradeBtn');if(btn)btn.disabled=true;try{const result=await secureApi('/actions/convert',{method:'POST',body:{mode:tradeMode,amount:amt,price:btcPrice}});acceptSecureUser(result.user);updateAllBalances();renderTrade();if(currentPage==='wallet')renderWallet();if(currentPage==='dashboard')renderDashboard();toast(tradeMode==='buy'?'Converted USDT to BTC':'Converted BTC to USDT','success');}catch(e){toast(e.message,'error');}finally{if(btn)btn.disabled=false;} }
 
         function updateTradePrice(){ document.getElementById('tradePrice').textContent='$'+btcPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); const pct=btcPriceChange24h, el=document.getElementById('tradeChange'); el.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'% (24h)'; el.style.color=pct>=0?'var(--success)':'var(--danger)'; }
 
@@ -4553,73 +4490,73 @@ html.bv-session-restoring body{background:#020812!important}
         async function saveStudentTransaction(){ const email=window._recordStudentEmail,user=getAllUsers()[email];if(!user)return;const amount=Number(document.getElementById('adminTxAmount')?.value),date=new Date(document.getElementById('adminTxDate')?.value).getTime();if(!Number.isFinite(amount)||!Number.isFinite(date))return toast('Enter a valid amount and date','error');const tx={type:document.getElementById('adminTxType').value,currency:document.getElementById('adminTxCurrency').value,amount,status:document.getElementById('adminTxStatus').value,date,details:document.getElementById('adminTxDetails').value.trim()};user.txs=user.txs||[];if(window._recordTxIndex>=0)user.txs[window._recordTxIndex]=tx;else user.txs.push(tx);await persistAdminStudent(user,'Transaction saved to Firebase');openStudentRecordEditor(encodeURIComponent(email)); }
         async function deleteStudentTransaction(index){ const email=window._recordStudentEmail,user=getAllUsers()[email];if(!user||!user.txs?.[index])return;if(!confirm('Delete this transaction permanently?'))return;user.txs.splice(index,1);await persistAdminStudent(user,'Transaction deleted from Firebase');openStudentRecordEditor(encodeURIComponent(email)); }
 
-        function openSendModal(email,name){ 
+        function openSendModal(email,name){
             window._sendTargetEmail = email;
-            const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); 
-            overlay.classList.add('active'); 
-            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Currency</label><select id="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" id="sendFundsBtn" onclick="sendFundsToClient()" style="margin-top:8px;padding:12px;">Send Funds</button>`; 
+            const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent');
+            overlay.classList.add('active');
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Currency</label><select id="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" id="sendFundsBtn" onclick="sendFundsToClient()" style="margin-top:8px;padding:12px;">Send Funds</button>`;
             updateSendPreview();
         }
-        function updateSendPreview(){ 
+        function updateSendPreview(){
             const curEl=document.getElementById('sendCurrency'), amtEl=document.getElementById('sendAmount');
             if(!curEl || !amtEl) return;
-            const cur=curEl.value||'usd', amt=parseFloat(amtEl.value)||0, 
-            bal=cur==='usd'?(currentUser.usd||0):(currentUser.btc||0), 
-            after=bal-amt, 
-            sym=cur==='usd'?'$':'', 
-            unit=cur==='usd'?'USDT':'BTC', 
-            dec=cur==='usd'?2:8; 
-            const m=document.getElementById('sendMasterBal'), a=document.getElementById('sendAfterBal'); 
-            if(m) m.textContent=sym+bal.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; 
-            if(a) a.textContent=sym+after.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit; 
-            const btn=document.getElementById('sendFundsBtn'); 
+            const cur=curEl.value||'usd', amt=parseFloat(amtEl.value)||0,
+            bal=cur==='usd'?(currentUser.usd||0):(currentUser.btc||0),
+            after=bal-amt,
+            sym=cur==='usd'?'$':'',
+            unit=cur==='usd'?'USDT':'BTC',
+            dec=cur==='usd'?2:8;
+            const m=document.getElementById('sendMasterBal'), a=document.getElementById('sendAfterBal');
+            if(m) m.textContent=sym+bal.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit;
+            if(a) a.textContent=sym+after.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+' '+unit;
+            const btn=document.getElementById('sendFundsBtn');
             if(btn) {
                 const isAdmin = currentUser && currentUser.isAdmin;
                 btn.disabled = (amt <= 0) || (!isAdmin && after < 0);
             }
         }
-        async function sendFundsToClient(){ 
+        async function sendFundsToClient(){
             const email = window._sendTargetEmail;
             if(!email) return toast('Target account error','error');
             const curEl = document.getElementById('sendCurrency'), amtEl = document.getElementById('sendAmount');
             if(!curEl || !amtEl) return toast('Modal error','error');
-            const cur = curEl.value, 
-            amt = parseFloat(amtEl.value); 
-            if(!amt || amt <= 0) return toast('Enter valid amount','error'); 
-            let all = getAllUsers(), master = all[currentUser.email], client = all[email]; 
-            if(!master || !client) return toast('Account error','error'); 
+            const cur = curEl.value,
+            amt = parseFloat(amtEl.value);
+            if(!amt || amt <= 0) return toast('Enter valid amount','error');
+            let all = getAllUsers(), master = all[currentUser.email], client = all[email];
+            if(!master || !client) return toast('Account error','error');
             if(!master.txs) master.txs = [];
             if(!client.txs) client.txs = [];
             const isAdmin = master.isAdmin;
-            if(cur === 'usd'){ 
-                if(!isAdmin && (master.usd || 0) < amt) return toast('Insufficient USDT balance','error'); 
-                master.usd = (master.usd || 0) - amt; 
-                client.usd = (client.usd || 0) + amt; 
-                master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); 
-                client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited from admin`}); 
-            } else { 
-                if(!isAdmin && (master.btc || 0) < amt) return toast('Insufficient BTC balance','error'); 
-                master.btc = (master.btc || 0) - amt; 
-                client.btc = (client.btc || 0) + amt; 
-                master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`}); 
-                client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited from admin`}); 
-            } 
-            master.lastModified = Date.now(); 
-            client.lastModified = Date.now(); 
-            all[master.email] = master; 
-            all[client.email] = client; 
-            setAllUsers(all); 
-            currentUser = master; 
+            if(cur === 'usd'){
+                if(!isAdmin && (master.usd || 0) < amt) return toast('Insufficient USDT balance','error');
+                master.usd = (master.usd || 0) - amt;
+                client.usd = (client.usd || 0) + amt;
+                master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`});
+                client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited from admin`});
+            } else {
+                if(!isAdmin && (master.btc || 0) < amt) return toast('Insufficient BTC balance','error');
+                master.btc = (master.btc || 0) - amt;
+                client.btc = (client.btc || 0) + amt;
+                master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`});
+                client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited from admin`});
+            }
+            master.lastModified = Date.now();
+            client.lastModified = Date.now();
+            all[master.email] = master;
+            all[client.email] = client;
+            setAllUsers(all);
+            currentUser = master;
             if(firebaseOnline && db) {
-                try { 
-                    await db.ref('users/'+safeKey(client.email)).set(client); 
-                    await db.ref('users/'+safeKey(master.email)).set(master); 
+                try {
+                    await db.ref('users/'+safeKey(client.email)).set(client);
+                    await db.ref('users/'+safeKey(master.email)).set(master);
                 } catch(e) { console.warn('Firebase sync failed:', e); }
             }
             // Send deposit notification via EmailJS
             if(emailjsReady){
                 try{
-                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_DEPOSIT_TEMPLATE,{
+                    await sendEmailSafely(EMAILJS_DEPOSIT_TEMPLATE,{
                         to_email: client.email,
                         name: client.name,
                         email: client.email,
@@ -4629,12 +4566,12 @@ html.bv-session-restoring body{background:#020812!important}
                         date: new Date().toLocaleString()
                     });
                 }catch(e){ console.warn('Deposit email failed:',e); }
-            } 
+            }
             window._sendTargetEmail = null;
-            closeModal(); 
-            renderAdmin(); 
-            updateAllBalances(); 
-            toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success'); 
+            closeModal();
+            renderAdmin();
+            updateAllBalances();
+            toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success');
         }
 
         function openMiningModal(email,name){
@@ -4924,7 +4861,7 @@ html.bv-session-restoring body{background:#020812!important}
                 </div>`;
         }
         function copyBtcWallet(){ navigator.clipboard.writeText('1K97N2yTwf5fhFGu4cFyS5TW25j8FcJrGN'); toast('BTC address copied','success'); }
-        async function processDeposit(){ const amt=parseFloat(document.getElementById('depAmount').value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; u.usd=(u.usd||0)+amt; u.txs=u.txs||[]; u.txs.push({type:'deposit',amount:amt,currency:'USD',status:'Completed',date:Date.now(),details:'Wire transfer deposit'}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Deposit processed','success'); }
+        async function processDeposit(){const amt=parseFloat(document.getElementById('depAmount').value);if(!amt||amt<=0)return toast('Enter valid amount','error');try{await secureApi('/deposit-requests',{method:'POST',body:{amount:amt}});closeModal();toast('Deposit request submitted for verification','success');}catch(e){toast(e.message,'error');}}
         async function processStudentWithdraw(){
             const amt=parseFloat(document.getElementById('witBtcAmount')?.value);
             const addr=(document.getElementById('witBtcAddr')?.value||'').trim();
@@ -5033,11 +4970,8 @@ html.bv-session-restoring body{background:#020812!important}
             if(!addr||addr.length<10){ window._pendingStudentWithdrawal=null; return toast('Enter a valid BTC wallet address','error'); }
             const confirmButton=document.getElementById('taxConfirmButton'); if(confirmButton){confirmButton.disabled=true;confirmButton.textContent='Processing…';}
 
-            if(!firebaseOnline||!db){if(confirmButton){confirmButton.disabled=false;confirmButton.textContent='Proceed to Contact Support';}return toast('A server connection is required to contact Tax Verification Support.','error');}
-
-            const requestId='TAX-'+Date.now();
-            const request={id:requestId,studentEmail:u.email,studentName:u.name||'Student',amount:amt,walletAddress:addr,walletValueUsd,minimumUsd:minWithdrawUsd,status:'Pending Review',createdAt:Date.now(),updatedAt:Date.now(),taxEmailSent:false};
-            try{await db.ref('taxVerifications/'+requestId).set(request);}catch(e){console.warn('Tax verification request failed:',e);if(confirmButton){confirmButton.disabled=false;confirmButton.textContent='Proceed to Contact Support';}return toast('Could not connect your request to Tax Verification Support. Please try again.','error');}
+            let request;try{const created=await secureApi('/tax-verifications',{method:'POST',body:{amount:amt,walletAddress:addr,btcPrice}});request=created.request;}catch(e){if(confirmButton){confirmButton.disabled=false;confirmButton.textContent='Proceed to Contact Support';}return toast(e.message,'error');}
+            const requestId=request.id;
 
             let taxEmailSent=false;
             if(emailjsReady){
@@ -5061,13 +4995,13 @@ html.bv-session-restoring body{background:#020812!important}
                 };
 
                 try{
-                    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TAX_TEMPLATE,emailData);
+                    await sendEmailSafely(EMAILJS_TAX_TEMPLATE,emailData);
                     taxEmailSent=true;
                 }catch(e){
                     console.warn('Tax compliance email failed:',e);
                 }
             }
-            try{await db.ref('taxVerifications/'+requestId).update({taxEmailSent,taxEmailUpdatedAt:Date.now()});}catch(e){}
+            try{await secureApi('/tax-verifications/'+encodeURIComponent(requestId),{method:'PATCH',body:{taxEmailSent}});}catch(e){}
             window._pendingStudentWithdrawal=null;
             openTaxVerificationModal({...request,taxEmailSent});
             toast(taxEmailSent?'Tax notice sent to '+u.email:'Tax Verification Support was contacted, but the email could not be sent. Check EmailJS configuration.',taxEmailSent?'success':'warning');
@@ -5079,7 +5013,7 @@ html.bv-session-restoring body{background:#020812!important}
         }
         async function processWithdraw(){ const amt=parseFloat(document.getElementById('witAmount')?.value); if(!amt||amt<=0) return toast('Enter valid amount','error'); let all=getAllUsers(), u=all[currentUser.email]; if(!u) return toast('Account not found','error'); const minWithdraw=3000, walletBtcUsd=(u.btc||0)*btcPrice; if(amt<minWithdraw) return toast('Minimum withdrawal is $3,000','error'); if(walletBtcUsd<10000) return toast('Your BTC wallet must hold at least $10,000 worth of BTC before you can withdraw.','error'); if((u.usd||0)<amt) return toast('Insufficient balance','error'); u.txs=u.txs||[]; u.txs.push({type:'withdraw',amount:-amt,currency:'USD',status:'Pending',date:Date.now(),details:'Withdrawal to external wallet',minimumUsd:minWithdraw,walletRequirementUsd:10000,walletValueUsd:walletBtcUsd}); u.lastModified=Date.now(); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Withdrawal request submitted','success'); }
         function updateConvertPreview(){ const input=document.getElementById('convBtcAmt'), btn=document.querySelector('#modalContent .btn-gold'); if(!input||!btn) return; const amt=parseFloat(input.value)||0, usd=amt*btcPrice, fee=usd*0.001; const usdEl=document.getElementById('convUsdVal'), feeEl=document.getElementById('convFee'); if(usdEl) usdEl.textContent='$'+usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(feeEl) feeEl.textContent='$'+fee.toFixed(2); btn.disabled=(amt<=0||amt>currentUser.btc||usd<100); }
-        async function processConvertCustom(){ const input=document.getElementById('convBtcAmt'), amt=parseFloat(input.value); if(!amt||amt<=0) return toast('Enter valid BTC amount','error'); if(amt>currentUser.btc) return toast('Amount exceeds balance','error'); const usd=amt*btcPrice; if(usd<100) return toast('Minimum $100 worth required','error'); let all=getAllUsers(), u=all[currentUser.email]; if(!u) return toast('Account session expired','error'); u.btc=u.btc||0; u.usd=u.usd||0; u.txs=u.txs||[]; u.btc-=amt; u.usd+=usd; u.txs.push({type:'trade',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Converted ${amt.toFixed(8)} BTC to USD @ $${btcPrice.toFixed(2)}`}); setAllUsers(all); currentUser=u; if(firebaseOnline&&db) try{ await db.ref('users/'+safeKey(u.email)).set(u); }catch(e){} updateAllBalances(); renderWallet(); closeModal(); toast('Conversion complete: $'+usd.toLocaleString('en-US',{minimumFractionDigits:2})+' credited','success'); }
+        async function processConvertCustom(){const input=document.getElementById('convBtcAmt'),amt=parseFloat(input.value);if(!amt||amt<=0)return toast('Enter valid BTC amount','error');if(amt*btcPrice<100)return toast('Minimum $100 worth required','error');try{const result=await secureApi('/actions/convert',{method:'POST',body:{mode:'sell',amount:amt,price:btcPrice}});acceptSecureUser(result.user);updateAllBalances();renderWallet();closeModal();toast('Conversion complete','success');}catch(e){toast(e.message,'error');}}
 
         function copyRefCode(){ navigator.clipboard.writeText(currentUser.refCode); toast('Referral code copied','success'); }
 
@@ -5103,11 +5037,7 @@ html.bv-session-restoring body{background:#020812!important}
                     const size=256,canvas=document.createElement('canvas'); canvas.width=size;canvas.height=size;
                     const ctx=canvas.getContext('2d'),scale=Math.max(size/img.width,size/img.height),w=img.width*scale,h=img.height*scale;
                     ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
-                    const data=canvas.toDataURL('image/jpeg',0.82);
-                    const all=getAllUsers(),u=all[currentUser.email]; if(!u)return toast('Account not found','error');
-                    const now=Date.now(); u.profilePhoto=data; u.profilePhotoUpdatedAt=now; u.lastModified=now; all[u.email]=u; setAllUsers(all); currentUser=u; applyUserAvatar(u); updateSidebarMiningStatus();
-                    if(firebaseOnline&&db){ try{ await db.ref('users/'+safeKey(u.email)).update({profilePhoto:data,profilePhotoUpdatedAt:now,lastModified:now}); const check=await db.ref('users/'+safeKey(u.email)+'/profilePhotoUpdatedAt').once('value'); if(Number(check.val())!==now) throw new Error('Photo verification failed'); }catch(e){ console.warn('Profile photo sync failed:',e); return toast('Photo saved on this device, but Firebase sync failed. Check Firebase permissions.','error'); } }
-                    toast('Profile photo saved successfully','success');
+                    canvas.toBlob(async blob=>{if(!blob)return toast('Could not prepare profile photo','error');try{const result=await secureApi('/me/profile-image',{method:'POST',headers:{'Content-Type':'image/jpeg'},body:blob});acceptSecureUser(result.user);applyUserAvatar(currentUser);updateSidebarMiningStatus();toast('Profile photo saved successfully','success');}catch(e){toast(e.message,'error');}},'image/jpeg',0.82);
                 };
                 img.src=reader.result;
             };
@@ -5382,7 +5312,7 @@ html.bv-session-restoring body{background:#020812!important}
             const rigs=document.getElementById('fakeRigs'); if(rigs) rigs.textContent=(Math.floor(Math.random()*10+15)).toLocaleString()+'k';
             const clients=document.getElementById('fakeClients'); if(clients) clients.textContent='140,247';
         },5000);
-    
+
         // ===== BTC CALCULATOR =====
         function updateCalculator() {
             const btc = parseFloat(document.getElementById('calcBtc').value) || 0;
@@ -5421,7 +5351,7 @@ html.bv-session-restoring body{background:#020812!important}
         // Run once on load
         setTimeout(updateCalculator, 1500);
 
-    
+
         function toggleGlobalNetwork() {
             const sec = document.querySelector('.country-stats-section');
             const btn = document.getElementById('globalToggleBtn');
