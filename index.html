@@ -2735,6 +2735,28 @@ html.bv-session-restoring body{background:#020812!important}
 .bv-tier-png-icon{max-width:none;max-height:none;width:76px;height:76px}.bv-deployed-icon .bv-tier-png-icon{width:39px;height:39px}
 @media(max-width:760px){.bv-tier-icon>.bv-tier-png-icon{width:54px;height:54px}.bv-deployed-icon .bv-tier-png-icon{width:32px;height:32px}}
 @media(max-width:390px){.bv-tier-icon>.bv-tier-png-icon{width:51px;height:51px}}
+/* Admin Control Center desktop containment */
+#page-control{width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:hidden!important;padding-bottom:110px!important}
+#page-control .admin-table-shell{display:block;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;padding-bottom:8px}
+#page-control .admin-table{width:max-content!important;min-width:100%!important;table-layout:auto!important}
+#page-control .admin-table th,#page-control .admin-table td{white-space:nowrap!important}
+#page-control .manage-btns{min-width:420px;max-width:520px;display:flex;flex-wrap:wrap;gap:4px}
+#page-control .grid-4>*{min-width:0}
+#page-control .card-value{overflow-wrap:anywhere}
+@media(min-width:761px){
+ .control-center-open .main-content{overflow-x:hidden!important}
+ .control-center-open #mobileBottomNav{left:calc(330px + (100vw - 330px)/2)!important;right:auto!important;transform:translateX(-50%)!important;width:min(720px,calc(100vw - 370px))!important;min-width:0!important;max-width:calc(100vw - 370px)!important}
+}
+@media(min-width:761px) and (max-width:1100px){
+ #page-control .grid-4{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #page-control .admin-table{font-size:.68rem!important}
+}
+@media(min-width:1101px){#page-control .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:760px){
+ #page-control .admin-table-shell{overflow:visible}
+ #page-control .admin-table{width:100%!important;min-width:0!important}
+ #page-control .manage-btns{min-width:0;max-width:none}
+}
 </style>
 
 </head>
@@ -3340,7 +3362,7 @@ html.bv-session-restoring body{background:#020812!important}
                     <div class="card"><div class="card-header"><span class="card-title">Total Mining</span><span class="icon-badge"><i class="fas fa-hammer"></i></span></div><div class="card-value change-up" id="adminTotalMining">$0.00</div></div>
                 </div>
                 <div class="card" style="margin-bottom:20px;"><div class="card-header" style="flex-wrap:wrap;gap:10px;"><span class="card-title">Client Registry</span><input type="text" placeholder="Search by name or email..." style="padding:6px 12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.8rem;outline:none;min-width:160px;font-family:'Inter',sans-serif;" oninput="filterAdminUsers(this.value)" /></div>
-                <div style="overflow-x:auto;"><table class="admin-table" id="adminClientsTable"><thead><tr><th>Client</th><th>Email</th><th>USDT</th><th>BTC</th><th>Mining</th><th>Rigs</th><th>Refs</th><th>Joined</th><th>Manage</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
+                <div class="admin-table-shell"><table class="admin-table" id="adminClientsTable"><thead><tr><th>Client</th><th>Email</th><th>USDT</th><th>BTC</th><th>Mining</th><th>Rigs</th><th>Refs</th><th>Joined</th><th>Manage</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
                 <div id="adminEmptyState" class="empty-state" style="display:none;padding:32px;"><div class="icon"><i class="fas fa-users"></i></div><h3>No clients yet</h3><p>Clients will appear here when they create accounts</p></div></div>
                 <div class="card" style="margin-bottom:20px;"><div class="card-header"><span class="card-title">Support Messages</span><span class="badge badge-pro" id="supportBadge" style="display:none;background:rgba(0,212,255,0.10);color:var(--electric-blue);padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:600;">0 New</span><span class="icon-badge"><i class="fas fa-envelope"></i></span></div>
                 <div id="supportMessagesList" style="max-height:350px;overflow-y:auto;"><div class="empty-state" style="padding:24px;"><div class="icon"><i class="fas fa-inbox"></i></div><h3 style="font-size:0.9rem;">No support messages</h3><p style="font-size:0.8rem;">Client messages will appear here</p></div></div></div>
@@ -3641,7 +3663,8 @@ html.bv-session-restoring body{background:#020812!important}
         let currentUser = null, users = JSON.parse(localStorage.getItem('bv_users')) || {};
         let balancesHidden = false;
         let btcPrice = 65000.00, btcPriceChange24h = 0, priceHistory = [], tradeMode = 'buy', currentPage = 'dashboard', chartPeriod = '1';
-        let priceUpdateInterval, miningInterval, syncInterval, tempRegData = null, tempVerifCode = '';
+let priceUpdateInterval, miningInterval, syncInterval, tempRegData = null, tempVerifCode = '';
+let cloudSyncInFlight = false, cloudSyncListenersBound = false;
         let btcSocket = null, btcSocketReconnectTimer = null, btcSocketRetryMs = 2000;
         let btcPriceRequestInFlight = false, lastBtcPriceFetch = 0, btcApiRetryAfter = 0;
 
@@ -3861,8 +3884,9 @@ html.bv-session-restoring body{background:#020812!important}
             updateAllBalances();
         }
 
-        async function navigate(p){
-            currentPage=p;
+async function navigate(p){
+    currentPage=p;
+    document.body.classList.toggle('control-center-open',p==='control');
             if(currentUser) localStorage.setItem('bv_last_page',p);
             // Primary navigation always dismisses the shared modal first. This prevents
             // Buy BTC (or any other modal) from remaining above the newly selected page.
@@ -3891,7 +3915,7 @@ html.bv-session-restoring body{background:#020812!important}
             document.getElementById('sidebar').classList.remove('open');
             if(p==='dashboard'){ renderDashboard(); syncFromFirebase(); }
             if(p==='wallet'){ renderWallet(); syncFromFirebase(); }
-            if(p==='mining') renderMining();
+    if(p==='mining'){ renderMining(); if(secureSessionToken) syncSecureAccountView(); }
             if(p==='trade') renderTrade();
             if(p==='referral') renderReferral();
             if(p==='account-settings') renderAccountSettings();
@@ -3905,7 +3929,42 @@ html.bv-session-restoring body{background:#020812!important}
             if(ov) ov.classList.toggle('active');
         }
 
+        async function syncSecureAccountView(){
+            if(!secureSessionToken||!currentUser||cloudSyncInFlight) return currentUser;
+            cloudSyncInFlight=true;
+            try{
+                const beforeFrozen=!!currentUser.frozen;
+                await refreshSecureUser();
+                if(currentUser.frozen&&!beforeFrozen){
+                    toast('Account frozen by administrator. Logging out.','error');
+                    logout();
+                    return null;
+                }
+                applyUserAvatar(currentUser);
+                updateSidebarMiningStatus();
+                updateAllBalances();
+                if(currentPage==='wallet') renderWallet();
+                if(currentPage==='dashboard') renderDashboard();
+                if(currentPage==='trade') renderTrade();
+                if(currentPage==='mining') renderMining();
+                if(currentPage==='control'&&currentUser.isAdmin) renderAdmin();
+                return currentUser;
+            }catch(e){
+                if(/session|authentication/i.test(e.message||'')) logout();
+                else console.warn('Secure account sync failed:',e);
+                return currentUser;
+            }finally{
+                cloudSyncInFlight=false;
+            }
+        }
+
         async function syncFromFirebase(){
+            // Authenticated accounts use the Worker as their authoritative source.
+            // This prevents a stale browser cache from restoring or erasing rig data.
+            if(secureSessionToken&&currentUser){
+                await syncSecureAccountView();
+                return;
+            }
             if(!firebaseOnline||!db) return;
             try{
                 const s=await db.ref('users').once('value'), d=s.val();
@@ -3939,17 +3998,16 @@ html.bv-session-restoring body{background:#020812!important}
             }catch(e){}
         }
 
-        async function startCloudSync(){
+        function startCloudSync(){
+            if(syncInterval){ clearInterval(syncInterval); syncInterval=null; }
             if(!secureSessionToken) return;
-            syncInterval=setInterval(async()=>{
-                if(!currentUser) return;
-                try{
-                    const beforeFrozen=!!currentUser.frozen;await refreshSecureUser();
-                    if(currentUser.frozen&&!beforeFrozen){toast('Account frozen by administrator. Logging out.','error');logout();return;}
-                    applyUserAvatar(currentUser);updateSidebarMiningStatus();updateAllBalances();
-                    if(currentPage==='wallet')renderWallet();if(currentPage==='dashboard')renderDashboard();if(currentPage==='trade')renderTrade();if(currentPage==='mining')renderMining();
-                }catch(e){if(/session|authentication/i.test(e.message||''))logout();}
-            },15000);
+            syncSecureAccountView();
+            syncInterval=setInterval(syncSecureAccountView,5000);
+            if(!cloudSyncListenersBound){
+                cloudSyncListenersBound=true;
+                window.addEventListener('focus',()=>{ if(secureSessionToken) syncSecureAccountView(); });
+                document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&secureSessionToken) syncSecureAccountView(); });
+            }
         }
 
         function updateAllBalances(){
