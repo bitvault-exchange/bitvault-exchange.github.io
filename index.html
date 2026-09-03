@@ -2984,12 +2984,12 @@ html.bv-session-restoring body{background:#020812!important}
                 <div class="form-group">
                     <label>Security code</label>
                     <div class="otp-inputs" id="otpInputs">
-                        <input type="text" maxlength="1" oninput="otpHandle(this,0)" onkeydown="otpKey(event,0)" />
-                        <input type="text" maxlength="1" oninput="otpHandle(this,1)" onkeydown="otpKey(event,1)" />
-                        <input type="text" maxlength="1" oninput="otpHandle(this,2)" onkeydown="otpKey(event,2)" />
-                        <input type="text" maxlength="1" oninput="otpHandle(this,3)" onkeydown="otpKey(event,3)" />
-                        <input type="text" maxlength="1" oninput="otpHandle(this,4)" onkeydown="otpKey(event,4)" />
-                        <input type="text" maxlength="1" oninput="otpHandle(this,5)" onkeydown="otpKey(event,5)" />
+                        <input type="text" id="verifyOtp1" name="verifyOtp1" maxlength="1" oninput="otpHandle(this,0)" onkeydown="otpKey(event,0)" />
+                        <input type="text" id="verifyOtp2" name="verifyOtp2" maxlength="1" oninput="otpHandle(this,1)" onkeydown="otpKey(event,1)" />
+                        <input type="text" id="verifyOtp3" name="verifyOtp3" maxlength="1" oninput="otpHandle(this,2)" onkeydown="otpKey(event,2)" />
+                        <input type="text" id="verifyOtp4" name="verifyOtp4" maxlength="1" oninput="otpHandle(this,3)" onkeydown="otpKey(event,3)" />
+                        <input type="text" id="verifyOtp5" name="verifyOtp5" maxlength="1" oninput="otpHandle(this,4)" onkeydown="otpKey(event,4)" />
+                        <input type="text" id="verifyOtp6" name="verifyOtp6" maxlength="1" oninput="otpHandle(this,5)" onkeydown="otpKey(event,5)" />
                     </div>
                 </div>
                 <button class="btn btn-primary" id="verifyBtn" onclick="handleVerify()" disabled>Verify &amp; Create Account</button>
@@ -3030,12 +3030,12 @@ html.bv-session-restoring body{background:#020812!important}
                 <div class="form-group">
                     <label>Enter Verification Code</label>
                     <div class="otp-inputs" id="fpOtpInputs">
-                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,0)" onkeydown="fpOtpKey(event,0)" />
-                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,1)" onkeydown="fpOtpKey(event,1)" />
-                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,2)" onkeydown="fpOtpKey(event,2)" />
-                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,3)" onkeydown="fpOtpKey(event,3)" />
-                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,4)" onkeydown="fpOtpKey(event,4)" />
-                        <input type="text" maxlength="1" oninput="fpOtpHandle(this,5)" onkeydown="fpOtpKey(event,5)" />
+                        <input type="text" id="resetOtp1" name="resetOtp1" maxlength="1" oninput="fpOtpHandle(this,0)" onkeydown="fpOtpKey(event,0)" />
+                        <input type="text" id="resetOtp2" name="resetOtp2" maxlength="1" oninput="fpOtpHandle(this,1)" onkeydown="fpOtpKey(event,1)" />
+                        <input type="text" id="resetOtp3" name="resetOtp3" maxlength="1" oninput="fpOtpHandle(this,2)" onkeydown="fpOtpKey(event,2)" />
+                        <input type="text" id="resetOtp4" name="resetOtp4" maxlength="1" oninput="fpOtpHandle(this,3)" onkeydown="fpOtpKey(event,3)" />
+                        <input type="text" id="resetOtp5" name="resetOtp5" maxlength="1" oninput="fpOtpHandle(this,4)" onkeydown="fpOtpKey(event,4)" />
+                        <input type="text" id="resetOtp6" name="resetOtp6" maxlength="1" oninput="fpOtpHandle(this,5)" onkeydown="fpOtpKey(event,5)" />
                     </div>
                 </div>
                 <button class="btn btn-primary" id="fpVerifyBtn" onclick="verifyPasswordReset()" disabled>Verify & Continue</button>
@@ -3364,7 +3364,7 @@ html.bv-session-restoring body{background:#020812!important}
                     <div class="card"><div class="card-header"><span class="card-title">Combined BTC</span><span class="icon-badge"><i class="fas fa-coins"></i></span></div><div class="card-value" id="adminTotalBtc">0.00000000</div></div>
                     <div class="card"><div class="card-header"><span class="card-title">Total Mining</span><span class="icon-badge"><i class="fas fa-hammer"></i></span></div><div class="card-value change-up" id="adminTotalMining">$0.00</div></div>
                 </div>
-                <div class="card" style="margin-bottom:20px;"><div class="card-header" style="flex-wrap:wrap;gap:10px;"><span class="card-title">Client Registry</span><input type="text" placeholder="Search by name or email..." style="padding:6px 12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.8rem;outline:none;min-width:160px;font-family:'Inter',sans-serif;" oninput="filterAdminUsers(this.value)" /></div>
+                <div class="card" style="margin-bottom:20px;"><div class="card-header" style="flex-wrap:wrap;gap:10px;"><span class="card-title">Client Registry</span><input type="text" id="adminUserSearch" name="adminUserSearch" placeholder="Search by name or email..." style="padding:6px 12px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.8rem;outline:none;min-width:160px;font-family:'Inter',sans-serif;" oninput="filterAdminUsers(this.value)" /></div>
                 <div class="admin-table-scroll"><table class="admin-table" id="adminClientsTable"><thead><tr><th>Client</th><th>Email</th><th>USDT</th><th>BTC</th><th>Mining</th><th>Rigs</th><th>Refs</th><th>Joined</th><th>Manage</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
                 <div id="adminEmptyState" class="empty-state" style="display:none;padding:32px;"><div class="icon"><i class="fas fa-users"></i></div><h3>No clients yet</h3><p>Clients will appear here when they create accounts</p></div></div>
                 <div class="card" style="margin-bottom:20px;"><div class="card-header"><span class="card-title">Support Messages</span><span class="badge badge-pro" id="supportBadge" style="display:none;background:rgba(0,212,255,0.10);color:var(--electric-blue);padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:600;">0 New</span><span class="icon-badge"><i class="fas fa-envelope"></i></span></div>
@@ -4034,90 +4034,22 @@ html.bv-session-restoring body{background:#020812!important}
         document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){connectLiveBTCPrice();fetchBTCPrice(true).then(()=>{updateDashPrice();updateTopBarPrice();updateAllBalances();if(currentPage==='dashboard')renderDashboard();if(currentPage==='trade')renderTrade();});}});
         window.addEventListener('focus',()=>{connectLiveBTCPrice();fetchBTCPrice(true).then(()=>{updateDashPrice();updateTopBarPrice();updateAllBalances();});});
 
-        async function settleAllStudentMining(){
-            if(!currentUser || !currentUser.isAdmin) return;
-            const all=getAllUsers();
-            const now=Date.now();
-            let changed=false;
-            for(const email of Object.keys(all)){
-                const u=all[email];
-                if(!u || u.isAdmin || !u.rigs || !u.rigs.length) continue;
-                const earned=accrueMining(u,now);
-                if(earned>0){
-                    u.btc=(u.btc||0)+earned;
-                    u.lastModified=now;
-                    u.txs=u.txs||[];
-                    // Keep the ledger readable: one reward entry per settlement, not per second.
-                    u.txs.push({type:'mining',amount:earned,currency:'BTC',status:'Completed',date:now,details:`Mining reward — ${u.rigs.length} active rig${u.rigs.length===1?'':'s'} @ ${(u.miningMultiplier||1).toFixed(1)}x`});
-                    changed=true;
-                }
-            }
-            if(changed){
-                setAllUsers(all);
-                for(const email of Object.keys(all)){
-                    const u=all[email];
-                    if(!u || u.isAdmin) continue;
-                    if(firebaseOnline&&db) db.ref('users/'+safeKey(email)).set(u).catch(()=>{});
-                }
-            }
-        }
-
         function startMiningSimulation(){
             clearInterval(miningInterval);
-            let firebaseWriteTick=0;
-            miningInterval=setInterval(async()=>{
+            miningInterval=setInterval(()=>{
+                if(!currentUser || !Array.isArray(currentUser.rigs) || currentUser.rigs.length===0) return;
+                // This one-second calculation is display-only. The Worker is the single
+                // authority that settles and saves mining whenever /me is refreshed.
+                const earned=accrueMining(currentUser,Date.now());
+                if(earned<=0) return;
+                currentUser.btc=Number(currentUser.btc||0)+earned;
                 const all=getAllUsers();
-                const now=Date.now();
-                let changed=false;
-                const changedUsers=[];
-
-                // Mining is account-state based, not page/login-state based.
-                // Every deployed rig accrues from its last timestamp even when its owner is offline.
-                for(const email of Object.keys(all)){
-                    let u=all[email];
-                    if(!u || !Array.isArray(u.rigs) || u.rigs.length===0) continue;
-                    if(u.isAdmin) u=ensureMasterMiningProfile(u);
-                    const earned=accrueMining(u,now);
-                    if(earned>0){
-                        u.btc=(u.btc||0)+earned;
-                        u.lastModified=now;
-                        u.txs=u.txs||[];
-                        const lastLedger=Number(u.lastMiningLedger||0);
-                        if(now-lastLedger>=60000){
-                            u.txs.push({
-                                type:'mining',amount:earned,currency:'BTC',status:'Completed',date:now,
-                                details:u.isAdmin?`Master fleet mining — ${u.rigs.length} rigs always running`:`Mining reward — ${u.rigs.length} active rig${u.rigs.length===1?'':'s'}`
-                            });
-                            u.lastMiningLedger=now;
-                        }
-                        all[email]=u;
-                        changed=true;
-                        changedUsers.push(u);
-                    }else{
-                        all[email]=u;
-                    }
-                }
-
-                if(changed){
-                    setAllUsers(all);
-                    if(currentUser && all[currentUser.email]){
-                        currentUser=all[currentUser.email];
-                        updateAllBalances();
-                        if(currentPage==='dashboard') renderDashboard();
-                        if(currentPage==='wallet') renderWallet();
-                        if(currentPage==='mining') renderMining();
-                        if(currentPage==='control' && currentUser.isAdmin) renderAdmin();
-                    }
-                }
-
-                // Persist the globally-running mining state periodically instead of hammering Firebase every second.
-                firebaseWriteTick++;
-                if(firebaseOnline && db && changed && firebaseWriteTick>=5){
-                    firebaseWriteTick=0;
-                    for(const u of changedUsers){
-                        db.ref('users/'+safeKey(u.email)).set(u).catch(()=>{});
-                    }
-                }
+                all[currentUser.email]=currentUser;
+                setAllUsers(all);
+                updateAllBalances();
+                if(currentPage==='dashboard') renderDashboard();
+                if(currentPage==='wallet') renderWallet();
+                if(currentPage==='mining') renderMining();
             },1000);
         }
 
@@ -4426,7 +4358,9 @@ html.bv-session-restoring body{background:#020812!important}
         async function renderAdmin(){
             if(!currentUser||!currentUser.isAdmin) return;
             await syncFromFirebase();
-            await settleAllStudentMining(); users=getAllUsers(); const all=Object.values(users||{}), clients=all.filter(u=>u&&!u.isAdmin);
+            // Student mining is settled by the Worker. The control center only reads
+            // confirmed server state and must never upload every student in a loop.
+            users=getAllUsers(); const all=Object.values(users||{}), clients=all.filter(u=>u&&!u.isAdmin);
             document.getElementById('adminTotalUsers').textContent=clients.length;
             document.getElementById('adminTotalUsd').textContent='$'+clients.reduce((s,u)=>s+(u.usd||0),0).toLocaleString('en-US',{minimumFractionDigits:2});
             document.getElementById('adminTotalBtc').textContent=clients.reduce((s,u)=>s+(u.btc||0),0).toFixed(8);
@@ -4501,39 +4435,21 @@ html.bv-session-restoring body{background:#020812!important}
             const txs=(user.txs||[]).map((tx,index)=>({tx,index})).sort((a,b)=>Number(b.tx.date)-Number(a.tx.date));
             const rows=txs.map(({tx,index})=>`<div class="admin-record-row"><div><strong>${String(tx.type||'transaction').toUpperCase()} — ${Number(tx.amount||0).toLocaleString()} ${tx.currency||'USDT'}</strong><small>${tx.status||'Completed'} • ${new Date(tx.date||Date.now()).toLocaleString()} • ${tx.details||'No details'}</small></div><div><button class="btn-edit" onclick="editStudentTransaction(${index})"><i class="fas fa-pen"></i></button> <button class="btn-danger-sm" onclick="deleteStudentTransaction(${index})"><i class="fas fa-trash"></i></button></div></div>`).join('');
             const overlay=document.getElementById('modalOverlay'),content=document.getElementById('modalContent');overlay.classList.add('active');content.className='modal';content.style.maxWidth='620px';
-            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-database"></i> ${user.name||'Student'} Records</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="admin-record-grid"><div class="form-group"><label>Date Joined</label><input type="datetime-local" id="adminJoinedDate" value="${adminDateValue(user.joined)}"></div><div style="display:flex;align-items:end"><button class="btn btn-primary" onclick="saveStudentJoinedDate()">Save Joined Date</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 9px"><strong>Transactions</strong><button class="btn-edit" onclick="editStudentTransaction(-1)"><i class="fas fa-plus"></i> Add</button></div><div class="admin-record-list">${rows||'<span style="color:var(--text-muted)">No transactions</span>'}</div></div>`;
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-database"></i> ${user.name||'Student'} Records</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="admin-record-grid"><div class="form-group"><label for="adminJoinedDate">Date Joined</label><input type="datetime-local" id="adminJoinedDate" name="adminJoinedDate" value="${adminDateValue(user.joined)}"></div><div style="display:flex;align-items:end"><button class="btn btn-primary" id="saveJoinedDateBtn" onclick="saveStudentJoinedDate()">Save Joined Date</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 9px"><strong>Transactions</strong><button class="btn-edit" onclick="editStudentTransaction(-1)"><i class="fas fa-plus"></i> Add</button></div><div class="admin-record-list">${rows||'<span style="color:var(--text-muted)">No transactions</span>'}</div></div>`;
         }
         async function persistAdminStudent(user,message){ user.lastModified=Date.now(); const all=getAllUsers();all[user.email]=user;setAllUsers(all);if(firebaseOnline&&db){try{await db.ref('users/'+safeKey(user.email)).set(user);}catch(e){console.warn('Student record sync failed',e);return toast('Local record changed, but Firebase sync failed.','error');}}toast(message,'success'); }
         async function saveStudentJoinedDate(){
-            const email=window._recordStudentEmail;
-            const user=getAllUsers()[email];
-            const value=document.getElementById('adminJoinedDate')?.value;
-            if(!user||!value)return toast('Choose a valid joined date','error');
-
-            const parsedDate=new Date(value);
-            if(Number.isNaN(parsedDate.getTime()))return toast('Choose a valid joined date','error');
-            if(!firebaseOnline||!db)return toast('Secure Firebase connection is unavailable. Joined date was not changed.','error');
-
-            const joined=parsedDate.toISOString();
-            const lastModified=Date.now();
+            const email=window._recordStudentEmail, value=document.getElementById('adminJoinedDate')?.value, btn=document.getElementById('saveJoinedDateBtn');
+            if(!email||!value)return toast('Choose a valid joined date','error');
+            if(btn?.dataset.busy==='1')return;
+            if(btn){btn.dataset.busy='1';btn.disabled=true;btn.textContent='Saving...';}
             try{
-                // Update only the joined date metadata. Do not PUT/replace the full student record.
-                await db.ref('users/'+safeKey(email)).update({joined,lastModified});
-
-                // Only update the local Control Center after Firebase confirms the PATCH succeeded.
-                const all=getAllUsers();
-                const current=all[email];
-                if(current){
-                    current.joined=joined;
-                    current.lastModified=lastModified;
-                    all[email]=current;
-                    setAllUsers(all);
-                }
-                toast('Joined date updated in Firebase','success');
-                openStudentRecordEditor(encodeURIComponent(email));
+                const result=await secureApi('/admin/users/'+encodeURIComponent(safeKey(email))+'/joined-date',{method:'PATCH',body:{joined:new Date(value).toISOString()}});
+                const all=getAllUsers();all[email]=result.user;setAllUsers(all);
+                toast('Joined date updated in Firebase','success');openStudentRecordEditor(encodeURIComponent(email));
             }catch(e){
-                console.warn('Joined date sync failed',e);
-                toast('Joined date was not changed. Firebase sync failed.','error');
+                toast(e.message||'Joined date update failed','error');
+                if(btn){btn.dataset.busy='0';btn.disabled=false;btn.textContent='Save Joined Date';}
             }
         }
         function editStudentTransaction(index){ const email=window._recordStudentEmail,user=getAllUsers()[email];if(!user)return;const tx=index>=0?(user.txs||[])[index]:{type:'deposit',amount:0,currency:'USDT',status:'Completed',date:Date.now(),details:''};window._recordTxIndex=index;const content=document.getElementById('modalContent');content.innerHTML=`<div class="modal-header"><h3>${index>=0?'Edit':'Add'} Transaction</h3><button class="modal-close" onclick="openStudentRecordEditor('${encodeURIComponent(email)}')"><i class="fas fa-arrow-left"></i></button></div><div class="modal-body"><div class="admin-record-grid"><div class="form-group"><label>Type</label><select id="adminTxType"><option>deposit</option><option>withdraw</option><option>trade</option><option>mining</option><option>bonus</option><option>referral</option></select></div><div class="form-group"><label>Currency</label><select id="adminTxCurrency"><option>USDT</option><option>USD</option><option>BTC</option></select></div><div class="form-group"><label>Amount</label><input id="adminTxAmount" type="number" step="0.00000001" value="${Number(tx.amount||0)}"></div><div class="form-group"><label>Status</label><select id="adminTxStatus"><option>Completed</option><option>Pending</option><option>Failed</option></select></div><div class="form-group"><label>Date</label><input id="adminTxDate" type="datetime-local" value="${adminDateValue(tx.date)}"></div><div class="form-group"><label>Details</label><input id="adminTxDetails" value="${String(tx.details||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></div></div></div><button class="btn btn-primary" onclick="saveStudentTransaction()">Save Transaction</button>`;document.getElementById('adminTxType').value=tx.type||'deposit';document.getElementById('adminTxCurrency').value=tx.currency||'USDT';document.getElementById('adminTxStatus').value=tx.status||'Completed'; }
@@ -4544,7 +4460,7 @@ html.bv-session-restoring body{background:#020812!important}
             window._sendTargetEmail = email;
             const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent');
             overlay.classList.add('active');
-            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Currency</label><select id="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" id="sendFundsBtn" onclick="sendFundsToClient()" style="margin-top:8px;padding:12px;">Send Funds</button>`;
+            content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-paper-plane"></i> Send Funds to ${name}</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="font-size:0.85rem;color:var(--text-muted);">Transfer from your master account.</p><div class="form-group" style="margin-bottom:6px;"><label for="sendCurrency" style="font-size:0.7rem;">Currency</label><select id="sendCurrency" name="sendCurrency" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;"><option value="usd">USDT</option><option value="btc">BTC</option></select></div><div class="form-group" style="margin-bottom:6px;"><label for="sendAmount" style="font-size:0.7rem;">Amount</label><input type="number" id="sendAmount" name="sendAmount" placeholder="Enter amount" step="0.0001" style="width:100%;padding:8px 10px;background:rgba(5,10,20,0.50);border:1px solid rgba(64,128,255,0.06);border-radius:8px;color:var(--text-primary);font-size:0.85rem;" oninput="updateSendPreview()" /></div><div style="background:rgba(5,10,20,0.40);padding:8px 10px;border-radius:8px;font-size:0.75rem;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:var(--text-muted);">Your Balance</span><span id="sendMasterBal" style="font-weight:600;">$0.00 USDT</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">After Transfer</span><span id="sendAfterBal" style="font-weight:600;color:var(--electric-blue);">$0.00 USDT</span></div></div></div><button class="btn btn-primary" id="sendFundsBtn" onclick="sendFundsToClient()" style="margin-top:8px;padding:12px;">Send Funds</button>`;
             updateSendPreview();
         }
         function updateSendPreview(){
@@ -4570,58 +4486,21 @@ html.bv-session-restoring body{background:#020812!important}
             if(!email) return toast('Target account error','error');
             const curEl = document.getElementById('sendCurrency'), amtEl = document.getElementById('sendAmount');
             if(!curEl || !amtEl) return toast('Modal error','error');
-            const cur = curEl.value,
-            amt = parseFloat(amtEl.value);
+            const cur = curEl.value, amt = parseFloat(amtEl.value), btn=document.getElementById('sendFundsBtn');
             if(!amt || amt <= 0) return toast('Enter valid amount','error');
-            let all = getAllUsers(), master = all[currentUser.email], client = all[email];
-            if(!master || !client) return toast('Account error','error');
-            if(!master.txs) master.txs = [];
-            if(!client.txs) client.txs = [];
-            const isAdmin = master.isAdmin;
-            if(cur === 'usd'){
-                if(!isAdmin && (master.usd || 0) < amt) return toast('Insufficient USDT balance','error');
-                master.usd = (master.usd || 0) - amt;
-                client.usd = (client.usd || 0) + amt;
-                master.txs.push({type:'withdraw',amount:-amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`});
-                client.txs.push({type:'deposit',amount:amt,currency:'USDT',status:'Completed',date:Date.now(),details:`Funds credited from admin`});
-            } else {
-                if(!isAdmin && (master.btc || 0) < amt) return toast('Insufficient BTC balance','error');
-                master.btc = (master.btc || 0) - amt;
-                client.btc = (client.btc || 0) + amt;
-                master.txs.push({type:'withdraw',amount:-amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Transfer to ${client.name}`});
-                client.txs.push({type:'deposit',amount:amt,currency:'BTC',status:'Completed',date:Date.now(),details:`Funds credited from admin`});
+            if(btn?.dataset.busy==='1') return;
+            if(btn){btn.dataset.busy='1';btn.disabled=true;btn.textContent='Sending...';}
+            try{
+                const result=await secureApi('/admin/actions/send-funds',{method:'POST',body:{email,currency:cur,amount:amt}});
+                const all=getAllUsers(), client=result.client, master=result.master;
+                all[master.email]=master; all[client.email]=client; setAllUsers(all); currentUser=master;
+                window._sendTargetEmail=null; closeModal(); renderAdmin(); updateAllBalances();
+                toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success');
+                if(emailjsReady) sendEmailSafely(EMAILJS_DEPOSIT_TEMPLATE,{to_email:client.email,name:client.name,email:client.email,amount:amt.toLocaleString(),currency:cur==='usd'?'USDT':'BTC',tx_id:'TX-'+Date.now(),date:new Date().toLocaleString()}).catch(e=>console.warn('Deposit email failed:',e));
+            }catch(e){
+                toast(e.message||'Transfer failed','error');
+                if(btn){btn.dataset.busy='0';btn.disabled=false;btn.textContent='Send Funds';}
             }
-            master.lastModified = Date.now();
-            client.lastModified = Date.now();
-            all[master.email] = master;
-            all[client.email] = client;
-            setAllUsers(all);
-            currentUser = master;
-            if(firebaseOnline && db) {
-                try {
-                    await db.ref('users/'+safeKey(client.email)).set(client);
-                    await db.ref('users/'+safeKey(master.email)).set(master);
-                } catch(e) { console.warn('Firebase sync failed:', e); }
-            }
-            // Send deposit notification via EmailJS
-            if(emailjsReady){
-                try{
-                    await sendEmailSafely(EMAILJS_DEPOSIT_TEMPLATE,{
-                        to_email: client.email,
-                        name: client.name,
-                        email: client.email,
-                        amount: amt.toLocaleString(),
-                        currency: cur==='usd'?'USDT':'BTC',
-                        tx_id: 'TX-'+Date.now(),
-                        date: new Date().toLocaleString()
-                    });
-                }catch(e){ console.warn('Deposit email failed:',e); }
-            }
-            window._sendTargetEmail = null;
-            closeModal();
-            renderAdmin();
-            updateAllBalances();
-            toast(`Sent ${cur==='usd'?'$'+amt.toLocaleString():amt.toFixed(8)+' BTC'} to ${client.name}`,'success');
         }
 
         function openMiningModal(email,name){
