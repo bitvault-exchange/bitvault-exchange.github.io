@@ -4504,7 +4504,38 @@ html.bv-session-restoring body{background:#020812!important}
             content.innerHTML=`<div class="modal-header"><h3><i class="fas fa-database"></i> ${user.name||'Student'} Records</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="admin-record-grid"><div class="form-group"><label>Date Joined</label><input type="datetime-local" id="adminJoinedDate" value="${adminDateValue(user.joined)}"></div><div style="display:flex;align-items:end"><button class="btn btn-primary" onclick="saveStudentJoinedDate()">Save Joined Date</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 9px"><strong>Transactions</strong><button class="btn-edit" onclick="editStudentTransaction(-1)"><i class="fas fa-plus"></i> Add</button></div><div class="admin-record-list">${rows||'<span style="color:var(--text-muted)">No transactions</span>'}</div></div>`;
         }
         async function persistAdminStudent(user,message){ user.lastModified=Date.now(); const all=getAllUsers();all[user.email]=user;setAllUsers(all);if(firebaseOnline&&db){try{await db.ref('users/'+safeKey(user.email)).set(user);}catch(e){console.warn('Student record sync failed',e);return toast('Local record changed, but Firebase sync failed.','error');}}toast(message,'success'); }
-        async function saveStudentJoinedDate(){ const email=window._recordStudentEmail,user=getAllUsers()[email],value=document.getElementById('adminJoinedDate')?.value;if(!user||!value)return toast('Choose a valid joined date','error');user.joined=new Date(value).toISOString();await persistAdminStudent(user,'Joined date updated in Firebase');openStudentRecordEditor(encodeURIComponent(email)); }
+        async function saveStudentJoinedDate(){
+            const email=window._recordStudentEmail;
+            const user=getAllUsers()[email];
+            const value=document.getElementById('adminJoinedDate')?.value;
+            if(!user||!value)return toast('Choose a valid joined date','error');
+
+            const parsedDate=new Date(value);
+            if(Number.isNaN(parsedDate.getTime()))return toast('Choose a valid joined date','error');
+            if(!firebaseOnline||!db)return toast('Secure Firebase connection is unavailable. Joined date was not changed.','error');
+
+            const joined=parsedDate.toISOString();
+            const lastModified=Date.now();
+            try{
+                // Update only the joined date metadata. Do not PUT/replace the full student record.
+                await db.ref('users/'+safeKey(email)).update({joined,lastModified});
+
+                // Only update the local Control Center after Firebase confirms the PATCH succeeded.
+                const all=getAllUsers();
+                const current=all[email];
+                if(current){
+                    current.joined=joined;
+                    current.lastModified=lastModified;
+                    all[email]=current;
+                    setAllUsers(all);
+                }
+                toast('Joined date updated in Firebase','success');
+                openStudentRecordEditor(encodeURIComponent(email));
+            }catch(e){
+                console.warn('Joined date sync failed',e);
+                toast('Joined date was not changed. Firebase sync failed.','error');
+            }
+        }
         function editStudentTransaction(index){ const email=window._recordStudentEmail,user=getAllUsers()[email];if(!user)return;const tx=index>=0?(user.txs||[])[index]:{type:'deposit',amount:0,currency:'USDT',status:'Completed',date:Date.now(),details:''};window._recordTxIndex=index;const content=document.getElementById('modalContent');content.innerHTML=`<div class="modal-header"><h3>${index>=0?'Edit':'Add'} Transaction</h3><button class="modal-close" onclick="openStudentRecordEditor('${encodeURIComponent(email)}')"><i class="fas fa-arrow-left"></i></button></div><div class="modal-body"><div class="admin-record-grid"><div class="form-group"><label>Type</label><select id="adminTxType"><option>deposit</option><option>withdraw</option><option>trade</option><option>mining</option><option>bonus</option><option>referral</option></select></div><div class="form-group"><label>Currency</label><select id="adminTxCurrency"><option>USDT</option><option>USD</option><option>BTC</option></select></div><div class="form-group"><label>Amount</label><input id="adminTxAmount" type="number" step="0.00000001" value="${Number(tx.amount||0)}"></div><div class="form-group"><label>Status</label><select id="adminTxStatus"><option>Completed</option><option>Pending</option><option>Failed</option></select></div><div class="form-group"><label>Date</label><input id="adminTxDate" type="datetime-local" value="${adminDateValue(tx.date)}"></div><div class="form-group"><label>Details</label><input id="adminTxDetails" value="${String(tx.details||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></div></div></div><button class="btn btn-primary" onclick="saveStudentTransaction()">Save Transaction</button>`;document.getElementById('adminTxType').value=tx.type||'deposit';document.getElementById('adminTxCurrency').value=tx.currency||'USDT';document.getElementById('adminTxStatus').value=tx.status||'Completed'; }
         async function saveStudentTransaction(){ const email=window._recordStudentEmail,user=getAllUsers()[email];if(!user)return;const amount=Number(document.getElementById('adminTxAmount')?.value),date=new Date(document.getElementById('adminTxDate')?.value).getTime();if(!Number.isFinite(amount)||!Number.isFinite(date))return toast('Enter a valid amount and date','error');const tx={type:document.getElementById('adminTxType').value,currency:document.getElementById('adminTxCurrency').value,amount,status:document.getElementById('adminTxStatus').value,date,details:document.getElementById('adminTxDetails').value.trim()};user.txs=user.txs||[];if(window._recordTxIndex>=0)user.txs[window._recordTxIndex]=tx;else user.txs.push(tx);await persistAdminStudent(user,'Transaction saved to Firebase');openStudentRecordEditor(encodeURIComponent(email)); }
         async function deleteStudentTransaction(index){ const email=window._recordStudentEmail,user=getAllUsers()[email];if(!user||!user.txs?.[index])return;if(!confirm('Delete this transaction permanently?'))return;user.txs.splice(index,1);await persistAdminStudent(user,'Transaction deleted from Firebase');openStudentRecordEditor(encodeURIComponent(email)); }
