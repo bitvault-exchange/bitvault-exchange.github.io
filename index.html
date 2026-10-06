@@ -2685,11 +2685,12 @@ html.bv-session-restoring body{background:#020812!important}
 .bv-rig-market-command{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
 .bv-tier-card{display:grid;grid-template-columns:110px minmax(180px,1.4fr) minmax(170px,1fr) 150px;align-items:center;gap:16px;padding:14px 16px;border:1px solid rgba(45,111,158,.28);border-left:4px solid var(--tier,#00cfff);border-radius:15px;background:linear-gradient(100deg,rgba(7,23,39,.98),rgba(3,12,22,.96));box-shadow:0 10px 32px rgba(0,0,0,.18);cursor:pointer;transition:.2s}
 .bv-tier-card:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--tier) 55%,#24435f);box-shadow:0 12px 34px rgba(0,0,0,.26)}
-.bv-tier-card.starter{--tier:#ff4662}.bv-tier-card.builder{--tier:#f4ca19}.bv-tier-card.industrial{--tier:#00cdec}.bv-tier-card.enterprise{--tier:#ee4c93}
+.bv-tier-card.starter{--tier:#ff4662}.bv-tier-card.builder{--tier:#f4ca19}.bv-tier-card.growth{--tier:#a94dff}.bv-tier-card.industrial{--tier:#00cdec}.bv-tier-card.power{--tier:#159cff}.bv-tier-card.enterprise{--tier:#ee4c93}
 .bv-tier-icon{height:94px;min-width:0;display:grid;place-items:center;border-right:1px solid rgba(92,139,180,.13);font-size:3.15rem;color:#f5f8ff;overflow:hidden;padding:10px}.bv-tier-icon .rig-cross-tools{transform:scale(1.35)}
 .bv-google-rig-icon{font-family:'Noto Emoji',sans-serif;font-weight:700;font-style:normal;font-size:54px;line-height:1;white-space:nowrap;color:#f5f8ff;-webkit-font-smoothing:antialiased;filter:grayscale(1) brightness(4) drop-shadow(0 0 8px rgba(255,255,255,.08));display:block}
 .bv-tier-png-icon{display:block;width:68px;height:68px;max-width:100%;max-height:100%;object-fit:contain;object-position:center;filter:drop-shadow(0 0 8px rgba(255,255,255,.08));pointer-events:none}
 .bv-approved-rig-svg{width:70px;height:70px;display:block;color:#f5f8ff;filter:drop-shadow(0 0 8px rgba(255,255,255,.08));overflow:visible}.bv-approved-rig-svg *{vector-effect:non-scaling-stroke}
+.bv-tier-icon>.bv-rig-icon-art,.bv-rig-modal-icon>.bv-rig-icon-art{display:block;width:76px;height:76px;object-fit:contain;color:#f5f8ff;filter:drop-shadow(0 0 8px rgba(255,255,255,.08));flex:0 0 76px}.bv-tier-icon>.bv-rig-icon-art *,.bv-rig-modal-icon>.bv-rig-icon-art *{vector-effect:non-scaling-stroke}.bv-tier-icon>.fa-tractor,.bv-rig-modal-icon>.fa-tractor{width:76px;height:76px;display:grid;place-items:center;font-size:3.15rem;line-height:76px}
 .bv-rig-svg{width:76px;height:76px;display:block;color:#f5f8ff;filter:drop-shadow(0 0 8px rgba(255,255,255,.08))}.bv-rig-svg *{vector-effect:non-scaling-stroke}
 .rig-pickaxe-symbol{display:inline-block;font-family:"Segoe UI Symbol","Noto Sans Symbols 2",sans-serif;font-weight:700;color:#f5f8ff;filter:grayscale(1) brightness(2.3)}
 .rig-cross-tools{position:relative;display:inline-block;width:58px;height:58px}.rig-cross-tools .tool-pickaxe{position:absolute;left:9px;top:3px;display:block;font-family:"Segoe UI Symbol","Noto Sans Symbols 2",sans-serif;font-size:2.55rem;line-height:1;color:#f5f8ff;filter:grayscale(1) brightness(2.3);transform:rotate(-35deg)}.rig-cross-tools .tool-shovel{position:absolute;left:28px;top:7px;width:6px;height:42px;border-radius:5px;background:#f5f8ff;transform:rotate(42deg);transform-origin:center}.rig-cross-tools .tool-shovel:before{content:'';position:absolute;left:-5px;top:-7px;width:16px;height:8px;border:3px solid #f5f8ff;border-bottom:0;border-radius:8px 8px 0 0}.rig-cross-tools .tool-shovel:after{content:'';position:absolute;left:-5px;bottom:-9px;width:16px;height:16px;background:#f5f8ff;border-radius:3px 3px 10px 10px}
@@ -2760,6 +2761,8 @@ html.bv-session-restoring body{background:#020812!important}
 .bv-tier-png-icon{max-width:none;max-height:none;width:76px;height:76px}.bv-deployed-icon .bv-tier-png-icon{width:39px;height:39px}
 @media(max-width:760px){.bv-tier-icon>.bv-tier-png-icon{width:54px;height:54px}.bv-deployed-icon .bv-tier-png-icon{width:32px;height:32px}}
 @media(max-width:390px){.bv-tier-icon>.bv-tier-png-icon{width:51px;height:51px}}
+@media(max-width:760px){.bv-tier-icon>.bv-rig-icon-art,.bv-tier-icon>.fa-tractor{width:54px;height:54px;flex-basis:54px;font-size:2.25rem;line-height:54px}.bv-rig-modal-icon>.bv-rig-icon-art,.bv-rig-modal-icon>.fa-tractor{width:68px;height:68px;flex-basis:68px;line-height:68px}}
+@media(max-width:390px){.bv-tier-icon>.bv-rig-icon-art,.bv-tier-icon>.fa-tractor{width:51px;height:51px;flex-basis:51px;line-height:51px}}
 </style>
 
 </head>
@@ -2774,7 +2777,7 @@ html.bv-session-restoring body{background:#020812!important}
 <div class="top-bar">
 <div class="logo">⚡ <span>BitVault</span></div>
 <div class="ticker">
-<span>BTC/USD <span class="price" id="topPrice">$65,000.00</span> <span class="up" id="topPriceChange">+0.0%</span></span>
+<span>BTC/USD <span class="price" id="topPrice">Loading…</span> <span class="up" id="topPriceChange">—</span></span>
 <span><i class="fas fa-bolt" style="color:var(--electric-blue);"></i> Hashrate: <span class="hash" id="topHashrate">2.4 EH/s</span></span>
 <span><i class="fas fa-users" style="color:var(--gold);"></i> Miners: <span class="gold" id="topMiners">0</span></span>
 </div>
@@ -2837,21 +2840,23 @@ html.bv-session-restoring body{background:#020812!important}
 <h2><i class="fas fa-server" style="color:var(--electric-blue);margin-right:8px;"></i> Mining Plans</h2>
 <div class="sub">Choose a plan to see your projected BTC earnings</div>
 <div class="plan-selector" style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;">
-<button class="plan-btn active" data-plan="0" onclick="selectPlan(0)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(0,212,255,0.10);border:1px solid var(--electric-blue);border-radius:10px;color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">Starter $1,800</button>
-<button class="plan-btn" data-plan="1" onclick="selectPlan(1)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Basic $3,500</button>
-<button class="plan-btn" data-plan="2" onclick="selectPlan(2)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Pro $8,500</button>
-<button class="plan-btn" data-plan="3" onclick="selectPlan(3)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Elite $18,000</button>
+<button class="plan-btn active" data-plan="0" onclick="selectPlan(0)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(0,212,255,0.10);border:1px solid var(--electric-blue);border-radius:10px;color:var(--electric-blue);font-weight:600;font-size:0.8rem;cursor:pointer;">Starter $2,000</button>
+<button class="plan-btn" data-plan="1" onclick="selectPlan(1)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Builder $3,500</button>
+<button class="plan-btn" data-plan="2" onclick="selectPlan(2)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Growth $5,000</button>
+<button class="plan-btn" data-plan="3" onclick="selectPlan(3)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Industrial $8,500</button>
+<button class="plan-btn" data-plan="4" onclick="selectPlan(4)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Power $10,000</button>
+<button class="plan-btn" data-plan="5" onclick="selectPlan(5)" style="flex:1;min-width:100px;padding:10px 14px;background:rgba(5,10,20,0.40);border:1px solid rgba(64,128,255,0.06);border-radius:10px;color:var(--text-muted);font-weight:600;font-size:0.8rem;cursor:pointer;">Enterprise $20,000</button>
 </div>
 </div>
 <div class="calc-results" id="planResults">
-<div class="row"><span class="label">Plan Price</span><span class="value" id="planPrice">$1,800</span></div>
+<div class="row"><span class="label">Plan Price</span><span class="value" id="planPrice">$2,000</span></div>
 <div class="row"><span class="label">Hashrate</span><span class="value" id="planHash">90 TH/s</span></div>
-<div class="row"><span class="label">Daily BTC</span><span class="value" id="planDaily">0.00200 BTC</span></div>
-<div class="row"><span class="label">Monthly BTC</span><span class="value" id="planMonthly">0.0600 BTC</span></div>
-<div class="row"><span class="label">Yearly BTC</span><span class="value" id="planYearly">0.730 BTC</span></div>
-<div class="row"><span class="label">Monthly USD</span><span class="value" id="planMonthlyUSD">~$3,900</span></div>
-<div class="row"><span class="label">Yearly USD</span><span class="value" id="planYearlyUSD">~$47,450</span></div>
-<div class="row"><span class="label">ROI Period</span><span class="value" id="planROI">~1 months</span></div>
+<div class="row"><span class="label">Daily BTC</span><span class="value" id="planDaily">0.002222 BTC</span></div>
+<div class="row"><span class="label">Monthly BTC</span><span class="value" id="planMonthly">0.0667 BTC</span></div>
+<div class="row"><span class="label">Yearly BTC</span><span class="value" id="planYearly">0.811 BTC</span></div>
+<div class="row"><span class="label">Monthly USD</span><span class="value" id="planMonthlyUSD">Loading…</span></div>
+<div class="row"><span class="label">Yearly USD</span><span class="value" id="planYearlyUSD">Loading…</span></div>
+<div class="row"><span class="label">ROI Period</span><span class="value" id="planROI">—</span></div>
 </div>
 </section>
 <!-- BTC Calculator & Converter -->
@@ -2874,15 +2879,15 @@ html.bv-session-restoring body{background:#020812!important}
 <div class="calc-result-box">
 <div class="item">
 <div class="lbl">Current BTC Price</div>
-<div class="val" id="calcPrice">$65,000</div>
+<div class="val" id="calcPrice">Loading…</div>
 </div>
 <div class="item">
-<div class="lbl">Daily Mining (Elite)</div>
-<div class="val" id="calcDailyUsd">~$975</div>
+<div class="lbl">Daily Mining (Selected Plan)</div>
+<div class="val" id="calcDailyUsd">—</div>
 </div>
 <div class="item">
-<div class="lbl">Monthly Mining (Elite)</div>
-<div class="val" id="calcMonthlyUsd">~$29,250</div>
+<div class="lbl">Monthly Mining (Selected Plan)</div>
+<div class="val" id="calcMonthlyUsd">—</div>
 </div>
 </div>
 </div>
@@ -3579,7 +3584,9 @@ html.bv-session-restoring body{background:#020812!important}
                 headers['Content-Type']='application/json'; options={...options,body:JSON.stringify(options.body)};
             }
             if(secureSessionToken) headers.Authorization='Bearer '+secureSessionToken;
-            const response=await fetch(SECURE_API_URL+path,{...options,headers});
+            let response;
+            try{response=await fetch(SECURE_API_URL+path,{...options,headers});}
+            catch(_){throw new Error('Cannot reach the BitVault secure server. Please check the Worker deployment and try again.');}
             let data={}; try{data=await response.json();}catch(_){ }
             if(!response.ok) throw new Error(data.error||'Secure server request failed');
             return data;
@@ -3626,12 +3633,16 @@ html.bv-session-restoring body{background:#020812!important}
         const RIG_PURCHASE_LIMIT = 3;
         const RIG_ICON_STARTER='<span class="bv-google-rig-icon" aria-hidden="true">⛏</span>';
         const RIG_ICON_BUILDER='<img class="bv-tier-png-icon" src="assets/mining-tools-crossed.png" alt="" aria-hidden="true">';
-        const RIG_ICON_INDUSTRIAL='<img class="bv-tier-png-icon" src="assets/mining-worker.png" alt="" aria-hidden="true">';
+        const RIG_ICON_GROWTH='<svg class="bv-rig-icon-art" viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 35h49l-8 31H27zM67 38l17-10M60 66l15 13M75 79h10"/><circle cx="25" cy="77" r="10"/><path d="M30 34l8-15 10 15M45 34l9-20 13 20M55 34l10-13 10 15"/></g></svg>';
+        const RIG_ICON_INDUSTRIAL='<img class="bv-tier-png-icon bv-rig-icon-art" src="assets/mining-worker.png" alt="" aria-hidden="true">';
+        const RIG_ICON_POWER='<svg class="bv-rig-icon-art" viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 42h73l-9 31H24zM9 78h82"/><circle cx="31" cy="73" r="8"/><circle cx="70" cy="73" r="8"/><path d="M25 41l9-18 11 18M42 41l11-25 14 25M59 41l11-17 12 17"/></g></svg>';
         const RIGS = [
-            { id:'basic', name:'Antminer S19j', icon:RIG_ICON_STARTER, hash:'90 TH/s', power:'3.1 kW', daily:0.0020, price:1800, tag:'Starter', personality:'Begin Mining', description:'Your entry point into BTC mining. Deploy your first rig, watch your earnings accumulate, and learn how your mining operation performs.', iconClass:'rig-icon-pickaxe' },
-            { id:'advanced', name:'Whatsminer M50', icon:RIG_ICON_BUILDER, hash:'118 TH/s', power:'3.3 kW', daily:0.0045, price:3500, tag:'Builder', personality:'Increase Your Output', description:'Ready for more capacity? Builder hardware provides greater mining power and higher projected BTC production.', iconClass:'rig-icon-builder' },
-            { id:'pro', name:'Antminer S19 XP', icon:RIG_ICON_INDUSTRIAL, hash:'140 TH/s', power:'3.0 kW', daily:0.0080, price:8500, tag:'Industrial', personality:'Scale Your Operation', description:'Designed for miners looking for substantially higher output and a more powerful mining setup.', iconClass:'rig-icon-industrial' },
-            { id:'enterprise', name:'Bitmain S21 Pro', icon:'<i class="fas fa-tractor" aria-hidden="true"></i>', hash:'234 TH/s', power:'3.5 kW', daily:0.0150, price:18000, tag:'Enterprise', personality:'Maximum Mining Power', description:'The highest equipment tier available, providing the strongest mining capacity and projected output on BitVault.', iconClass:'rig-icon-bulldozer' }
+            { id:'basic', name:'Antminer S19j', icon:RIG_ICON_STARTER, hash:'90 TH/s', power:'3.1 kW', daily:0.002222, price:2000, tag:'Starter', iconClass:'rig-icon-pickaxe' },
+            { id:'advanced', name:'Whatsminer M50', icon:RIG_ICON_BUILDER, hash:'118 TH/s', power:'3.3 kW', daily:0.004500, price:3500, tag:'Builder', iconClass:'rig-icon-builder' },
+            { id:'growth', name:'Antminer S19 Pro', icon:RIG_ICON_GROWTH, hash:'128 TH/s', power:'3.2 kW', daily:0.005550, price:5000, tag:'Growth', iconClass:'rig-icon-growth' },
+            { id:'pro', name:'Antminer S19 XP', icon:RIG_ICON_INDUSTRIAL, hash:'140 TH/s', power:'3.0 kW', daily:0.008000, price:8500, tag:'Industrial', iconClass:'rig-icon-industrial' },
+            { id:'power', name:'Whatsminer M60S', icon:RIG_ICON_POWER, hash:'186 TH/s', power:'3.4 kW', daily:0.009130, price:10000, tag:'Power', iconClass:'rig-icon-power' },
+            { id:'enterprise', name:'Bitmain S21 Pro', icon:'<i class="fas fa-tractor bv-rig-icon-art" aria-hidden="true"></i>', hash:'234 TH/s', power:'3.5 kW', daily:0.016667, price:20000, tag:'Enterprise', iconClass:'rig-icon-bulldozer' }
         ];
 
         function ensureMasterMiningProfile(u){
@@ -3665,7 +3676,7 @@ html.bv-session-restoring body{background:#020812!important}
         window._sendTargetEmail = null;
         let currentUser = null, users = JSON.parse(localStorage.getItem('bv_users')) || {};
         let balancesHidden = false;
-        let btcPrice = 65000.00, btcPriceChange24h = 0, priceHistory = [], tradeMode = 'buy', currentPage = 'dashboard', chartPeriod = '1';
+        let btcPrice = 0, btcPriceChange24h = 0, priceHistory = [], tradeMode = 'buy', currentPage = 'dashboard', chartPeriod = '1';
         let priceUpdateInterval, miningInterval, syncInterval, tempRegData = null, tempVerifCode = '';
         let btcSocket = null, btcSocketReconnectTimer = null, btcSocketRetryMs = 2000;
         let btcPriceRequestInFlight = false, lastBtcPriceFetch = 0, btcApiRetryAfter = 0;
@@ -3713,7 +3724,8 @@ html.bv-session-restoring body{background:#020812!important}
             const email = document.getElementById('fpEmail').value.trim().toLowerCase();
             if(!email) return toast('Enter your email address','error');
             fpTargetEmail = email;
-            try{const result=await secureApi('/auth/request-reset',{method:'POST',body:{email}});fpResetId=result.resetId||'';}catch(e){return toast(e.message,'error');}
+            const btn=document.getElementById('fpRequestBtn');if(btn){btn.disabled=true;btn.textContent='Sending…';}
+            try{const result=await secureApi('/auth/request-reset',{method:'POST',body:{email}});fpResetId=result.resetId||'';if(!fpResetId)throw new Error('The reset service did not return a valid request.');}catch(e){return toast(e.message,'error');}finally{if(btn){btn.disabled=false;btn.textContent='Request Code';}}
             document.getElementById('fpVerifyEmailDisplay').textContent = email;
             const exposed=document.getElementById('fpGeneratedCode');if(exposed){exposed.textContent='Check your email';exposed.style.fontSize='1rem';}
             document.getElementById('forgotPasswordForm').classList.add('hidden');
@@ -3757,6 +3769,7 @@ html.bv-session-restoring body{background:#020812!important}
             if(p.length<8) return toast('Password must be 8+ characters','error');
             if(p!==cp) return toast('Passwords do not match','error');
             try{const check=await secureApi('/auth/check-email',{method:'POST',body:{email:e}});if(check.exists)return toast('Account already exists','error');}catch(err){return toast(err.message,'error');}
+            if(ref){try{const referral=await secureApi('/auth/check-referral',{method:'POST',body:{refCode:ref}});if(!referral.valid)return toast('Referral code is invalid','error');}catch(err){return toast(err.message,'error');}}
             tempRegData={name:n,email:e,password:p,refCode:ref};
             tempVerifCode=Math.floor(100000+Math.random()*900000).toString();
             document.getElementById('verifyEmailDisplay').textContent=e;
@@ -3979,12 +3992,13 @@ html.bv-session-restoring body{background:#020812!important}
 
         function updateTopBarPrice() {
             const priceEl=document.getElementById('topPrice'), changeEl=document.getElementById('topPriceChange');
-            if(priceEl) priceEl.textContent='$'+Number(btcPrice||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-            if(changeEl){const pct=Number(btcPriceChange24h||0);changeEl.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';changeEl.className=pct>=0?'up':'down';}
+            if(priceEl) priceEl.textContent=btcPrice>0?'$'+btcPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'Loading…';
+            if(changeEl){if(!(btcPrice>0)){changeEl.textContent='—';changeEl.className='';return;}const pct=Number(btcPriceChange24h||0);changeEl.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';changeEl.className=pct>=0?'up':'down';}
         }
         function applyBTCPrice(price,change24h){
             const n=Number(price);if(!Number.isFinite(n)||n<=0)return false;btcPrice=n;if(Number.isFinite(Number(change24h)))btcPriceChange24h=Number(change24h);
-            updateTopBarPrice();updateDashPrice();return true;
+            try{localStorage.setItem('bv_last_btc_price',JSON.stringify({price:btcPrice,change:btcPriceChange24h,at:Date.now()}));}catch(_){}
+            updateTopBarPrice();updateDashPrice();updateCalcResults();return true;
         }
         async function fetchWithTimeout(url,ms=6000){
             const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),ms);
@@ -4018,12 +4032,13 @@ html.bv-session-restoring body{background:#020812!important}
             try{const limit=d===1?288:500;const data=await fetchWithTimeout(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=${limit}`,8000);if(Array.isArray(data)&&data.length)return data.map(k=>({price:parseFloat(k[4]),time:k[0]}));}catch(_){}return null;
         }
         async function initRealPriceData(){
-            await fetchBTCPrice(true);const h=await fetchBTCHistory(1);if(h&&h.length)priceHistory=h;else if(!priceHistory.length)generateFallbackHistory();updateDashPrice();updateTopBarPrice();if(currentPage==='dashboard')drawChart('priceChart');if(currentPage==='trade'){updateTradePrice();drawChart('tradeChart');}
+            const loaded=await fetchBTCPrice(true);if(!loaded&&!(btcPrice>0)){try{const cached=JSON.parse(localStorage.getItem('bv_last_btc_price')||'null');if(cached?.price>0)applyBTCPrice(cached.price,cached.change||0);}catch(_){}}
+            const h=await fetchBTCHistory(1);if(h&&h.length)priceHistory=h;updateDashPrice();updateTopBarPrice();if(currentPage==='dashboard'&&priceHistory.length)drawChart('priceChart');if(currentPage==='trade'){updateTradePrice();if(priceHistory.length)drawChart('tradeChart');}
         }
-        function generateFallbackHistory(){priceHistory=[];let p=btcPrice||81000;for(let i=200;i>0;i--){p=p*(1+(Math.random()-0.5)*0.001);priceHistory.push({price:p,time:Date.now()-i*300000});}}
+        function generateFallbackHistory(){priceHistory=[];}
         function updateDashPrice(){
             const el=document.getElementById('dashPrice'),chg=document.getElementById('dashPriceChange'),hdr=document.getElementById('chartHeaderPrice'),hdrChg=document.getElementById('chartHeaderChange');
-            const s='$'+Number(btcPrice||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),pct=Number(btcPriceChange24h||0),pctStr=(pct>=0?'+':'')+pct.toFixed(2)+'% (24h)';
+            const s=btcPrice>0?'$'+btcPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'Loading…',pct=Number(btcPriceChange24h||0),pctStr=btcPrice>0?(pct>=0?'+':'')+pct.toFixed(2)+'% (24h)':'—';
             if(el)el.textContent=s;if(chg){chg.textContent=pctStr;chg.className=pct>=0?'card-sub change-up':'card-sub change-down';}if(hdr){hdr.textContent=s;if(hdrChg){hdrChg.textContent=pctStr;hdrChg.style.color=pct>=0?'var(--success)':'var(--danger)';}}
         }
         async function startPriceSimulation(){
@@ -4137,13 +4152,12 @@ html.bv-session-restoring body{background:#020812!important}
             updateSidebarMiningStatus();
             for(let i=0;i<RIGS.length;i++){
                 const rig=RIGS[i], owned=userRigs.filter(r=>r.id===rig.id).length, atLimit=!currentUser.isAdmin&&owned>=RIG_PURCHASE_LIMIT, canAfford=currentUser.isAdmin||(currentUser.usd||0)>=rig.price, disabled=!canAfford||atLimit;
-                let btn='View & Deploy'; if(atLimit) btn='Limit ('+owned+'/'+RIG_PURCHASE_LIMIT+')'; else if(!canAfford) btn='Insufficient Funds';
                 let lb=''; if(!currentUser.isAdmin) lb=' / '+RIG_PURCHASE_LIMIT;
                 html+=`<div class="bv-tier-card ${rig.tag.toLowerCase()}" data-rig="${rig.id}" onclick="openRigDetails(this.dataset.rig)">
                     <div class="bv-tier-icon ${rig.iconClass||''}">${rig.icon}</div>
-                    <div class="bv-tier-copy"><span class="bv-tier-badge">${rig.tag}</span><h3>${rig.tag} — ${rig.personality}</h3><div class="rig-model">${rig.name}</div><div class="rig-spec">${rig.hash} • ${rig.power}</div></div>
-                    <div class="bv-tier-output"><div><span>Daily BTC</span><strong>${rig.daily.toFixed(4)} BTC</strong></div><div><span>Monthly BTC</span><strong>${(rig.daily*30).toFixed(4)} BTC</strong></div></div>
-                    <div class="bv-tier-buy"><div class="bv-tier-price">$${rig.price.toLocaleString()}</div><div class="bv-tier-owned">Owned: <strong>${owned}</strong>${lb}</div><button class="btn ${disabled?'btn-outline':'btn-primary'}" data-rig="${rig.id}" onclick="event.stopPropagation();${disabled?'':'openRigDetails(this.dataset.rig)'}" ${disabled?'disabled style="opacity:.45;cursor:not-allowed;"':''}>${btn}</button></div>
+                    <div class="bv-tier-copy"><span class="bv-tier-badge">${rig.tag}</span><h3>${rig.name}</h3><div class="rig-spec">${rig.hash} • ${rig.power}</div></div>
+                    <div class="bv-tier-output"><div><span>Daily</span><strong>${rig.daily.toFixed(6)} BTC</strong></div><div><span>Monthly</span><strong>${(rig.daily*30).toFixed(6)} BTC</strong></div></div>
+                    <div class="bv-tier-buy"><div class="bv-tier-price">$${rig.price.toLocaleString()}</div><div class="bv-tier-owned">Owned: <strong>${owned}</strong>${lb}</div><button class="btn btn-primary" data-rig="${rig.id}" onclick="event.stopPropagation();openRigDetails(this.dataset.rig)">View Rig</button></div>
                 </div>`;
             }
             m.innerHTML=html; renderMyRigs();
@@ -4268,8 +4282,10 @@ html.bv-session-restoring body{background:#020812!important}
             const rig=RIGS.find(r=>r.id===rid); if(!rig) return;
             const owned=(currentUser.rigs||[]).filter(r=>r.id===rid).length, mult=currentUser.miningMultiplier||1, dailyBtc=rig.daily*mult, monthlyBtc=dailyBtc*30;
             const dailyUsdt=dailyBtc*btcPrice, monthlyUsdt=monthlyBtc*btcPrice;
+            const atLimit=!currentUser.isAdmin&&owned>=RIG_PURCHASE_LIMIT, canAfford=currentUser.isAdmin||(currentUser.usd||0)>=rig.price, canDeploy=!atLimit&&canAfford;
+            const deployLabel=atLimit?'Rig Limit Reached':(!canAfford?'Insufficient Funds':`Deploy Rig — $${rig.price.toLocaleString()}`);
             const overlay=document.getElementById('modalOverlay'), content=document.getElementById('modalContent'); overlay.classList.add('active'); content.className='modal bv-mining-modal';
-            content.innerHTML=`<div class="modal-header"><div><div class="bv-modal-kicker">${rig.tag} mining hardware</div><h3 class="bv-modal-title"><i class="fas fa-microchip"></i> Rig Details</h3></div><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="bv-rig-modal-top"><div class="bv-rig-modal-icon ${rig.iconClass||''}">${rig.icon}</div><div class="bv-rig-modal-copy"><h4>${rig.name}</h4><p>${rig.hash} • ${rig.power} • ${rig.tag}</p></div></div><p style="margin:10px 0 12px;color:var(--text-muted);font-size:.72rem;line-height:1.55;">${rig.description}</p><div class="bv-modal-stat-grid"><div class="bv-modal-stat"><div class="label">Purchase Price</div><div class="value cyan">${formatUSDT(rig.price)}</div></div><div class="bv-modal-stat"><div class="label">Currently Owned</div><div class="value">${owned} / ${currentUser.isAdmin?'∞':RIG_PURCHASE_LIMIT}</div></div></div><div class="bv-rig-output"><div class="bv-rig-output-title">Projected mining output</div><div class="bv-rig-output-grid"><div class="bv-rig-output-item"><span>Per Day</span><strong class="cyan">${formatBTC(dailyBtc)}</strong></div><div class="bv-rig-output-item"><span>Per Day (USDT)</span><strong>${formatUSDT(dailyUsdt)}</strong></div><div class="bv-rig-output-item"><span>Per 30 Days</span><strong class="cyan">${formatBTC(monthlyBtc)}</strong></div><div class="bv-rig-output-item"><span>Per 30 Days (USDT)</span><strong>${formatUSDT(monthlyUsdt)}</strong></div></div></div><p class="bv-rig-note"><strong style="display:block;color:#00cfff;margin-bottom:4px;">Projected Earnings</strong>BTC and USD projections are estimates based on the configured mining rate and current BTC market price. USD values update with the market, and actual results may vary.</p><button class="btn btn-primary" style="width:100%;margin-top:14px;" onclick="closeModal();setTimeout(()=>buyRig('${rig.id}'),120)">Deploy ${rig.name}</button></div>`;
+            content.innerHTML=`<div class="modal-header"><div class="bv-rig-modal-top"><div class="bv-rig-modal-icon ${rig.iconClass||''}">${rig.icon}</div><div class="bv-rig-modal-copy"><div class="bv-modal-kicker">${rig.tag}</div><h3 class="bv-modal-title">${rig.name}</h3></div></div><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="bv-rig-output"><div class="bv-rig-output-grid"><div class="bv-rig-output-item"><span>Price</span><strong class="cyan">${formatUSDT(rig.price)}</strong></div><div class="bv-rig-output-item"><span>Daily Earnings</span><strong>${dailyBtc.toFixed(6)} BTC</strong><small>${btcPrice>0?'≈ '+formatUSDT(dailyUsdt)+' USD':'USD loading…'}</small></div><div class="bv-rig-output-item"><span>Monthly Earnings</span><strong>${monthlyBtc.toFixed(6)} BTC</strong><small>${btcPrice>0?'≈ '+formatUSDT(monthlyUsdt)+' USD':'USD loading…'}</small></div><div class="bv-rig-output-item"><span>Hashrate</span><strong>${rig.hash}</strong></div><div class="bv-rig-output-item"><span>Power</span><strong>${rig.power}</strong></div></div></div><p class="bv-rig-note">USD values update with the live BTC price.</p><button class="btn ${canDeploy?'btn-primary':'btn-outline'}" style="width:100%;margin-top:14px;" ${canDeploy?`onclick="closeModal();setTimeout(()=>buyRig('${rig.id}'),120)"`:'disabled'}>${deployLabel}</button></div>`;
         }
 
         function renderTrade(){
@@ -5105,7 +5121,7 @@ html.bv-session-restoring body{background:#020812!important}
         const FAKE_ACTIONS = [
             { type: 'Withdraw', color: 'red', icon: 'fa-arrow-up', min: 3000, max: 50000 },
             { type: 'Deposited', color: 'green', icon: 'fa-arrow-down', min: 800, max: 60000 },
-            { type: 'Deployed Rigs', color: 'blue', icon: 'fa-server', min: 1800, max: 30000 }
+            { type: 'Deployed Rigs', color: 'blue', icon: 'fa-server', prices: [2000,3500,5000,8500,10000,20000] }
         ];
         let fakeFeedData = [];
         let landingFeedExpanded = false;
@@ -5127,7 +5143,7 @@ html.bv-session-restoring body{background:#020812!important}
                 const country = pickCountry();
                 const name = country.pool[Math.floor(Math.random() * country.pool.length)];
                 const actionObj = FAKE_ACTIONS[Math.floor(Math.random() * FAKE_ACTIONS.length)];
-                const amount = Math.floor(Math.random() * (actionObj.max - actionObj.min) + actionObj.min);
+                const amount = actionObj.prices ? actionObj.prices[Math.floor(Math.random()*actionObj.prices.length)] : Math.floor(Math.random() * (actionObj.max - actionObj.min) + actionObj.min);
                 const minutesAgo = Math.floor(Math.random() * 55 + 1);
                 const date = now - (minutesAgo * 60000);
                 fakeFeedData.push({ name, action: actionObj, amount, date, country });
@@ -5166,15 +5182,13 @@ html.bv-session-restoring body{background:#020812!important}
         setInterval(updateLiveFeed, 8000);
         updateLiveFeed();
 
-        const PLAN_DATA = [
-            { name: 'Starter', price: 1800, hash: 90, dailyBTC: 0.0020, power: 3.1 },
-            { name: 'Basic', price: 3500, hash: 118, dailyBTC: 0.0045, power: 3.3 },
-            { name: 'Pro', price: 8500, hash: 140, dailyBTC: 0.0080, power: 3.0 },
-            { name: 'Elite', price: 18000, hash: 234, dailyBTC: 0.0150, power: 3.5 }
-        ];
+        const PLAN_DATA = RIGS.map(r=>({name:r.tag,price:r.price,hash:parseFloat(r.hash),dailyBTC:r.daily,power:parseFloat(r.power)}));
+        let selectedPlanIndex = 0;
 
         function selectPlan(idx){
             const plan = PLAN_DATA[idx];
+            if(!plan) return;
+            selectedPlanIndex=idx;
             const dailyBTC = plan.dailyBTC;
             const dailyUSD = dailyBTC * btcPrice;
             const monthlyBTC = dailyBTC * 30;
@@ -5188,9 +5202,10 @@ html.bv-session-restoring body{background:#020812!important}
             document.getElementById('planDaily').textContent = dailyBTC.toFixed(5) + ' BTC';
             document.getElementById('planMonthly').textContent = monthlyBTC.toFixed(4) + ' BTC';
             document.getElementById('planYearly').textContent = yearlyBTC.toFixed(3) + ' BTC';
-            document.getElementById('planMonthlyUSD').textContent = '~$' + Math.round(monthlyUSD).toLocaleString();
-            document.getElementById('planYearlyUSD').textContent = '~$' + Math.round(yearlyUSD).toLocaleString();
-            document.getElementById('planROI').textContent = '~' + Math.ceil(roi) + ' months';
+            document.getElementById('planMonthlyUSD').textContent = btcPrice>0?'~$' + Math.round(monthlyUSD).toLocaleString():'Loading…';
+            document.getElementById('planYearlyUSD').textContent = btcPrice>0?'~$' + Math.round(yearlyUSD).toLocaleString():'Loading…';
+            document.getElementById('planROI').textContent = btcPrice>0?'~' + Math.ceil(roi) + ' months':'—';
+            updateCalcResults();
 
             document.querySelectorAll('.plan-btn').forEach((btn,i) => {
                 if(i===idx){
@@ -5315,12 +5330,12 @@ html.bv-session-restoring body{background:#020812!important}
             const priceEl = document.getElementById('calcPrice');
             const dailyEl = document.getElementById('calcDailyUsd');
             const monthlyEl = document.getElementById('calcMonthlyUsd');
-            if (priceEl) priceEl.textContent = '$' + btcPrice.toLocaleString('en-US', {maximumFractionDigits:0});
-            // Use Elite plan daily (0.0150 BTC)
-            const dailyUsd = 0.0150 * btcPrice;
+            if (priceEl) priceEl.textContent = btcPrice>0?'$' + btcPrice.toLocaleString('en-US', {maximumFractionDigits:0}):'Loading…';
+            const selectedPlan=PLAN_DATA[selectedPlanIndex]||PLAN_DATA[0];
+            const dailyUsd = selectedPlan.dailyBTC * btcPrice;
             const monthlyUsd = dailyUsd * 30;
-            if (dailyEl) dailyEl.textContent = '~$' + Math.round(dailyUsd).toLocaleString();
-            if (monthlyEl) monthlyEl.textContent = '~$' + Math.round(monthlyUsd).toLocaleString();
+            if (dailyEl) dailyEl.textContent = btcPrice>0?'~$' + Math.round(dailyUsd).toLocaleString():'—';
+            if (monthlyEl) monthlyEl.textContent = btcPrice>0?'~$' + Math.round(monthlyUsd).toLocaleString():'—';
         }
         // Run once on load
         setTimeout(updateCalculator, 1500);
