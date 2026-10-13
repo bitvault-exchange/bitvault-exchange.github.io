@@ -2585,6 +2585,14 @@ html.bv-session-restoring body{background:#020812!important}
 .bv-address-step.active span{color:#8e67ff}
 .bv-address-note{display:flex;text-align:left;gap:12px;align-items:center;margin-top:14px;padding:13px;border:1px solid rgba(108,76,191,.2);border-radius:13px;background:rgba(76,48,135,.11);color:#c8bcf7;font-size:.72rem;line-height:1.45}
 .bv-address-note i{color:#956bff;font-size:1.15rem}
+.bv-deposit-choice{height:64px;padding:0 18px!important;font-size:.95rem!important;display:flex!important;align-items:center;justify-content:center;gap:11px;border:0!important;border-radius:12px!important;font-weight:900!important;color:#fff!important;box-shadow:0 10px 25px rgba(0,0,0,.22);cursor:pointer}
+.bv-deposit-choice.usdt{background:linear-gradient(135deg,#26a17b,#16b991)!important}
+.bv-deposit-choice.btc{background:linear-gradient(135deg,#f7931a,#ffad32)!important}
+.bv-deposit-choice.bnb{background:linear-gradient(135deg,#f3ba2f,#ffd35a)!important;color:#111!important}
+.bv-deposit-choice.sol{background:linear-gradient(135deg,#7200a8 0%,#111b45 52%,#04cfa5 100%)!important}
+.bv-deposit-brand-logo{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:0 0 40px;background:rgba(6,10,22,.88);border:1px solid rgba(255,255,255,.28)}
+.bv-deposit-choice.bnb .bv-deposit-brand-logo{background:#111;border-color:#111}
+.bv-deposit-brand-logo svg{width:26px;height:26px;display:block}
 .bv-ready-screen{border-color:rgba(0,224,151,.32)!important}
 .bv-ready-screen .bv-address-screen{padding-top:24px}
 .bv-success-scene{position:relative;width:230px;height:175px;margin:10px auto 4px}
@@ -4726,16 +4734,37 @@ html.bv-session-restoring body{background:#020812!important}
                     <h3>Choose Deposit Address</h3>
                     <div class="lead">Select the cryptocurrency address you want to generate.</div>
                     <div style="display:grid;gap:14px;margin:30px 0 22px;">
-                        <button class="btn btn-primary" onclick="startDepositAddress('USDT')" style="padding:17px 18px;font-size:.95rem;"><i class="fas fa-dollar-sign"></i>&nbsp; Generate USDT Address</button>
-                        <button class="btn btn-gold" onclick="startDepositAddress('BTC')" style="padding:17px 18px;font-size:.95rem;"><i class="fab fa-bitcoin"></i>&nbsp; Generate BTC Address</button>
+                        <button class="bv-deposit-choice usdt" onclick="startDepositAddress('USDT')">${depositBrandLogo('USDT','button')}<span>Generate USDT Address</span></button>
+                        <button class="bv-deposit-choice btc" onclick="startDepositAddress('BTC')">${depositBrandLogo('BTC','button')}<span>Generate BTC Address</span></button>
+                        <button class="bv-deposit-choice bnb" onclick="startDepositAddress('BNB')">${depositBrandLogo('BNB','button')}<span>Generate BNB Address</span></button>
+                        <button class="bv-deposit-choice sol" onclick="startDepositAddress('SOL')">${depositBrandLogo('SOL','button')}<span>Generate SOL Address</span></button>
                     </div>
                     <div class="bv-address-note"><i class="fas fa-shield-halved"></i><span>Always confirm the cryptocurrency and network before sending funds.</span></div>
                     <button class="bv-done-btn" onclick="closeModal()">Cancel</button>
                 </div>`;
         }
 
+        function depositBrandLogo(asset,placement='loading'){
+            const button=placement==='button';
+            const wrapClass=button?'bv-deposit-brand-logo':'bv-deposit-brand-logo bv-loading-brand-logo';
+            const wrapStyle=button?'':'width:72px;height:72px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:#090d1d;';
+            const svgStyle=button?'':'width:58px;height:58px;display:block;filter:drop-shadow(0 0 7px rgba(255,255,255,.16));';
+            if(asset==='USDT')return `<span class="${wrapClass} usdt" style="${wrapStyle}"><svg aria-label="USDT" viewBox="0 0 32 32" style="${svgStyle}"><circle cx="16" cy="16" r="15" fill="#26A17B"/><path fill="#fff" d="M17.8 17.25v-.01c-.11.01-.67.04-1.91.04-.99 0-1.68-.03-1.93-.04v.01c-3.8-.17-6.64-.83-6.64-1.62s2.84-1.45 6.64-1.62v2.58c.25.02.96.06 1.95.06 1.18 0 1.77-.05 1.89-.06v-2.58c3.79.17 6.62.83 6.62 1.62s-2.83 1.45-6.62 1.62zm0-3.51v-2.31h5.29V7.91H8.68v3.52h5.28v2.31c-4.3.2-7.54 1.05-7.54 2.08s3.24 1.88 7.54 2.08v7.4h3.84v-7.4c4.29-.2 7.52-1.05 7.52-2.08s-3.23-1.88-7.52-2.08z"/></svg></span>`;
+            if(asset==='BTC')return `<span class="${wrapClass} btc" style="${wrapStyle}"><svg aria-label="Bitcoin" viewBox="0 0 32 32" style="${svgStyle}"><circle cx="16" cy="16" r="15" fill="#F7931A"/><path fill="#fff" d="M22.9 13.1c.3-2.1-1.3-3.2-3.5-3.9l.7-2.8-1.7-.4-.7 2.7-1.4-.3.7-2.7-1.7-.4-.7 2.8-3.5-.9-.5 1.9 1.3.3c.7.2.9.7.8 1.1l-2 7.8c-.1.3-.4.8-1.2.6l-1.3-.3-.9 2.1 3.5.9-.7 2.8 1.7.4.7-2.8 1.4.4-.7 2.8 1.7.4.7-2.8c3 .6 5.2.3 6.1-2.4.8-2.2 0-3.5-1.6-4.4 1.4-.3 2.5-1.2 2.8-2.9zm-5 6.3c-.5 2.2-4.2 1-5.4.7l1-3.9c1.2.3 5 .9 4.4 3.2zm.6-6.3c-.5 2-3.6 1-4.6.7l.9-3.5c1 .2 4.2.7 3.7 2.8z"/></svg></span>`;
+            if(asset==='BNB')return `<span class="${wrapClass} bnb" style="${wrapStyle}"><svg aria-label="BNB" viewBox="0 0 32 32" style="${svgStyle}"><g fill="#F3BA2F"><path d="M16 3.6l5.05 5.05-2.93 2.93L16 9.46l-2.12 2.12-2.93-2.93L16 3.6z"/><path d="M8.65 10.95l2.93 2.93L9.46 16l2.12 2.12-2.93 2.93L3.6 16l5.05-5.05z"/><path d="M23.35 10.95L28.4 16l-5.05 5.05-2.93-2.93L22.54 16l-2.12-2.12 2.93-2.93z"/><path d="M16 12.12L19.88 16 16 19.88 12.12 16 16 12.12z"/><path d="M13.88 20.42L16 22.54l2.12-2.12 2.93 2.93L16 28.4l-5.05-5.05 2.93-2.93z"/></g></svg></span>`;
+            if(asset==='SOL')return `<span class="${wrapClass} sol" style="${wrapStyle}"><svg aria-label="Solana" viewBox="0 0 32 32" style="${svgStyle}"><defs><linearGradient id="solBrandGradient" x1="5" y1="27" x2="27" y2="5" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9945FF"/><stop offset=".5" stop-color="#14F195"/><stop offset="1" stop-color="#00D1FF"/></linearGradient></defs><path fill="url(#solBrandGradient)" d="M8.35 5.8c.28-.28.67-.44 1.07-.44h16.1c.67 0 1.01.81.54 1.28l-3.18 3.18c-.28.28-.67.44-1.07.44H5.71c-.67 0-1.01-.81-.54-1.28L8.35 5.8zM23.65 13.55c-.28-.28-.67-.44-1.07-.44H6.48c-.67 0-1.01.81-.54 1.28l3.18 3.18c.28.28.67.44 1.07.44h16.1c.67 0 1.01-.81.54-1.28l-3.18-3.18zM8.35 21.3c.28-.28.67-.44 1.07-.44h16.1c.67 0 1.01.81.54 1.28l-3.18 3.18c-.28.28-.67.44-1.07.44H5.71c-.67 0-1.01-.81-.54-1.28l3.18-3.18z"/></svg></span>`;
+            return '';
+        }
+
         function startDepositAddress(asset){
-            asset=asset==='USDT'?'USDT':'BTC';
+            const depositAssets={
+                BTC:{symbol:'₿',network:'Bitcoin'},
+                USDT:{symbol:'₮',network:'Ethereum'},
+                BNB:{symbol:'B',network:'BNB Smart Chain'},
+                SOL:{symbol:'◎',network:'Solana'}
+            };
+            asset=depositAssets[asset]?asset:'BTC';
+            const assetInfo=depositAssets[asset];
             const overlay=document.getElementById('modalOverlay'),content=document.getElementById('modalContent');
             if(!overlay||!content)return toast('Deposit window is unavailable','error');
 
@@ -4751,11 +4780,11 @@ html.bv-session-restoring body{background:#020812!important}
                         <div class="bv-orbit-ring r3"></div>
                         <span class="bv-orbit-dot d1"></span><span class="bv-orbit-dot d2"></span><span class="bv-orbit-dot d3"></span>
                         <div class="bv-coin-platform"></div>
-                        <div class="bv-btc-coin">${asset==='BTC'?'₿':'₮'}</div>
+                        <div class="bv-btc-coin">${asset==='BNB'||asset==='SOL'?depositBrandLogo(asset,'loading'):assetInfo.symbol}</div>
                     </div>
 
                     <div class="bv-address-steps">
-                        <div class="bv-address-step active" data-address-step="0"><span class="ico"></span><div><strong>Connecting to ${asset==='BTC'?'Bitcoin':'Ethereum'} network</strong><span>In progress</span></div><i class="fas fa-ellipsis"></i></div>
+                        <div class="bv-address-step active" data-address-step="0"><span class="ico"></span><div><strong>Connecting to ${assetInfo.network} network</strong><span>In progress</span></div><i class="fas fa-ellipsis"></i></div>
                         <div class="bv-address-step" data-address-step="1"><span class="ico"><i class="fas fa-lock"></i></span><div><strong>Fetching available addresses</strong><span>Pending</span></div></div>
                         <div class="bv-address-step" data-address-step="2"><span class="ico"><i class="fas fa-lock"></i></span><div><strong>Securing your wallet</strong><span>Pending</span></div></div>
                         <div class="bv-address-step" data-address-step="3"><span class="ico"><i class="fas fa-lock"></i></span><div><strong>Finalizing and encrypting</strong><span>Pending</span></div></div>
@@ -4788,7 +4817,10 @@ html.bv-session-restoring body{background:#020812!important}
 
             setTimeout(()=>{
                 if(!overlay.classList.contains('active'))return;
-                if(asset==='USDT')showUsdtAddressReady();else showBtcAddressReady();
+                if(asset==='USDT')showUsdtAddressReady();
+                else if(asset==='BNB')showBnbAddressReady();
+                else if(asset==='SOL')showSolAddressReady();
+                else showBtcAddressReady();
             },3250);
         }
 
@@ -4849,8 +4881,50 @@ html.bv-session-restoring body{background:#020812!important}
             copyButtons.forEach(btn=>btn.setAttribute('onclick','copyUsdtWallet()'));
             if(warning)warning.innerHTML='<strong>Important</strong>Send only USDT through the Ethereum (ERC-20) network to this address.<br>Using another network or token may result in permanent loss.';
         }
+        function showBnbAddressReady(){
+            showBtcAddressReady();
+            const content=document.getElementById('modalContent');
+            if(!content)return;
+            const address='0x67aa28959828498D49f1ba5cbfE7333fB70bB1c6';
+            const title=content.querySelector('.bv-address-screen h3');
+            const label=content.querySelector('.bv-wallet-address-label');
+            const value=content.querySelector('.bv-address-value');
+            const qr=content.querySelector('.bv-wallet-qr');
+            const warning=content.querySelector('.bv-ready-warning div');
+            if(title)title.textContent='BNB Address Ready!';
+            if(label)label.textContent='Your BNB Wallet Address (BEP-20)';
+            if(value)value.textContent=address;
+            if(qr){
+                qr.src='https://api.qrserver.com/v1/create-qr-code/?size=320x320&data='+encodeURIComponent(address);
+                qr.alt='QR code for BNB Smart Chain BEP-20 deposit address '+address;
+            }
+            content.querySelectorAll('.bv-copy-mini,.bv-copy-main').forEach(btn=>btn.setAttribute('onclick','copyBnbWallet()'));
+            if(warning)warning.innerHTML='<strong>Important</strong>Send only BNB through the BNB Smart Chain (BEP-20) network to this address.<br>Using another network or token may result in permanent loss.';
+        }
+        function showSolAddressReady(){
+            showBtcAddressReady();
+            const content=document.getElementById('modalContent');
+            if(!content)return;
+            const address='G71Yw52ynWxeMVhpRJwpY6WumXGtQdgUtMfJzSmKqGiY';
+            const title=content.querySelector('.bv-address-screen h3');
+            const label=content.querySelector('.bv-wallet-address-label');
+            const value=content.querySelector('.bv-address-value');
+            const qr=content.querySelector('.bv-wallet-qr');
+            const warning=content.querySelector('.bv-ready-warning div');
+            if(title)title.textContent='SOL Address Ready!';
+            if(label)label.textContent='Your SOL Wallet Address (Solana)';
+            if(value)value.textContent=address;
+            if(qr){
+                qr.src='https://api.qrserver.com/v1/create-qr-code/?size=320x320&data='+encodeURIComponent('solana:'+address);
+                qr.alt='QR code for Solana deposit address '+address;
+            }
+            content.querySelectorAll('.bv-copy-mini,.bv-copy-main').forEach(btn=>btn.setAttribute('onclick','copySolWallet()'));
+            if(warning)warning.innerHTML='<strong>Important</strong>Send only SOL through the Solana network to this address.<br>Using another network or token may result in permanent loss.';
+        }
         function copyBtcWallet(){ navigator.clipboard.writeText('bc1qqm7rwsq5yzny6cz6w2ex60ygx6ux520wyd4f29'); toast('BTC address copied','success'); }
         function copyUsdtWallet(){ navigator.clipboard.writeText('0x6F978B2Ae8cC3946EbeCb3D4b22dF8623ffF1ac9'); toast('USDT ERC-20 address copied','success'); }
+        function copyBnbWallet(){ navigator.clipboard.writeText('0x67aa28959828498D49f1ba5cbfE7333fB70bB1c6'); toast('BNB BEP-20 address copied','success'); }
+        function copySolWallet(){ navigator.clipboard.writeText('G71Yw52ynWxeMVhpRJwpY6WumXGtQdgUtMfJzSmKqGiY'); toast('Solana address copied','success'); }
         async function processDeposit(){const amt=parseFloat(document.getElementById('depAmount').value);if(!amt||amt<=0)return toast('Enter valid amount','error');try{await secureApi('/deposit-requests',{method:'POST',body:{amount:amt}});closeModal();toast('Deposit request submitted for verification','success');}catch(e){toast(e.message,'error');}}
         async function processStudentWithdraw(){
             const amt=parseFloat(document.getElementById('witBtcAmount')?.value);
