@@ -5222,6 +5222,7 @@ html.bv-session-restoring body{background:#020812!important}
             { type: 'Deposited', color: 'green', icon: 'fa-arrow-down', min: 800, max: 60000 },
             { type: 'Deployed Rigs', color: 'blue', icon: 'fa-server', prices: [2000,3500,5000,8500,10000,20000] }
         ];
+        const FEED_DEPOSIT_ASSETS = ['BTC','USDT','BNB','SOL'];
         let fakeFeedData = [];
         let landingFeedExpanded = false;
 
@@ -5245,7 +5246,10 @@ html.bv-session-restoring body{background:#020812!important}
                 const amount = actionObj.prices ? actionObj.prices[Math.floor(Math.random()*actionObj.prices.length)] : Math.floor(Math.random() * (actionObj.max - actionObj.min) + actionObj.min);
                 const minutesAgo = Math.floor(Math.random() * 55 + 1);
                 const date = now - (minutesAgo * 60000);
-                fakeFeedData.push({ name, action: actionObj, amount, date, country });
+                const depositAsset = actionObj.type === 'Deposited'
+                    ? FEED_DEPOSIT_ASSETS[Math.floor(Math.random() * FEED_DEPOSIT_ASSETS.length)]
+                    : null;
+                fakeFeedData.push({ name, action: actionObj, amount, date, country, depositAsset });
             }
             fakeFeedData.sort((a,b) => b.date - a.date);
 
@@ -5254,7 +5258,7 @@ html.bv-session-restoring body{background:#020812!important}
                 const initial = tx.name.substring(0,1).toUpperCase();
                 const timeStr = timeAgo(tx.date);
                 const rigNames={2000:'Starter',3500:'Builder',5000:'Growth',8500:'Industrial',10000:'Power',20000:'Enterprise'};
-                const depositAsset=tx.amount%2===0?'USDT':'BTC';
+                const depositAsset=tx.depositAsset||'USDT';
                 const actionText = tx.action.type === 'Withdraw' ? 'Withdrawal' :
                                    tx.action.type === 'Deposited' ? `${depositAsset} Deposit` : `Deployed ${rigNames[tx.amount]||'Mining'} Rig`;
                 const actionIcon = tx.action.type === 'Deployed Rigs' ? 'fa-server' :
